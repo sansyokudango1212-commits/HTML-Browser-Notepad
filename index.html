@@ -67,7 +67,6 @@
     <span onclick="newFile()">新規</span>
     <span onclick="openFile()">開く</span>
     <span onclick="saveFile()">保存</span>
-    <span onclick="saveFileAs()">名前を付けて保存</span>
     <span onclick="toggleOptions()">オプション</span>
   </header>
 
@@ -117,18 +116,15 @@
     }
 
     async function saveFile() {
-      if (!fileHandle) return saveFileAs();
+      if (!fileHandle) {
+        fileHandle = await window.showSaveFilePicker({
+          suggestedName: "memo.txt",
+          types: [{ description: "Text Files", accept: { "text/plain": [".txt"] } }]
+        });
+      }
       const writable = await fileHandle.createWritable();
       await writable.write(editor.value);
       await writable.close();
-    }
-
-    async function saveFileAs() {
-      fileHandle = await window.showSaveFilePicker({
-        suggestedName: "memo.txt",
-        types: [{ description: "Text Files", accept: { "text/plain": [".txt"] } }]
-      });
-      saveFile();
     }
 
     function loadFile(event) {
