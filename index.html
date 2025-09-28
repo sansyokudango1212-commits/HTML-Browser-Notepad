@@ -66,7 +66,7 @@
 <body>
   <header>
     <span onclick="newFile()">新規</span>
-    <span onclick="openFile()">開く</span>
+    <span onclick="document.getElementById('fileInput').click()">開く</span>
     <span onclick="saveFile()">保存</span>
     <span onclick="toggleOptions()">オプション</span>
   </header>
@@ -89,7 +89,6 @@
   <input type="file" id="fileInput" accept=".txt" style="display:none" onchange="loadFile(event)">
 
   <script>
-    let fileHandle = null;
     const editor = document.getElementById("editor");
     const options = document.getElementById("options");
 
@@ -102,30 +101,8 @@
       editor.style.fontFamily = font;
     }
 
-    async function newFile() {
+    function newFile() {
       editor.value = "";
-      fileHandle = null;
-    }
-
-    async function openFile() {
-      [fileHandle] = await window.showOpenFilePicker({
-        types: [{ description: "Text Files", accept: { "text/plain": [".txt"] } }]
-      });
-      const file = await fileHandle.getFile();
-      const contents = await file.text();
-      editor.value = contents;
-    }
-
-    async function saveFile() {
-      if (!fileHandle) {
-        fileHandle = await window.showSaveFilePicker({
-          suggestedName: "memo.txt",
-          types: [{ description: "Text Files", accept: { "text/plain": [".txt"] } }]
-        });
-      }
-      const writable = await fileHandle.createWritable();
-      await writable.write(editor.value);
-      await writable.close();
     }
 
     function loadFile(event) {
@@ -134,6 +111,20 @@
       const reader = new FileReader();
       reader.onload = e => editor.value = e.target.result;
       reader.readAsText(file);
+    }
+
+    function saveFile() {
+      const blob = new Blob([editor.value], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "memo.txt";
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a); document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
     }
   </script>
 </body>
