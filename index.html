@@ -171,25 +171,33 @@
       let browser = "不明なブラウザ";
 
       try {
-        if (navigator.brave && navigator.brave.isBrave) {
-          if (await navigator.brave.isBrave()) browser = "Brave";
-        }
-      } catch (e) {}
-
-      if (browser === "不明なブラウザ") {
-        if (ua.includes("Edg")) browser = "Microsoft Edge";
-        else if (ua.includes("OPR") || ua.includes("Opera")) browser = "Opera";
-        else if (ua.includes("Firefox")) browser = "Mozilla Firefox";
-        else if (ua.includes("Safari") && !ua.includes("Chrome")) browser = "Safari";
-        else if (ua.includes("Chrome")) browser = "Google Chrome";
-        else if (ua.includes("NetFront")) browser = "NetFront";
-        else if (ua.includes("AppleWebKit")) browser = "WebKit";
-      }
-
-      document.getElementById("browser-info").textContent = browser;
+      if (navigator.brave && navigator.brave.isBrave) {
+        if (await navigator.brave.isBrave()) browser = "Brave";
     }
+  } catch (e) {}
 
-    detectBrowser();
+  if (browser === "不明なブラウザ") {
+    if (ua.includes("Edg")) {
+      browser = "Microsoft Edge";
+    } else if (ua.includes("OPR") || ua.includes("Opera")) {
+      browser = "Opera";
+    } else if (ua.includes("Firefox")) {
+      browser = "Mozilla Firefox";
+    } else if (ua.includes("Safari") && !ua.includes("Chrome")) {
+      browser = "Safari";
+    } else if (ua.includes("Chrome")) {
+      browser = "Google Chrome";
+    } else if (ua.includes("NetFront")) {
+      browser = "NetFront";
+    } else if (ua.includes("AppleWebKit")) {
+      browser = "WebKit";
+    }
+  }
+
+  document.getElementById("browser-info").textContent = browser;
+}
+
+detectBrowser();
   </script>
 </body>
 </html>
