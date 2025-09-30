@@ -14,6 +14,7 @@
       flex-direction: column;
       height: 100vh;
     }
+
     header {
       background: #2d2d2d;
       padding: 4px 10px;
@@ -23,15 +24,18 @@
       user-select: none;
       color: #ccc;
     }
+
     header span {
       cursor: pointer;
       padding: 2px 6px;
       border-radius: 4px;
     }
+
     header span:hover {
       background: #444;
       color: white;
     }
+
     #options {
       display: none;
       background: #2d2d2d;
@@ -39,6 +43,7 @@
       font-size: 14px;
       color: #ccc;
     }
+
     textarea {
       flex: 1;
       width: 100%;
@@ -53,6 +58,7 @@
       line-height: 1.5;
       font-family: "Segoe UI", "Meiryo", monospace;
     }
+
     footer {
       background: #2d2d2d;
       padding: 5px 10px;
@@ -60,6 +66,12 @@
       color: #aaa;
       display: flex;
       justify-content: flex-start;
+    }
+
+    @media (max-width: 600px) {
+      footer {
+        justify-content: center;
+      }
     }
   </style>
 </head>
@@ -74,16 +86,18 @@
   <div id="options">
     フォント：
     <select id="fontSelect" onchange="changeFont()">
-      <option value='"Verdana", sans-serif'>Verdana</option>
-      <option value='"Georgia", serif'>Georgia</option>
-      <option value='"Arial", sans-serif'>Arial</option>
+      <option value='"Noto Sans JP", "Segoe UI", sans-serif'>Noto Sans JP</option>
+      <option value='"Noto Serif JP", "Times New Roman", serif'>Noto Serif JP</option>
+      <option value='"Meiryo", "Segoe UI", sans-serif'>メイリオ</option>
+      <option value='"Yu Gothic", "Segoe UI", sans-serif'>游ゴシック</option>
+      <option value='arial, "Segoe UI", sans-serif'>Arial</option>
     </select>
   </div>
 
   <textarea id="editor" placeholder="ここに入力..."></textarea>
 
   <footer>
-    <span>HTMLメモ帳</span>
+    <span id="browser-info">不明</span>
   </footer>
 
   <input type="file" id="fileInput" accept=".txt" style="display:none" onchange="loadFile(event)">
@@ -91,41 +105,91 @@
   <script>
     const editor = document.getElementById("editor");
     const options = document.getElementById("options");
+    const fontSelect = document.getElementById("fontSelect");
 
     function toggleOptions() {
       options.style.display = options.style.display === "none" ? "block" : "none";
     }
 
     function changeFont() {
-      const font = document.getElementById("fontSelect").value;
-      editor.style.fontFamily = font;
+      editor.style.fontFamily = fontSelect.value;
     }
 
     function newFile() {
       editor.value = "";
+      editor.style.fontFamily = '"Segoe UI", "Meiryo", monospace';
+      fontSelect.value = '"Meiryo", "Segoe UI", sans-serif';
     }
 
     function loadFile(event) {
       const file = event.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = e => editor.value = e.target.result;
+      reader.onload = function(e) {
+        let content = e.target.result.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+        // フォント指定を取得
+        const fontMatch = content.match(/##FONT:(.+)$/m);
+        if (fontMatch) {
+          const font = fontMatch[1].trim();
+          // 選択肢にあるか確認
+          const optionExists = Array.from(fontSelect.options).some(opt => opt.value === font);
+          editor.style.fontFamily = optionExists ? font : '"Segoe UI", "Meiryo", monospace';
+          if (optionExists) fontSelect.value = font;
+        } else {
+          // フォント指定がない場合はデフォルト
+          editor.style.fontFamily = '"Segoe UI", "Meiryo", monospace';
+          fontSelect.value = '"Meiryo", "Segoe UI", sans-serif';
+        }
+
+        // フォント行を削除して表示
+        content = content.replace(/##FONT:.+$/m, '').trimEnd();
+        editor.value = content;
+      };
       reader.readAsText(file);
+      event.target.value = "";
     }
 
     function saveFile() {
-      const blob = new Blob([editor.value], { type: "text/plain" });
+      const font = fontSelect.value;
+      const body = editor.value.trimEnd();
+      const includeFont = confirm("フォント情報ありで保存しますか？");
+      const content = includeFont ? body + "\n\n##FONT:" + font + "\n" : body + "\n";
+      const blob = new Blob([content], { type: "text/plain" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
       a.download = "memo.txt";
       document.body.appendChild(a);
       a.click();
-      setTimeout(() => {
-        document.body.removeChild(a); document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }, 100);
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 100);
     }
+
+    async function detectBrowser() {
+      const ua = navigator.userAgent;
+      let browser = "不明なブラウザ";
+
+      try {
+        if (navigator.brave && navigator.brave.isBrave) {
+          if (await navigator.brave.isBrave()) browser = "Brave";
+        }
+      } catch (e) {}
+
+      if (browser === "不明なブラウザ") {
+        if (ua.includes("Edg")) browser = "Microsoft Edge";
+        else if (ua.includes("OPR") || ua.includes("Opera")) browser = "Opera";
+        else if (ua.includes("Firefox")) browser = "Mozilla Firefox";
+        else if (ua.includes("Safari") && !ua.includes("Chrome")) browser = "Safari";
+        else if (ua.includes("Chrome")) browser = "Google Chrome";
+        else if (ua.includes("NetFront")) browser = "NetFront";
+        else if (ua.includes("AppleWebKit")) browser = "WebKit";
+      }
+
+      document.getElementById("browser-info").textContent = browser;
+    }
+
+    detectBrowser();
   </script>
 </body>
 </html>
