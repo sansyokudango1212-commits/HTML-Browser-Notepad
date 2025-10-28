@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
   <meta charset="UTF-8">
   <title>HTMLブラウザメモ帳</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale:1.0">
   <style>
     body {
       margin: 0;
@@ -38,11 +37,42 @@
     }
 
     #options {
-      display: none;
       background: #2d2d2d;
-      padding: 5px 10px;
       font-size: 14px;
       color: #ccc;
+      display: flex;
+      flex-direction: column; 
+      gap: 5px; 
+      
+      max-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      padding-left: 10px; 
+      padding-right: 10px;
+      overflow: hidden; 
+      
+      transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out; 
+    }
+    
+    .show-options {
+        max-height: 100px !important; 
+        padding-top: 5px !important;
+        padding-bottom: 5px !important;
+    }
+
+    #options > div {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .option-label {
+        width: 70px; 
+        margin-left: 5px; 
+    }
+
+    textarea::placeholder {
+        color: #888;
     }
 
     textarea {
@@ -51,7 +81,6 @@
       border: none;
       outline: none;
       padding: 10px;
-      font-size: 14px;
       resize: none;
       box-sizing: border-box;
       background: #1e1e1e;
@@ -84,18 +113,41 @@
     <span onclick="toggleOptions()">オプション</span>
   </header>
 
-  <div id="options">
-    フォント：
-    <select id="fontSelect" onchange="changeFont()">
-      <option value='"Noto Sans JP", "Segoe UI", sans-serif'>Noto Sans JP</option>
-      <option value='"Noto Serif JP", "Times New Roman", serif'>Noto Serif JP</option>
-      <option value='"Meiryo", "Segoe UI", sans-serif'>メイリオ</option>
-      <option value='"Yu Gothic", "Segoe UI", sans-serif'>游ゴシック</option>
-      <option value='arial, "Segoe UI", sans-serif'>Arial</option>
-    </select>
+  <div id="options"> 
+    <div>
+      <span class="option-label">フォント：</span>
+      <select id="fontSelect" onchange="changeFont()">
+        <option value='"Noto Sans JP", "Segoe UI", sans-serif'>Noto Sans JP</option>
+        <option value='"Noto Serif JP", "Times New Roman", serif'>Noto Serif JP</option>
+        <option value='"Meiryo", "Segoe UI", sans-serif' selected>メイリオ</option>
+        <option value='"Yu Gothic", "Segoe UI", sans-serif'>游ゴシック</option>
+        <option value='arial, "Segoe UI", sans-serif'>Arial</option>
+      </select>
+    </div>
+    
+    <div>
+      <span class="option-label">サイズ：</span>
+      <select id="sizeSelect" onchange="changeFontSize()">
+        <option value="8">8px</option>
+        <option value="10">10px</option>
+        <option value="12">12px</option>
+        <option value="14" selected>14px</option>
+        <option value="16">16px</option>
+        <option value="18">18px</option>
+        <option value="20">20px</option>
+        <option value="24">24px</option>
+        <option value="28">28px</option>
+        <option value="32">32px</option>
+        <option value="36">36px</option>
+        <option value="40">40px</option>
+        <option value="44">44px</option>
+        <option value="48">48px</option>
+        <option value="50">50px</option>
+      </select>
+    </div>
   </div>
 
-  <textarea id="editor" placeholder="ここに入力..."></textarea>
+  <textarea id="editor" placeholder=""></textarea>
 
   <footer>
     <span id="browser-info">不明</span>
@@ -107,44 +159,138 @@
     const editor = document.getElementById("editor");
     const options = document.getElementById("options");
     const fontSelect = document.getElementById("fontSelect");
+    const sizeSelect = document.getElementById("sizeSelect"); 
+
+    const MIN_FONT_SIZE = 8;
+    const MAX_FONT_SIZE = 50;
+    const FONT_SIZE_STEP = 2; 
+
+    const placeholderText = [
+        "ここに入力...",
+        "アイデアを書き留めよう",
+        "テキストを開いて作業を再開しよう",
+        "気分転換フォント変更"
+    ];
+    let currentTextIndex = 0;
+    let currentCharIndex = 0;
+    let isDeleting = false;
+    let typeSpeed = 150; 
+    let deleteSpeed = 100; 
+    let delayBetweenTexts = 2000; 
+    let typeTimeout; 
+
+    function typeAnimation() {
+        if (typeTimeout) clearTimeout(typeTimeout);
+
+        if (document.activeElement === editor) {
+            editor.placeholder = "ここに入力..."; 
+            typeTimeout = setTimeout(typeAnimation, 5000);
+            return;
+        }
+
+        const currentText = placeholderText[currentTextIndex];
+        let displayedText;
+        
+        let timeout;
+
+        if (isDeleting) {
+            displayedText = currentText.substring(0, currentCharIndex - 1);
+            currentCharIndex--;
+            timeout = deleteSpeed;
+        } else {
+            displayedText = currentText.substring(0, currentCharIndex + 1);
+            currentCharIndex++;
+            timeout = typeSpeed;
+        }
+
+        editor.placeholder = displayedText + "|";
+
+
+        if (!isDeleting && currentCharIndex === currentText.length) {
+            timeout = delayBetweenTexts; 
+            isDeleting = true; 
+            
+            blinkCursor(displayedText, 4); 
+            return; 
+        } else if (isDeleting && currentCharIndex === 0) {
+            isDeleting = false;
+            currentTextIndex = (currentTextIndex + 1) % placeholderText.length;
+            timeout = typeSpeed / 2; 
+        }
+
+        typeTimeout = setTimeout(typeAnimation, timeout);
+    }
+
+    function blinkCursor(text, count) {
+        if (count <= 0) {
+            typeTimeout = setTimeout(typeAnimation, deleteSpeed); 
+            editor.placeholder = text; 
+            return;
+        }
+        
+        if (editor.placeholder.endsWith("|")) {
+            editor.placeholder = text;
+        } else {
+            editor.placeholder = text + "|";
+        }
+        
+        setTimeout(() => blinkCursor(text, count - 1), 500); 
+    }
+
+    function initializeEditor() {
+      editor.style.fontFamily = '"Segoe UI", "Meiryo", monospace';
+      editor.style.fontSize = "14px";
+      fontSelect.value = '"Meiryo", "Segoe UI", sans-serif';
+      sizeSelect.value = "14";
+    }
 
     function toggleOptions() {
-      options.style.display = options.style.display === "none" ? "block" : "none";
+      options.classList.toggle("show-options");
     }
 
     function changeFont() {
       editor.style.fontFamily = fontSelect.value;
     }
+    
+    function changeFontSize() {
+      editor.style.fontSize = sizeSelect.value + "px";
+    }
 
     function newFile() {
       editor.value = "";
-      editor.style.fontFamily = '"Segoe UI", "Meiryo", monospace';
-      fontSelect.value = '"Meiryo", "Segoe UI", sans-serif';
+      initializeEditor(); 
     }
 
     function loadFile(event) {
       const file = event.target.files[0];
       if (!file) return;
+      
+      initializeEditor();
+
       const reader = new FileReader();
       reader.onload = function(e) {
         let content = e.target.result.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
-        // フォント指定を取得
         const fontMatch = content.match(/##FONT:(.+)$/m);
         if (fontMatch) {
           const font = fontMatch[1].trim();
-          // 選択肢にあるか確認
           const optionExists = Array.from(fontSelect.options).some(opt => opt.value === font);
           editor.style.fontFamily = optionExists ? font : '"Segoe UI", "Meiryo", monospace';
           if (optionExists) fontSelect.value = font;
-        } else {
-          // フォント指定がない場合はデフォルト
-          editor.style.fontFamily = '"Segoe UI", "Meiryo", monospace';
-          fontSelect.value = '"Meiryo", "Segoe UI", sans-serif';
         }
 
-        // フォント行を削除して表示
-        content = content.replace(/##FONT:.+$/m, '').trimEnd();
+        const sizeMatch = content.match(/##SIZE:(\d+)$/m);
+        if (sizeMatch) {
+          const size = parseInt(sizeMatch[1].trim());
+          if (size >= MIN_FONT_SIZE && size <= MAX_FONT_SIZE) {
+            editor.style.fontSize = size + "px";
+            if (Array.from(sizeSelect.options).some(opt => parseInt(opt.value) === size)) {
+              sizeSelect.value = size.toString();
+            }
+          }
+        }
+
+        content = content.replace(/##FONT:.+$/m, '').replace(/##SIZE:.+$/m, '').trimEnd();
         editor.value = content;
       };
       reader.readAsText(file);
@@ -153,10 +299,16 @@
 
     function saveFile() {
       const font = fontSelect.value;
+      const size = parseInt(editor.style.fontSize.replace('px', '')); 
       const body = editor.value.trimEnd();
-      const includeFont = confirm("フォント情報ありで保存しますか？");
-      const content = includeFont ? body + "\n\n##FONT:" + font + "\n" : body + "\n";
-      const blob = new Blob([content], { type: "text/plain" });
+      
+      let content = body + "\n\n";
+
+      content += "##FONT:" + font + "\n";
+      content += "##SIZE:" + size + "\n"; 
+      
+      const blob = new Blob([content.trimEnd() + "\n"], { type: "text/plain" });
+
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -166,40 +318,76 @@
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 100);
     }
+    
+    editor.addEventListener('wheel', function(e) {
+      if (e.ctrlKey) {
+        e.preventDefault(); 
+        
+        let currentSize = parseFloat(editor.style.fontSize);
+        let newSize;
+
+        if (e.deltaY < 0) {
+          newSize = currentSize + FONT_SIZE_STEP;
+        } else if (e.deltaY > 0) {
+          newSize = currentSize - FONT_SIZE_STEP;
+        } else {
+          return;
+        }
+        
+        if (newSize < MIN_FONT_SIZE) newSize = MIN_FONT_SIZE;
+        if (newSize > MAX_FONT_SIZE) newSize = MAX_FONT_SIZE;
+        
+        editor.style.fontSize = newSize + "px";
+        
+        const newSizeStr = newSize.toString();
+        const optionExists = Array.from(sizeSelect.options).some(opt => opt.value === newSizeStr);
+
+        if (optionExists) {
+            sizeSelect.value = newSizeStr;
+        } else if (sizeSelect.value) {
+        }
+      }
+    });
 
     async function detectBrowser() {
       const ua = navigator.userAgent;
       let browser = "不明なブラウザ";
 
       try {
-      if (navigator.brave && navigator.brave.isBrave) {
-        if (await navigator.brave.isBrave()) browser = "Brave";
+        if (navigator.brave && navigator.brave.isBrave) {
+          if (await navigator.brave.isBrave()) browser = "Brave";
+        }
+      } catch (e) {}
+
+      if (browser === "不明なブラウザ") {
+        if (ua.includes("Edg")) {
+          browser = "Microsoft Edge";
+        } else if (ua.includes("OPR") || ua.includes("Opera")) {
+          browser = "Opera";
+        } else if (ua.includes("Firefox")) {
+          browser = "Mozilla Firefox";
+        } else if (ua.includes("Safari") && !ua.includes("Chrome")) {
+          browser = "Safari";
+        } else if (ua.includes("Chrome")) {
+          browser = "Google Chrome";
+        } else if (ua.includes("NetFront")) {
+          browser = "NetFront";
+        } else if (ua.includes("AppleWebKit")) {
+          browser = "WebKit";
+        }
+      }
+
+      document.getElementById("browser-info").textContent = browser;
     }
-  } catch (e) {}
 
-  if (browser === "不明なブラウザ") {
-    if (ua.includes("Edg")) {
-      browser = "Microsoft Edge";
-    } else if (ua.includes("OPR") || ua.includes("Opera")) {
-      browser = "Opera";
-    } else if (ua.includes("Firefox")) {
-      browser = "Mozilla Firefox";
-    } else if (ua.includes("Safari") && !ua.includes("Chrome")) {
-      browser = "Safari";
-    } else if (ua.includes("Chrome")) {
-      browser = "Google Chrome";
-    } else if (ua.includes("NetFront")) {
-      browser = "NetFront";
-    } else if (ua.includes("AppleWebKit")) {
-      browser = "WebKit";
-    }
-  }
+    initializeEditor(); 
+    detectBrowser();
 
-  document.getElementById("browser-info").textContent = browser;
-}
+    setTimeout(typeAnimation, 500); 
 
-detectBrowser();
   </script>
 </body>
 </html>
+
+
 
