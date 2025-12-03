@@ -6,18 +6,13 @@
   <title>HTMLブラウザメモ帳（コンパクト版）</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* ----------------------------------- */
-    /* --- 全般・ライトモードスタイル --- */
-    /* ----------------------------------- */
     :root {
-      /* ライトモードのカラースキーム */
-      --color-background: #ffffff;  /* 白背景 */
-      --color-text: #333333;        /* 黒文字 */
-      --color-header-bg: #f0f0f0;   /* 明るいグレー */
-      --color-border: #ddd;          /* 区切り線 (今回は使用しません) */
-      --color-footer-text: #666;     /* グレー文字 */
-      --color-hover-bg: #ddd;        /* ホバー時 */
-      --color-placeholder: #aaa;     /* プレースホルダ */
+      --color-background: #ffffff; 
+      --color-text: #333333;        
+      --color-header-bg: #f0f0f0;   
+      --color-footer-text: #666;    
+      --color-hover-bg: #ddd;       
+      --color-placeholder: #aaa;    
     }
 
     body {
@@ -32,11 +27,9 @@
 
     header {
       background: var(--color-header-bg);
-      /* 修正点: 上下のパディングをさらに縮小 (8px -> 4px) */
       padding: 4px 10px; 
       display: flex;
       gap: 15px;
-      /* 修正点: 文字サイズを縮小 (14px -> 12px) */
       font-size: 12px;
       user-select: none;
       color: var(--color-text);
@@ -46,7 +39,6 @@
 
     header span {
       cursor: pointer;
-      /* 修正点: メニュー項目のホバーエリアのパディングを縮小 */
       padding: 1px 4px; 
       border-radius: 4px;
     }
@@ -129,12 +121,8 @@
       }
     }
     
-    /* ----------------------------------- */
-    /* --- ダークモードスタイル --- */
-    /* ----------------------------------- */
     @media (prefers-color-scheme: dark) {
       :root {
-        /* ダークモードのカラースキーム */
         --color-background: #1e1e1e;  
         --color-text: #f0f0f0;        
         --color-header-bg: #333333;   
@@ -214,7 +202,6 @@
     const FONT_SIZE_STEP = 2; 
 
     function initializeEditor() {
-      // エディタのフォントとサイズを初期化
       editor.style.fontFamily = '"Segoe UI", "Meiryo", monospace'; 
       editor.style.fontSize = "14px";
       fontSelect.value = '"Meiryo", "Segoe UI", sans-serif';
@@ -363,3 +350,4 @@
   </script>
 </body>
 </html>
+
