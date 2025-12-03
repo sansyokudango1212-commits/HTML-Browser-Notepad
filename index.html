@@ -3,44 +3,64 @@
 <head>
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <meta charset="UTF-8">
-  <title>HTMLブラウザメモ帳</title>
-  <meta name="viewport" content="width=device-width, initial-scale:1.0">
+  <title>HTMLブラウザメモ帳（コンパクト版）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    /* ----------------------------------- */
+    /* --- 全般・ライトモードスタイル --- */
+    /* ----------------------------------- */
+    :root {
+      /* ライトモードのカラースキーム */
+      --color-background: #ffffff;  /* 白背景 */
+      --color-text: #333333;        /* 黒文字 */
+      --color-header-bg: #f0f0f0;   /* 明るいグレー */
+      --color-border: #ddd;          /* 区切り線 (今回は使用しません) */
+      --color-footer-text: #666;     /* グレー文字 */
+      --color-hover-bg: #ddd;        /* ホバー時 */
+      --color-placeholder: #aaa;     /* プレースホルダ */
+    }
+
     body {
       margin: 0;
       font-family: "Segoe UI", "Meiryo", monospace;
-      background: #1e1e1e;
-      color: #e0e0e0;
+      background: var(--color-background);
+      color: var(--color-text);
       display: flex;
       flex-direction: column;
       height: 100vh;
     }
 
     header {
-      background: #2d2d2d;
-      padding: 4px 10px;
+      background: var(--color-header-bg);
+      /* 修正点: 上下のパディングをさらに縮小 (8px -> 4px) */
+      padding: 4px 10px; 
       display: flex;
       gap: 15px;
-      font-size: 14px;
+      /* 修正点: 文字サイズを縮小 (14px -> 12px) */
+      font-size: 12px;
       user-select: none;
-      color: #ccc;
+      color: var(--color-text);
+      /* 線は削除済み */
+      border-bottom: none;
     }
 
     header span {
       cursor: pointer;
-      padding: 2px 6px;
+      /* 修正点: メニュー項目のホバーエリアのパディングを縮小 */
+      padding: 1px 4px; 
       border-radius: 4px;
     }
 
     header span:hover {
-      background: #444;
-      color: white;
+      background: var(--color-hover-bg);
+      color: var(--color-text);
     }
 
     #options {
-      background: #2d2d2d;
+      background: var(--color-header-bg);
+      /* font-size: 14px; はそのまま */
       font-size: 14px;
-      color: #ccc;
+      color: var(--color-text);
       display: flex;
       flex-direction: column; 
       gap: 5px; 
@@ -51,6 +71,7 @@
       padding-left: 10px; 
       padding-right: 10px;
       overflow: hidden; 
+      border-bottom: none;
       
       transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out; 
     }
@@ -73,7 +94,7 @@
     }
 
     textarea::placeholder {
-        color: #888;
+        color: var(--color-placeholder);
     }
 
     textarea {
@@ -84,19 +105,22 @@
       padding: 10px;
       resize: none;
       box-sizing: border-box;
-      background: #1e1e1e;
-      color: #e0e0e0;
+      background: var(--color-background);
+      color: var(--color-text);
       line-height: 1.5;
       font-family: "Segoe UI", "Meiryo", monospace;
     }
 
     footer {
-      background: #2d2d2d;
-      padding: 5px 10px;
-      font-size: 12px;
-      color: #aaa;
+      background: var(--color-header-bg);
+      /* 修正点: 上下のパディングを縮小 (5px -> 3px) */
+      padding: 3px 10px;
+      /* 修正点: 文字サイズをさらに縮小 (12px -> 11px) */
+      font-size: 11px;
+      color: var(--color-footer-text);
       display: flex;
       justify-content: flex-start;
+      border-top: none;
     }
 
     @media (max-width: 600px) {
@@ -104,6 +128,29 @@
         justify-content: center;
       }
     }
+    
+    /* ----------------------------------- */
+    /* --- ダークモードスタイル --- */
+    /* ----------------------------------- */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        /* ダークモードのカラースキーム */
+        --color-background: #1e1e1e;  
+        --color-text: #f0f0f0;        
+        --color-header-bg: #333333;   
+        --color-border: #444;          
+        --color-footer-text: #bbb;     
+        --color-hover-bg: #555;        
+        --color-placeholder: #888;     
+      }
+      
+      select, input[type="text"] {
+        background: #3e3e3e; 
+        color: #f0f0f0;
+        border: 1px solid #555;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -148,7 +195,7 @@
     </div>
   </div>
 
-  <textarea id="editor" placeholder=""></textarea>
+  <textarea id="editor" placeholder="ここに入力..."></textarea>
 
   <footer>
     <span id="browser-info">不明</span>
@@ -166,80 +213,9 @@
     const MAX_FONT_SIZE = 50;
     const FONT_SIZE_STEP = 2; 
 
-    const placeholderText = [
-        "ここに入力...",
-        "アイデアを書き留めよう",
-        "テキストを開いて作業を再開しよう",
-        "気分転換フォント変更"
-    ];
-    let currentTextIndex = 0;
-    let currentCharIndex = 0;
-    let isDeleting = false;
-    let typeSpeed = 150; 
-    let deleteSpeed = 100; 
-    let delayBetweenTexts = 2000; 
-    let typeTimeout; 
-
-    function typeAnimation() {
-        if (typeTimeout) clearTimeout(typeTimeout);
-
-        if (document.activeElement === editor) {
-            editor.placeholder = "ここに入力..."; 
-            typeTimeout = setTimeout(typeAnimation, 5000);
-            return;
-        }
-
-        const currentText = placeholderText[currentTextIndex];
-        let displayedText;
-        
-        let timeout;
-
-        if (isDeleting) {
-            displayedText = currentText.substring(0, currentCharIndex - 1);
-            currentCharIndex--;
-            timeout = deleteSpeed;
-        } else {
-            displayedText = currentText.substring(0, currentCharIndex + 1);
-            currentCharIndex++;
-            timeout = typeSpeed;
-        }
-
-        editor.placeholder = displayedText + "|";
-
-
-        if (!isDeleting && currentCharIndex === currentText.length) {
-            timeout = delayBetweenTexts; 
-            isDeleting = true; 
-            
-            blinkCursor(displayedText, 4); 
-            return; 
-        } else if (isDeleting && currentCharIndex === 0) {
-            isDeleting = false;
-            currentTextIndex = (currentTextIndex + 1) % placeholderText.length;
-            timeout = typeSpeed / 2; 
-        }
-
-        typeTimeout = setTimeout(typeAnimation, timeout);
-    }
-
-    function blinkCursor(text, count) {
-        if (count <= 0) {
-            typeTimeout = setTimeout(typeAnimation, deleteSpeed); 
-            editor.placeholder = text; 
-            return;
-        }
-        
-        if (editor.placeholder.endsWith("|")) {
-            editor.placeholder = text;
-        } else {
-            editor.placeholder = text + "|";
-        }
-        
-        setTimeout(() => blinkCursor(text, count - 1), 500); 
-    }
-
     function initializeEditor() {
-      editor.style.fontFamily = '"Segoe UI", "Meiryo", monospace';
+      // エディタのフォントとサイズを初期化
+      editor.style.fontFamily = '"Segoe UI", "Meiryo", monospace'; 
       editor.style.fontSize = "14px";
       fontSelect.value = '"Meiryo", "Segoe UI", sans-serif';
       sizeSelect.value = "14";
@@ -384,12 +360,6 @@
     initializeEditor(); 
     detectBrowser();
 
-    setTimeout(typeAnimation, 500); 
-
   </script>
 </body>
 </html>
-
-
-
-
