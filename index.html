@@ -1,353 +1,269 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
   <meta charset="UTF-8">
   <title>HTMLブラウザメモ帳</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Noto+Serif+JP&family=Zen+Maru+Gothic&display=swap" rel="stylesheet">
   <style>
+    /* 変数の定義 */
     :root {
-      --color-background: #ffffff; 
-      --color-text: #333333;        
-      --color-header-bg: #f0f0f0;   
-      --color-footer-text: #666;    
-      --color-hover-bg: #ddd;       
-      --color-placeholder: #aaa;    
-    }
-
-    body {
-      margin: 0;
-      font-family: "Segoe UI", "Meiryo", monospace;
-      background: var(--color-background);
-      color: var(--color-text);
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-
-    header {
-      background: var(--color-header-bg);
-      padding: 4px 10px; 
-      display: flex;
-      gap: 15px;
-      font-size: 12px;
-      user-select: none;
-      color: var(--color-text);
-      /* 線は削除済み */
-      border-bottom: none;
-    }
-
-    header span {
-      cursor: pointer;
-      padding: 1px 4px; 
-      border-radius: 4px;
-    }
-
-    header span:hover {
-      background: var(--color-hover-bg);
-      color: var(--color-text);
-    }
-
-    #options {
-      background: var(--color-header-bg);
-      /* font-size: 14px; はそのまま */
-      font-size: 14px;
-      color: var(--color-text);
-      display: flex;
-      flex-direction: column; 
-      gap: 5px; 
-      
-      max-height: 0;
-      padding-top: 0;
-      padding-bottom: 0;
-      padding-left: 10px; 
-      padding-right: 10px;
-      overflow: hidden; 
-      border-bottom: none;
-      
-      transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out; 
-    }
-    
-    .show-options {
-        max-height: 100px !important; 
-        padding-top: 5px !important;
-        padding-bottom: 5px !important;
-    }
-
-    #options > div {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .option-label {
-        width: 70px; 
-        margin-left: 5px; 
-    }
-
-    textarea::placeholder {
-        color: var(--color-placeholder);
-    }
-
-    textarea {
-      flex: 1;
-      width: 100%;
-      border: none;
-      outline: none;
-      padding: 10px;
-      resize: none;
-      box-sizing: border-box;
-      background: var(--color-background);
-      color: var(--color-text);
-      line-height: 1.5;
-      font-family: "Segoe UI", "Meiryo", monospace;
-    }
-
-    footer {
-      background: var(--color-header-bg);
-      padding: 3px 10px;
-      font-size: 11px;
-      color: var(--color-footer-text);
-      display: flex;
-      justify-content: flex-start;
-      border-top: none;
-    }
-
-    @media (max-width: 600px) {
-      footer {
-        justify-content: center;
-      }
+      --bg: #ffffff;
+      --text: #333333;
+      --ui-bg: #f0f0f0;
+      --hover: #ddd;
+      --dim: #666;
     }
     
     @media (prefers-color-scheme: dark) {
       :root {
-        --color-background: #1e1e1e;  
-        --color-text: #f0f0f0;        
-        --color-header-bg: #333333;   
-        --color-border: #444;          
-        --color-footer-text: #bbb;     
-        --color-hover-bg: #555;        
-        --color-placeholder: #888;     
+        --bg: #1e1e1e;
+        --text: #f0f0f0;
+        --ui-bg: #333333;
+        --hover: #555555;
+        --dim: #bbbbbb;
       }
-      
-      select, input[type="text"] {
-        background: #3e3e3e; 
-        color: #f0f0f0;
-        border: 1px solid #555;
-      }
+      select { background: #3e3e3e; color: #f0f0f0; border: 1px solid #555; }
     }
 
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Meiryo", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      /* 画面全体の不要なスクロールバーを完全に抑制 */
+      overflow: hidden;
+    }
+
+    header {
+      background: var(--ui-bg);
+      padding: 4px 10px;
+      display: flex;
+      gap: 15px;
+      font-size: 12px;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    header span {
+      cursor: pointer;
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+
+    header span:hover { background: var(--hover); }
+
+    /* オプションメニューのアニメーション */
+    #options {
+      background: var(--ui-bg);
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      max-height: 0;
+      padding: 0 10px;
+      overflow: hidden;
+      transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+      flex-shrink: 0;
+    }
+
+    #options.show {
+      max-height: 100px;
+      padding-top: 5px;
+      padding-bottom: 5px;
+    }
+
+    #options div { display: flex; align-items: center; gap: 10px; }
+    .label { width: 70px; margin-left: 5px; }
+
+    textarea {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 10px;
+      resize: none;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      font-family: inherit;
+      font-size: 14px;
+      /* テキストエリア内だけは必要に応じてスクロール可能にする */
+      overflow-y: auto;
+    }
+
+    footer {
+      background: var(--ui-bg);
+      padding: 3px 10px;
+      font-size: 11px;
+      color: var(--dim);
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 600px) { footer { text-align: center; } }
   </style>
 </head>
 <body>
+
   <header>
     <span onclick="newFile()">新規</span>
-    <span onclick="document.getElementById('fileInput').click()">開く</span>
+    <span onclick="fileInput.click()">開く</span>
     <span onclick="saveFile()">保存</span>
-    <span onclick="toggleOptions()">オプション</span>
+    <span onclick="optionsMenu.classList.toggle('show')">オプション</span>
   </header>
 
-  <div id="options"> 
+  <div id="options">
     <div>
-      <span class="option-label">フォント：</span>
-      <select id="fontSelect" onchange="changeFont()">
-        <option value='"Noto Sans JP", "Segoe UI", sans-serif'>Noto Sans JP</option>
-        <option value='"Noto Serif JP", "Times New Roman", serif'>Noto Serif JP</option>
-        <option value='"Meiryo", "Segoe UI", sans-serif' selected>メイリオ</option>
-        <option value='"Yu Gothic", "Segoe UI", sans-serif'>游ゴシック</option>
-        <option value='arial, "Segoe UI", sans-serif'>Arial</option>
-      </select>
+      <span class="label">フォント：</span>
+      <select id="fSel" onchange="apply()"></select>
     </div>
-    
     <div>
-      <span class="option-label">サイズ：</span>
-      <select id="sizeSelect" onchange="changeFontSize()">
-        <option value="8">8px</option>
-        <option value="10">10px</option>
-        <option value="12">12px</option>
-        <option value="14" selected>14px</option>
-        <option value="16">16px</option>
-        <option value="18">18px</option>
-        <option value="20">20px</option>
-        <option value="24">24px</option>
-        <option value="28">28px</option>
-        <option value="32">32px</option>
-        <option value="36">36px</option>
-        <option value="40">40px</option>
-        <option value="44">44px</option>
-        <option value="48">48px</option>
-        <option value="50">50px</option>
-      </select>
+      <span class="label">サイズ：</span>
+      <select id="sSel" onchange="apply()"></select>
     </div>
   </div>
 
-  <textarea id="editor" placeholder="ここに入力..."></textarea>
+  <textarea id="edit" placeholder="ここに入力..."></textarea>
 
   <footer>
-    <span id="browser-info">不明</span>
+    <span id="browser-info">...</span>
   </footer>
 
-  <input type="file" id="fileInput" accept=".txt" style="display:none" onchange="loadFile(event)">
+  <input type="file" id="fileInput" hidden onchange="loadFile(event)">
 
   <script>
-    const editor = document.getElementById("editor");
-    const options = document.getElementById("options");
-    const fontSelect = document.getElementById("fontSelect");
-    const sizeSelect = document.getElementById("sizeSelect"); 
+    const edit = document.getElementById('edit');
+    const fSel = document.getElementById('fSel');
+    const sSel = document.getElementById('sSel');
+    const optionsMenu = document.getElementById('options');
+    const fileInput = document.getElementById('fileInput');
 
-    const MIN_FONT_SIZE = 8;
-    const MAX_FONT_SIZE = 50;
-    const FONT_SIZE_STEP = 2; 
+    // 指定されたフォントリスト
+    const fonts = [
+      { name: 'Arial', value: 'Arial, sans-serif' },
+      { name: 'Noto Serif JP', value: '"Noto Serif JP", serif' },
+      { name: 'Zen Maru Gothic', value: '"Zen Maru Gothic", sans-serif' },
+      { name: 'Dela Gothic One', value: '"Dela Gothic One", cursive' }
+    ];
+    const sizes = [8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 48, 50];
 
-    function initializeEditor() {
-      editor.style.fontFamily = '"Segoe UI", "Meiryo", monospace'; 
-      editor.style.fontSize = "14px";
-      fontSelect.value = '"Meiryo", "Segoe UI", sans-serif';
-      sizeSelect.value = "14";
-    }
+    // デフォルト値の定義
+    const DEFAULT_FONT = fonts[0].value;
+    const DEFAULT_SIZE = 14;
 
-    function toggleOptions() {
-      options.classList.toggle("show-options");
-    }
+    // 現在のファイル名を管理
+    let currentFileName = 'memo.txt';
 
-    function changeFont() {
-      editor.style.fontFamily = fontSelect.value;
-    }
-    
-    function changeFontSize() {
-      editor.style.fontSize = sizeSelect.value + "px";
+    // セレクトボックスの生成
+    fonts.forEach(f => fSel.add(new Option(f.name, f.value)));
+    sizes.forEach(s => sSel.add(new Option(s + 'px', s)));
+
+    /**
+     * 設定をバリデーションして反映する
+     * @param {string|null} newFont 適用したいフォント名(value)
+     * @param {number|null} newSize 適用したいフォントサイズ(px)
+     */
+    function apply(newFont, newSize) {
+      if (newFont !== undefined && newFont !== null) {
+        const isValidFont = [...fSel.options].some(o => o.value === newFont);
+        fSel.value = isValidFont ? newFont : DEFAULT_FONT;
+      }
+
+      if (newSize !== undefined && newSize !== null) {
+        const s = Math.min(Math.max(parseInt(newSize) || DEFAULT_SIZE, 8), 50);
+        if (![...sSel.options].some(o => parseInt(o.value) === s)) {
+          sSel.add(new Option(s + 'px', s));
+        }
+        sSel.value = s;
+      }
+
+      const finalFont = [...fSel.options].some(o => o.value === fSel.value) ? fSel.value : DEFAULT_FONT;
+      edit.style.fontFamily = finalFont;
+
+      const finalSize = parseInt(sSel.value);
+      if (!isNaN(finalSize) && finalSize >= 8 && finalSize <= 50) {
+        edit.style.fontSize = finalSize + 'px';
+      } else {
+        edit.style.fontSize = DEFAULT_SIZE + 'px';
+        sSel.value = DEFAULT_SIZE;
+      }
     }
 
     function newFile() {
-      editor.value = "";
-      initializeEditor(); 
-    }
-
-    function loadFile(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      
-      initializeEditor();
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        let content = e.target.result.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-
-        const fontMatch = content.match(/##FONT:(.+)$/m);
-        if (fontMatch) {
-          const font = fontMatch[1].trim();
-          const optionExists = Array.from(fontSelect.options).some(opt => opt.value === font);
-          editor.style.fontFamily = optionExists ? font : '"Segoe UI", "Meiryo", monospace';
-          if (optionExists) fontSelect.value = font;
-        }
-
-        const sizeMatch = content.match(/##SIZE:(\d+)$/m);
-        if (sizeMatch) {
-          const size = parseInt(sizeMatch[1].trim());
-          if (size >= MIN_FONT_SIZE && size <= MAX_FONT_SIZE) {
-            editor.style.fontSize = size + "px";
-            if (Array.from(sizeSelect.options).some(opt => parseInt(opt.value) === size)) {
-              sizeSelect.value = size.toString();
-            }
-          }
-        }
-
-        content = content.replace(/##FONT:.+$/m, '').replace(/##SIZE:.+$/m, '').trimEnd();
-        editor.value = content;
-      };
-      reader.readAsText(file);
-      event.target.value = "";
+      edit.value = "";
+      currentFileName = 'memo.txt';
+      apply(DEFAULT_FONT, DEFAULT_SIZE);
     }
 
     function saveFile() {
-      const font = fontSelect.value;
-      const size = parseInt(editor.style.fontSize.replace('px', '')); 
-      const body = editor.value.trimEnd();
-      
-      let content = body + "\n\n";
+      let fileName = window.prompt("保存するファイル名を入力してください", currentFileName);
+      if (fileName === null) return;
+      fileName = fileName.trim() || 'memo.txt';
+      if (!fileName.includes('.')) fileName += '.txt';
 
-      content += "##FONT:" + font + "\n";
-      content += "##SIZE:" + size + "\n"; 
-      
-      const blob = new Blob([content.trimEnd() + "\n"], { type: "text/plain" });
-
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "memo.txt";
-      document.body.appendChild(a);
+      const data = `${edit.value.trimEnd()}\n\n##FONT:${fSel.value}\n##SIZE:${sSel.value}`;
+      const blob = new Blob([data], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = fileName;
       a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 100);
+      currentFileName = fileName;
+      setTimeout(() => URL.revokeObjectURL(a.href), 100);
     }
-    
-    editor.addEventListener('wheel', function(e) {
+
+    function loadFile(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      currentFileName = file.name;
+      const reader = new FileReader();
+      reader.onload = () => {
+        let content = reader.result.replace(/\r\n/g, '\n');
+        const fMatch = content.match(/##FONT:(.+)$/m);
+        const sMatch = content.match(/##SIZE:(\d+)$/m);
+        const f = fMatch ? fMatch[1].trim() : DEFAULT_FONT;
+        const s = sMatch ? parseInt(sMatch[1]) : DEFAULT_SIZE;
+        apply(f, s);
+        edit.value = content.replace(/##FONT:.+$/gm, '').replace(/##SIZE:.+$/gm, '').trimEnd();
+      };
+      reader.readAsText(file);
+      e.target.value = "";
+    }
+
+    edit.addEventListener('wheel', e => {
       if (e.ctrlKey) {
-        e.preventDefault(); 
-        
-        let currentSize = parseFloat(editor.style.fontSize);
-        let newSize;
-
-        if (e.deltaY < 0) {
-          newSize = currentSize + FONT_SIZE_STEP;
-        } else if (e.deltaY > 0) {
-          newSize = currentSize - FONT_SIZE_STEP;
-        } else {
-          return;
-        }
-        
-        if (newSize < MIN_FONT_SIZE) newSize = MIN_FONT_SIZE;
-        if (newSize > MAX_FONT_SIZE) newSize = MAX_FONT_SIZE;
-        
-        editor.style.fontSize = newSize + "px";
-        
-        const newSizeStr = newSize.toString();
-        const optionExists = Array.from(sizeSelect.options).some(opt => opt.value === newSizeStr);
-
-        if (optionExists) {
-            sizeSelect.value = newSizeStr;
-        } else if (sizeSelect.value) {
-        }
+        e.preventDefault();
+        const currentSize = parseInt(sSel.value) || DEFAULT_SIZE;
+        const newSize = Math.min(Math.max(currentSize + (e.deltaY < 0 ? 2 : -2), 8), 50);
+        apply(null, newSize);
       }
-    });
+    }, { passive: false });
 
     async function detectBrowser() {
       const ua = navigator.userAgent;
       let browser = "不明なブラウザ";
-
       try {
-        if (navigator.brave && navigator.brave.isBrave) {
+        if (typeof navigator.brave?.isBrave === "function") {
           if (await navigator.brave.isBrave()) browser = "Brave";
         }
       } catch (e) {}
-
       if (browser === "不明なブラウザ") {
-        if (ua.includes("Edg")) {
-          browser = "Microsoft Edge";
-        } else if (ua.includes("OPR") || ua.includes("Opera")) {
-          browser = "Opera";
-        } else if (ua.includes("Firefox")) {
-          browser = "Mozilla Firefox";
-        } else if (ua.includes("Safari") && !ua.includes("Chrome")) {
-          browser = "Safari";
-        } else if (ua.includes("Chrome")) {
-          browser = "Google Chrome";
-        } else if (ua.includes("NetFront")) {
-          browser = "NetFront";
-        } else if (ua.includes("AppleWebKit")) {
-          browser = "WebKit";
-        }
+        if (ua.includes("Edg")) browser = "Microsoft Edge";
+        else if (ua.includes("OPR") || ua.includes("Opera")) browser = "Opera";
+        else if (ua.includes("Firefox")) browser = "Mozilla Firefox";
+        else if (ua.includes("Safari") && !ua.includes("Chrome")) browser = "Safari";
+        else if (ua.includes("Chrome")) browser = "Google Chrome";
+        else if (ua.includes("NetFront")) browser = "NetFront";
+        else if (ua.includes("AppleWebKit")) browser = "WebKit";
       }
-
       document.getElementById("browser-info").textContent = browser;
     }
 
-    initializeEditor(); 
-    detectBrowser();
-
+    (async () => {
+      await detectBrowser();
+      apply(DEFAULT_FONT, DEFAULT_SIZE);
+    })();
   </script>
 </body>
 </html>
-
-
-
