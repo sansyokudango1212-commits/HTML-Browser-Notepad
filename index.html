@@ -3,8 +3,10 @@
 <head>
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <meta charset="UTF-8">
-  <title>HTMLブラウザメモ帳</title>
+  <title>Notepad</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Noto+Serif+JP&family=Zen+Maru+Gothic&display=swap" rel="stylesheet">
   <style>
     /* 変数の定義 */
@@ -35,7 +37,6 @@
       display: flex;
       flex-direction: column;
       height: 100vh;
-      /* 画面全体の不要なスクロールバーを完全に抑制 */
       overflow: hidden;
     }
 
@@ -67,18 +68,25 @@
       max-height: 0;
       padding: 0 10px;
       overflow: hidden;
-      transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+      transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out;
       flex-shrink: 0;
     }
 
     #options.show {
-      max-height: 100px;
+      max-height: 180px;
       padding-top: 5px;
       padding-bottom: 5px;
     }
 
     #options div { display: flex; align-items: center; gap: 10px; }
-    .label { width: 70px; margin-left: 5px; }
+    .label { width: 80px; margin-left: 5px; }
+
+    /* セパレーターの色を変数を使用してダークモードに対応 */
+    .separator {
+      border-top: 1px solid var(--dim);
+      margin: 5px 0;
+      width: 100%;
+    }
 
     textarea {
       flex: 1;
@@ -91,7 +99,6 @@
       line-height: 1.5;
       font-family: inherit;
       font-size: 14px;
-      /* テキストエリア内だけは必要に応じてスクロール可能にする */
       overflow-y: auto;
     }
 
@@ -101,6 +108,9 @@
       font-size: 11px;
       color: var(--dim);
       flex-shrink: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     @media (max-width: 600px) { footer { text-align: center; } }
@@ -109,20 +119,30 @@
 <body>
 
   <header>
-    <span onclick="newFile()">新規</span>
-    <span onclick="fileInput.click()">開く</span>
-    <span onclick="saveFile()">保存</span>
-    <span onclick="optionsMenu.classList.toggle('show')">オプション</span>
+    <span data-action="new">新規</span>
+    <span data-action="open">開く</span>
+    <span data-action="save">保存</span>
+    <span data-action="toggle-options">オプション</span>
   </header>
 
   <div id="options">
     <div>
       <span class="label">フォント：</span>
-      <select id="fSel" onchange="apply()"></select>
+      <select id="fSel"></select>
     </div>
     <div>
       <span class="label">サイズ：</span>
-      <select id="sSel" onchange="apply()"></select>
+      <select id="sSel"></select>
+    </div>
+
+    <div class="separator"></div>
+    <div>
+      <span class="label">Ver：</span>
+      <span>4</span>
+    </div>
+    <div>
+      <span class="label">Build：</span>
+      <span>SN2026118516_FK</span>
     </div>
   </div>
 
@@ -130,117 +150,166 @@
 
   <footer>
     <span id="browser-info">...</span>
+    <span id="file-info">memo.txt · 0文字</span>
   </footer>
 
-  <input type="file" id="fileInput" hidden onchange="loadFile(event)">
+  <input type="file" id="fileInput" hidden accept=".txt,.cmd,.csv">
 
   <script>
+  (function(){
+    'use strict';
     const edit = document.getElementById('edit');
     const fSel = document.getElementById('fSel');
     const sSel = document.getElementById('sSel');
     const optionsMenu = document.getElementById('options');
     const fileInput = document.getElementById('fileInput');
 
-    // 指定されたフォントリスト
     const fonts = [
       { name: 'Arial', value: 'Arial, sans-serif' },
       { name: 'Noto Serif JP', value: '"Noto Serif JP", serif' },
       { name: 'Zen Maru Gothic', value: '"Zen Maru Gothic", sans-serif' },
       { name: 'Dela Gothic One', value: '"Dela Gothic One", cursive' }
     ];
-    const sizes = [8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 48, 50];
+    const sizes = [8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 48, 50, 60, 64, 72, 80, 90, 100];
 
-    // デフォルト値の定義
     const DEFAULT_FONT = fonts[0].value;
-    const DEFAULT_SIZE = 14;
-
-    // 現在のファイル名を管理
+    const DEFAULT_SIZE = 20;
     let currentFileName = 'memo.txt';
 
-    // セレクトボックスの生成
+    // セレクトボックスの初期化
     fonts.forEach(f => fSel.add(new Option(f.name, f.value)));
     sizes.forEach(s => sSel.add(new Option(s + 'px', s)));
 
-    /**
-     * 設定をバリデーションして反映する
-     * @param {string|null} newFont 適用したいフォント名(value)
-     * @param {number|null} newSize 適用したいフォントサイズ(px)
-     */
+    // スタイル適用関数
     function apply(newFont, newSize) {
       if (newFont !== undefined && newFont !== null) {
         const isValidFont = [...fSel.options].some(o => o.value === newFont);
-        fSel.value = isValidFont ? newFont : DEFAULT_FONT;
+        if (!isValidFont) fSel.add(new Option(newFont, newFont));
+        fSel.value = newFont;
       }
-
       if (newSize !== undefined && newSize !== null) {
-        const s = Math.min(Math.max(parseInt(newSize) || DEFAULT_SIZE, 8), 50);
+        const s = Math.min(Math.max(parseInt(newSize) || DEFAULT_SIZE, 8), 100);
         if (![...sSel.options].some(o => parseInt(o.value) === s)) {
           sSel.add(new Option(s + 'px', s));
         }
-        sSel.value = s;
+        sSel.value = String(s);
       }
-
-      const finalFont = [...fSel.options].some(o => o.value === fSel.value) ? fSel.value : DEFAULT_FONT;
-      edit.style.fontFamily = finalFont;
-
+      edit.style.fontFamily = fSel.value;
       const finalSize = parseInt(sSel.value);
-      if (!isNaN(finalSize) && finalSize >= 8 && finalSize <= 50) {
-        edit.style.fontSize = finalSize + 'px';
-      } else {
-        edit.style.fontSize = DEFAULT_SIZE + 'px';
-        sSel.value = DEFAULT_SIZE;
-      }
+      if (!isNaN(finalSize)) edit.style.fontSize = finalSize + 'px';
     }
 
+    // 新規作成
     function newFile() {
+      if (edit.value !== "" && !confirm("内容が失われますがよろしいですか？")) return;
       edit.value = "";
       currentFileName = 'memo.txt';
       apply(DEFAULT_FONT, DEFAULT_SIZE);
+      updateStatus();
     }
 
+    // 保存
     function saveFile() {
-      let fileName = window.prompt("保存するファイル名を入力してください", currentFileName);
+      let fileName = window.prompt("ファイル名を入力してください", currentFileName);
       if (fileName === null) return;
       fileName = fileName.trim() || 'memo.txt';
-      if (!fileName.includes('.')) fileName += '.txt';
-
-      const data = `${edit.value.trimEnd()}\n\n##FONT:${fSel.value}\n##SIZE:${sSel.value}`;
+      if (!fileName.includes('.')) {
+        const curExt = (currentFileName && currentFileName.includes('.')) ? currentFileName.slice(currentFileName.lastIndexOf('.')) : '.txt';
+        fileName += curExt;
+      }
+      
+      const data = `${edit.value}\n\n--- DON'T EDIT BELOW ---\n##FONT:${fSel.value}\n##SIZE:${sSel.value}`;
       const blob = new Blob([data], { type: 'text/plain' });
       const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(blob);
+      a.href = url;
       a.download = fileName;
       a.click();
       currentFileName = fileName;
-      setTimeout(() => URL.revokeObjectURL(a.href), 100);
+      updateStatus();
+      setTimeout(() => URL.revokeObjectURL(url), 100);
     }
 
+    // 読み込み
     function loadFile(e) {
       const file = e.target.files[0];
       if (!file) return;
       currentFileName = file.name;
       const reader = new FileReader();
       reader.onload = () => {
-        let content = reader.result.replace(/\r\n/g, '\n');
-        const fMatch = content.match(/##FONT:(.+)$/m);
-        const sMatch = content.match(/##SIZE:(\d+)$/m);
+        let content = String(reader.result).replace(/\r\n/g, '\n');
+        // 行単位で末尾の連続するメタ情報ブロック（空行, マーカー, ##FONT, ##SIZE）を取り除く
+        const lines = content.split('\n');
+        let splitIndex = lines.length;
+        for (let i = lines.length - 1; i >= 0; i--) {
+          const t = lines[i].trim();
+          if (t === '' || t === "--- DON'T EDIT BELOW ---" || t.startsWith('##FONT:') || t.startsWith('##SIZE:')) {
+            splitIndex = i;
+            continue;
+          }
+          break;
+        }
+        const cleanText = lines.slice(0, splitIndex).join('\n').trimEnd();
+        const footer = lines.slice(splitIndex).join('\n');
+        const fMatch = footer.match(/##FONT:(.+)/);
+        const sMatch = footer.match(/##SIZE:(\d+)/);
         const f = fMatch ? fMatch[1].trim() : DEFAULT_FONT;
         const s = sMatch ? parseInt(sMatch[1]) : DEFAULT_SIZE;
+        if (![...fSel.options].some(o => o.value === f)) {
+          fSel.add(new Option(f, f));
+        }
         apply(f, s);
-        edit.value = content.replace(/##FONT:.+$/gm, '').replace(/##SIZE:.+$/gm, '').trimEnd();
+        edit.value = cleanText;
+        updateStatus();
       };
       reader.readAsText(file);
-      e.target.value = "";
+      // ファイル入力のリセット（Safari 等で同一ファイル選択時に change が発火しない問題対策）
+      try {
+        const inputEl = document.getElementById('fileInput');
+        inputEl.value = '';
+        // type を一度切り替えると確実に内部状態がリセットされるブラウザがある
+        inputEl.type = 'text';
+        inputEl.type = 'file';
+      } catch (ex) {
+        try { e.target.value = ''; } catch (_) { /* ignore */ }
+      }
     }
 
+    // ホイールでのズーム
     edit.addEventListener('wheel', e => {
       if (e.ctrlKey) {
         e.preventDefault();
         const currentSize = parseInt(sSel.value) || DEFAULT_SIZE;
-        const newSize = Math.min(Math.max(currentSize + (e.deltaY < 0 ? 2 : -2), 8), 50);
+        const newSize = Math.min(Math.max(currentSize + (e.deltaY < 0 ? 2 : -2), 8), 100);
         apply(null, newSize);
       }
     }, { passive: false });
 
+    // 文字数・ファイル名表示の更新
+    function updateStatus() {
+      const fileInfoEl = document.getElementById('file-info');
+      if (!fileInfoEl) return;
+      const count = edit.value.length;
+      fileInfoEl.textContent = `${currentFileName} · ${count}文字`;
+    }
+
+    edit.addEventListener('input', updateStatus);
+
+    // UI イベントを集中登録（インライン属性を避ける）
+    document.querySelectorAll('header span[data-action]').forEach(el => {
+      el.addEventListener('click', () => {
+        const action = el.getAttribute('data-action');
+        if (action === 'new') newFile();
+        else if (action === 'open') fileInput.click();
+        else if (action === 'save') saveFile();
+        else if (action === 'toggle-options') optionsMenu.classList.toggle('show');
+      });
+    });
+    fSel.addEventListener('change', () => apply(fSel.value, null));
+    sSel.addEventListener('change', () => apply(null, sSel.value));
+    fileInput.addEventListener('change', loadFile);
+
+    // ブラウザ判定
     async function detectBrowser() {
       const ua = navigator.userAgent;
       let browser = "不明なブラウザ";
@@ -248,7 +317,9 @@
         if (typeof navigator.brave?.isBrave === "function") {
           if (await navigator.brave.isBrave()) browser = "Brave";
         }
-      } catch (e) {}
+      } catch (e) {
+        console.warn("Brave check failed:", e);
+      }
       if (browser === "不明なブラウザ") {
         if (ua.includes("Edg")) browser = "Microsoft Edge";
         else if (ua.includes("OPR") || ua.includes("Opera")) browser = "Opera";
@@ -261,10 +332,13 @@
       document.getElementById("browser-info").textContent = browser;
     }
 
+    // 起動
     (async () => {
       await detectBrowser();
       apply(DEFAULT_FONT, DEFAULT_SIZE);
+      updateStatus();
     })();
+  })();
   </script>
 </body>
 </html>
