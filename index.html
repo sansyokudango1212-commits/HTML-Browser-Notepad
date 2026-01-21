@@ -12,176 +12,259 @@
     :root {
       --bg: #ffffff; --text: #333; --ui-bg: rgba(255, 255, 255, 0.5);
       --hover: rgba(0,0,0,0.05); --dim: #888; --radius: 25px;
+      --accent: #007aff;
     }
     @media (prefers-color-scheme: dark) {
       :root { --bg: #121212; --text: #e0e0e0; --ui-bg: rgba(40, 40, 40, 0.5); --hover: rgba(255,255,255,0.08); }
       select { background: #333; color: #fff; border: none; }
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
     body {
       margin: 0; background: var(--bg); color: var(--text);
-      font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+      font-family: sans-serif; height: 100vh; overflow: hidden;
     }
+
     .glass {
       background: var(--ui-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255,255,255,0.2); z-index: 10;
     }
-    header, #options, footer { border-radius: var(--radius); margin: 12px auto; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    header { padding: 6px 12px; display: flex; gap: 8px; width: fit-content; font-size: 12px; }
-    header span { cursor: pointer; padding: 4px 12px; border-radius: 20px; }
-    header span:hover { background: var(--hover); }
+    header, #options, footer, .modal { border-radius: var(--radius); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    
+    header { 
+      position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+      padding: 4px 12px; display: flex; gap: 8px; width: fit-content;
+    }
+    header button { 
+      background: transparent; border: none; cursor: pointer; 
+      padding: 8px 16px; font-size: 12px; color: inherit;
+      border-radius: 20px; transition: 0.2s; font-family: inherit;
+    }
+    header button:hover { background: var(--hover); }
+
     #options {
-      position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
+      position: fixed; top: 68px; left: 50%; transform: translateX(-50%);
       width: 280px; padding: 0 20px; overflow: hidden; max-height: 0; opacity: 0;
       pointer-events: none;
     }
-    #options.show { max-height: 200px; padding: 12px 20px; opacity: 1; pointer-events: auto; }
-    #options div { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+    #options.show { max-height: 250px; padding: 16px 20px; opacity: 1; pointer-events: auto; }
+    #options div { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .label { width: 60px; color: var(--dim); font-size: 11px; }
-    textarea {
-      flex: 1; border: none; outline: none; padding: 60px 30px; margin-top: -60px;
-      background: transparent; color: inherit; line-height: 1.8; font-size: 18px; resize: none;
+
+    .modal {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -40%);
+      width: 260px; padding: 24px; text-align: center; opacity: 0; pointer-events: none;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 100;
     }
+    .modal.show { opacity: 1; transform: translate(-50%, -50%); pointer-events: auto; }
+    .modal p { margin: 0 0 20px 0; font-size: 14px; }
+    .modal-btns { display: flex; gap: 10px; justify-content: center; }
+    .modal-btns button { 
+      padding: 8px 20px; border-radius: 15px; border: none; cursor: pointer; 
+      font-size: 12px; font-family: inherit; transition: 0.2s;
+    }
+    .btn-main { background: var(--accent); color: white; }
+    .btn-sub { background: var(--hover); color: var(--text); }
+
+    textarea {
+      display: block; border: none; outline: none; 
+      padding: 80px 30px 100px 30px; 
+      background: transparent; color: inherit; line-height: 1.8; font-size: 18px; resize: none;
+      width: 100%; height: 100vh;
+    }
+
     footer {
       position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
       padding: 8px 24px; font-size: 12px; color: var(--dim); display: flex; gap: 20px;
     }
     footer.hidden { transform: translate(-50%, 50px); opacity: 0; pointer-events: none; }
-    #backdrop { position: fixed; inset: 0; z-index: 9; display: none; }
-    #backdrop.show { display: block; }
-    @media (max-width: 768px) {
-      #b-info { display: none; }
+    
+    #backdrop { 
+      position: fixed; inset: 0; background: rgba(0,0,0,0.05); 
+      z-index: 9; display: none; 
     }
+    #backdrop.show { display: block; }
+    
+    @media (max-width: 768px) { #b-info { display: none; } }
   </style>
 </head>
 <body>
 
   <header class="glass">
-    <span onclick="act('new')">新規</span>
-    <span onclick="act('open')">開く</span>
-    <span onclick="act('save')">保存</span>
-    <span onclick="act('toggle')">設定</span>
+    <button onclick="act('new')">新規</button>
+    <button onclick="act('open')">開く</button>
+    <button onclick="act('save')">保存</button>
+    <button onclick="act('toggle')">設定</button>
   </header>
 
   <div id="options" class="glass">
     <div><span class="label">Font</span><select id="fSel"></select></div>
     <div><span class="label">Size</span><select id="sSel"></select></div>
-    <div style="font-size: 10px; color: var(--dim); justify-content: center; border-top: 1px solid rgba(128,128,128,0.1); padding-top: 5px;">
-      Build TH202601220046FUX · Version 5.3.1
+    <div style="font-size: 10px; color: var(--dim); justify-content: center; border-top: 1px solid rgba(128,128,128,0.1); padding-top: 8px; margin-top: 8px;">
+      Build TH20260140FKUX · Version 6.0
     </div>
   </div>
 
-  <div id="backdrop" onclick="act('toggle')"></div>
+  <div id="confirmModal" class="glass modal">
+    <p>内容をすべて消去しますか？</p>
+    <div class="modal-btns">
+      <button class="btn-sub" onclick="closeConfirm(false)">キャンセル</button>
+      <button class="btn-main" onclick="closeConfirm(true)">消去</button>
+    </div>
+  </div>
+
+  <div id="backdrop" onclick="act('closeOverlays')"></div>
   <textarea id="edit" spellcheck="false"></textarea>
 
   <footer id="ft" class="glass">
-    <span id="b-info">Browser</span>
-    <span id="f-info">memo.txt · 0 文字</span>
+    <span id="b-info"></span>
+    <span id="f-info"></span>
   </footer>
 
   <input type="file" id="fileInput" hidden accept=".txt">
 
   <script>
-    function getBrowserName() {
-      const uaStr = navigator.userAgent.toLowerCase();
-      if (uaStr.includes('edge')) return 'Edge';
-      if (uaStr.includes('opr') || uaStr.includes('opera')) return 'Opera';
-      if (uaStr.includes('firefox')) return 'Firefox';
-      if (uaStr.includes('chrome') && !uaStr.includes('chromium')) return 'Chrome';
-      if (uaStr.includes('safari')) return 'Safari';
+    var $ = function(id) { return document.getElementById(id); };
+    var getBrowser = function() {
+      var ua = navigator.userAgent.toLowerCase();
+      if (ua.indexOf('opr') !== -1 || ua.indexOf('opera') !== -1) return 'Opera';
+      if (ua.indexOf('edg') !== -1) return 'Edge';
+      if (ua.indexOf('firefox') !== -1) return 'Firefox';
+      if (ua.indexOf('chrome') !== -1) return 'Chrome'; 
+      if (ua.indexOf('safari') !== -1) return 'Safari';
       return 'Browser';
-    }
-    const detectedBrowser = getBrowserName();
+    };
 
-    const $ = id => document.getElementById(id);
-    const edit = $('edit'), fSel = $('fSel'), sSel = $('sSel'), opt = $('options'), bd = $('backdrop'), ft = $('ft');
-    let curFile = 'memo.txt';
-    let hideTimer = null;
+    var state = {
+      curFile: 'memo.txt',
+      browser: getBrowser(),
+      text: '',
+      isOptionsOpen: false,
+      isModalOpen: false,
+      isFooterHidden: false,
+      hideTimer: null
+    };
+
+    var ActionHandlers = {
+      new: function() { 
+        state.isModalOpen = true; 
+      },
+      open: function() { 
+        $('fileInput').click(); 
+      },
+      save: function() {
+        var a = document.createElement('a');
+        var blob = new Blob([state.text]);
+        var url = URL.createObjectURL(blob);
+        a.href = url;
+        a.download = state.curFile;
+        a.click();
+        setTimeout(function() { URL.revokeObjectURL(url); }, 100);
+      },
+      toggle: function() { 
+        state.isOptionsOpen = !state.isOptionsOpen; 
+      },
+      closeOverlays: function() {
+        state.isOptionsOpen = false;
+        state.isModalOpen = false;
+      },
+      updateText: function(val) {
+        state.text = val;
+        this.processFooterLogic();
+      },
+      processFooterLogic: function() {
+        clearTimeout(state.hideTimer);
+        var edit = $('edit');
+        var isBottom = edit.scrollHeight - (edit.scrollTop + edit.clientHeight) < 50;
+        
+        if (state.text.length > 0 && isBottom) {
+          state.isFooterHidden = true;
+          state.hideTimer = setTimeout(function() {
+            state.isFooterHidden = false;
+            render(); 
+          }, 1000);
+        } else {
+          state.isFooterHidden = false;
+        }
+      }
+    };
 
     window.act = function(type) {
-      switch(type) {
-        case 'new':
-          if (confirm("内容を削除しますか？")) edit.value = "";
-          break;
-        case 'open':
-          $('fileInput').click();
-          break;
-        case 'save': {
-          const a = document.createElement('a');
-          const blob = new Blob([edit.value]);
-          const url = URL.createObjectURL(blob);
-          a.href = url;
-          a.download = curFile;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          setTimeout(() => {
-            URL.revokeObjectURL(url);
-          }, 100);
-          break;
-        }
-        case 'toggle': {
-          const isShow = opt.classList.toggle('show');
-          bd.classList.toggle('show', isShow);
-          break;
-        }
-      }
-      update();
+      if (ActionHandlers[type]) ActionHandlers[type]();
+      render();
     };
 
-    function apply() {
-      edit.style.fontFamily = fSel.value;
-      edit.style.fontSize = sSel.value + 'px';
-    }
-
-    function update() {
-      $('f-info').textContent = `${curFile} · ${edit.value.length} 文字`;
-      
-      // 5秒タイマーのリセットと開始
-      clearTimeout(hideTimer);
-      
-      // 基本の隠す判定：最下部付近に文字があるかどうか
-      const isBottom = edit.scrollHeight - (edit.scrollTop + edit.clientHeight) < 50;
-      const shouldHide = edit.value.length > 0 && isBottom;
-
-      if (shouldHide) {
-        ft.classList.add('hidden');
-        // 1秒間操作がなければ表示するタイマー
-        hideTimer = setTimeout(() => {
-          ft.classList.remove('hidden');
-        }, 1000);
-      } else {
-        ft.classList.remove('hidden');
+    window.closeConfirm = function(yes) {
+      if (yes) {
+        $('edit').value = ""; 
+        ActionHandlers.updateText("");
       }
-    }
-
-    const fonts = ['Arial', 'Noto Serif JP', 'Zen Maru Gothic', 'Dela Gothic One'];
-    fonts.forEach(f => fSel.add(new Option(f, f)));
-    for(let i=12; i<=80; i+=2) sSel.add(new Option(`${i}px`, `${i}`));
-    sSel.value = 18;
-
-    edit.oninput = update;
-    edit.onscroll = update;
-    // クリックやタップなどの操作でもタイマーをリセット
-    edit.onclick = update;
-    fSel.onchange = apply;
-    sSel.onchange = apply;
-
-    $('fileInput').onchange = (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      curFile = file.name;
-      const reader = new FileReader();
-      reader.onload = () => { edit.value = reader.result; update(); };
-      reader.readAsText(file);
+      ActionHandlers.closeOverlays();
+      render();
     };
 
-    $('b-info').textContent = detectedBrowser;
-    edit.placeholder = detectedBrowser + " >";
+    function renderEditor() {
+      var edit = $('edit');
+      var hideLower = (state.browser === 'Chrome' || state.browser === 'Opera');
+      $('f-info').textContent = state.curFile + " · " + state.text.length + " 文字";
+      $('b-info').textContent = hideLower ? "" : state.browser;
+      edit.placeholder = state.browser + " >";
+    }
 
-    apply();
-    update();
+    function renderOverlays() {
+      var bd = $('backdrop');
+      var isAnyOpen = state.isOptionsOpen || state.isModalOpen;
+      
+      $('options').className = 'glass' + (state.isOptionsOpen ? ' show' : '');
+      $('confirmModal').className = 'glass modal' + (state.isModalOpen ? ' show' : '');
+      bd.className = (isAnyOpen ? 'show' : '');
+    }
+
+    function renderFooter() {
+      $('ft').className = 'glass' + (state.isFooterHidden ? ' hidden' : '');
+    }
+
+    function render() {
+      renderEditor();
+      renderOverlays();
+      renderFooter();
+    }
+
+    function applyStyles() {
+      var edit = $('edit');
+      edit.style.fontFamily = $('fSel').value;
+      edit.style.fontSize = $('sSel').value + 'px';
+    }
+
+    (function init() {
+      var fSel = $('fSel'), sSel = $('sSel'), edit = $('edit');
+      var fonts = ['Arial', 'Noto Serif JP', 'Zen Maru Gothic', 'Dela Gothic One'];
+      for (var i = 0; i < fonts.length; i++) fSel.add(new Option(fonts[i], fonts[i]));
+      for (var j = 12; j <= 80; j += 2) sSel.add(new Option(j + "px", j));
+      sSel.value = 18;
+
+      edit.oninput = function() { ActionHandlers.updateText(edit.value); render(); };
+      edit.onscroll = function() { ActionHandlers.updateText(edit.value); render(); };
+      edit.onclick = function() { ActionHandlers.updateText(edit.value); render(); };
+      fSel.onchange = applyStyles;
+      sSel.onchange = applyStyles;
+
+      $('fileInput').onchange = function(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        state.curFile = file.name;
+        var reader = new FileReader();
+        reader.onload = function() { 
+          edit.value = reader.result; 
+          ActionHandlers.updateText(edit.value); 
+          render(); 
+        };
+        reader.readAsText(file);
+      };
+
+      applyStyles();
+      render();
+    })();
   </script>
 </body>
 </html>
-
