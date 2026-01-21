@@ -2,7 +2,8 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>Notepad - Slim Glass</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <title>Notepad</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -66,7 +67,7 @@
     <div><span class="label">Font</span><select id="fSel"></select></div>
     <div><span class="label">Size</span><select id="sSel"></select></div>
     <div style="font-size: 10px; color: var(--dim); justify-content: center; border-top: 1px solid rgba(128,128,128,0.1); padding-top: 5px;">
-      Build TH202601220046FUX · Version 5.3
+      Build TH202601220046FUX · Version 5.3.1
     </div>
   </div>
 
@@ -100,7 +101,7 @@
     window.act = function(type) {
       switch(type) {
         case 'new':
-          if (confirm("内容を消去しますか？")) edit.value = "";
+          if (confirm("内容を削除しますか？")) edit.value = "";
           break;
         case 'open':
           $('fileInput').click();
@@ -183,3 +184,4 @@
   </script>
 </body>
 </html>
+
