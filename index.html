@@ -68,32 +68,40 @@
       header button { padding: 6px 10px; font-size: 11px; }
     }
 
+    /* 設定ウィンドウの中央配置修正 */
     #options {
-      position: fixed; top: -9999px; left: -9999px; z-index: 120; 
-      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-      min-width: 150px; max-width: 220px; width: fit-content; 
-      padding: 10px 12px; padding-top: 32px; overflow: hidden;
-      border-radius: 14px;
-      transform: scale(0.9);
-      opacity: 0; pointer-events: none; will-change: opacity, transform;
+      position: fixed; 
+      top: 50%; 
+      left: 50%; 
+      z-index: 120; 
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      min-width: 220px; 
+      padding: 12px; 
+      padding-top: 36px; 
+      border-radius: 18px;
+      /* transformで正確に中央へ。初期状態は少し小さくしてフェードアウト */
+      transform: translate(-50%, -50%) scale(0.9);
+      opacity: 0; 
+      pointer-events: none; 
+      will-change: opacity, transform;
       transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s cubic-bezier(0.4,0,0.2,1);
     }
     #options.show {
       opacity: 1;
-      transform: scale(1);
+      transform: translate(-50%, -50%) scale(1);
       pointer-events: auto;
     }
+
     .close-dot {
       position: absolute; top: 12px; left: 12px; width: 14px; height: 14px; border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, #ff6b6b, #e53935);
       border: 1px solid rgba(0,0,0,0.25); box-shadow: 0 2px 6px rgba(0,0,0,0.25);
       cursor: pointer; padding: 0; display: inline-block;
     }
-    .close-dot:hover { transform: scale(1.06); }
+    .close-dot:hover { transform: scale(1.1); }
     .close-dot:focus { outline: none; }
 
     #options div { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-    @media (max-width: 480px) { #options div { gap: 8px; } }
     .label { width: 60px; color: var(--dim); font-size: 11px; }
 
     .modal {
@@ -149,7 +157,6 @@
     }
     #backdrop.show { display: block; }
 
-    /* トースト通知共通スタイル */
     .toast {
       position: fixed; right: 16px; top: 12px; min-width: 260px; max-width: 420px;
       background: var(--ui-bg); color: var(--text); z-index: 200; overflow: hidden;
@@ -158,7 +165,6 @@
     }
     .toast.show { transform: translateX(0); opacity: 1; }
     
-    /* モバイル向けに通知の長さをヘッダーと同じにする */
     @media (max-width: 480px) {
       .toast {
         left: 50%;
@@ -191,14 +197,14 @@
 
     <div><span class="label">Font</span><select id="fSel"></select></div>
     <div><span class="label">Size</span><select id="sSel"></select></div>
-    <div style="font-size: 10px; color: var(--dim); justify-content: center; border-top: 1px solid rgba(128,128,128,0.1); padding-top: 8px; margin-top: 8px; text-align:center;">
-      <div>Build SA2026020712115</div>
-      <div>Version 7.2</div>
+    <div style="font-size: 10px; color: var(--dim); justify-content: center; border-top: 1px solid rgba(128,128,128,0.1); padding-top: 8px; margin-top: 8px; text-align:center; display: flex; flex-direction: column;">
+      <span>Build SA2026020712115</span>
+      <span>Version 7.2</span>
     </div>
   </div>
 
   <div id="confirmModal" class="glass modal" role="dialog" aria-modal="true" aria-labelledby="modalMsg" tabindex="-1">
-    <p id="modalMsg">消去しますか？</p>
+    <p id="modalMsg">内容をすべて消去しますか？</p>
     <input type="text" id="fileNameInput" placeholder="ファイル名を入力..." style="display:none">
     <div class="modal-btns">
       <button class="btn-sub" onclick="closeConfirm(false)">キャンセル</button>
@@ -216,7 +222,6 @@
 
   <input type="file" id="fileInput" hidden accept=".txt">
 
-  <!-- 通知用のコンテナ -->
   <div id="toastContainer"></div>
 
   <script>
@@ -246,10 +251,8 @@
     var supportedFonts = ['Arial', 'Noto Sans JP', 'Noto Serif JP', 'Zen Maru Gothic', 'Dela Gothic One'];
     var supportedSizes = (function(){ var a=[]; for(var s=12;s<=80;s+=2) a.push(s); return a; })();
 
-    // --- 通知管理（キュー）システム ---
     var toastQueue = [];
     var isToastShowing = false;
-    // timer for showing final font-size toast after wheel stops
     var sizeToastTimer = null;
 
     function queueToast(message, duration) {
@@ -259,7 +262,6 @@
 
     function processToastQueue() {
       if (isToastShowing || toastQueue.length === 0) return;
-      
       isToastShowing = true;
       var item = toastQueue.shift();
       showToastUI(item.message, item.duration);
@@ -269,46 +271,35 @@
       var container = $('toastContainer');
       var el = document.createElement('div');
       el.className = 'glass toast';
-
       var count = document.createElement('div');
       count.className = 'count';
-
       var msg = document.createElement('div');
       msg.className = 'msg';
       msg.textContent = message;
-      msg.setAttribute('role', 'status');
-      msg.setAttribute('aria-live', 'polite');
-
       el.appendChild(count);
       el.appendChild(msg);
       container.appendChild(el);
 
-      // スタイル調整（ヘッダーに合わせる）
       var header = document.querySelector('header');
       if (header) {
         var rect = header.getBoundingClientRect();
         el.style.top = rect.top + 'px';
         el.style.height = rect.height + 'px';
-        var cs = getComputedStyle(header);
-        el.style.borderRadius = cs.borderRadius;
+        el.style.borderRadius = getComputedStyle(header).borderRadius;
       }
 
-      var bar = count;
-      
-      // 表示アニメーション
       setTimeout(function() {
         el.classList.add('show');
-        bar.style.transitionDuration = duration + 'ms';
-        bar.style.width = '0%';
+        count.style.transitionDuration = duration + 'ms';
+        count.style.width = '0%';
       }, 50);
 
-      // 終了処理
       setTimeout(function() {
         el.classList.remove('show');
         setTimeout(function() {
           el.remove();
           isToastShowing = false;
-          processToastQueue(); // 次の通知へ
+          processToastQueue();
         }, 400);
       }, duration);
     }
@@ -327,18 +318,9 @@
         fi.click(); 
       },
       save: function() {
-        ActionHandlers.executeSave();
-      },
-      executeSave: function() {
         var editEl = $('edit');
-        var prevText = editEl.value;
-        ActionHandlers.updateText(prevText);
-        state.text = prevText;
-
+        state.text = editEl.value;
         try {
-          var inputName = sanitizeFileName(state.curFile);
-          state.curFile = inputName;
-
           var fontMeta = '##FONT:"' + $('fSel').value + '"';
           var sizeMeta = '##SIZE:' + $('sSel').value;
           var fullText = fontMeta + '\n' + sizeMeta + '\n' + state.text;
@@ -347,15 +329,11 @@
           var blob = new Blob([fullText], { type: 'text/plain' });
           var url = URL.createObjectURL(blob);
           a.href = url;
-          a.download = state.curFile;
-          document.body.appendChild(a);
+          a.download = sanitizeFileName(state.curFile);
           a.click();
-          document.body.removeChild(a);
-          setTimeout(function() { URL.revokeObjectURL(url); }, 100);
-
+          URL.revokeObjectURL(url);
           queueToast('保存を開始しました：' + state.curFile, 2500);
         } catch (e) {
-          console.error('保存に失敗しました', e);
           queueToast('保存に失敗しました。');
         }
       },
@@ -368,11 +346,6 @@
         state.isModalOpen = false;
       },
       updateText: function(val) {
-        var processed = this.parseMetaData(val);
-        state.text = processed;
-        this.processFooterLogic();
-      },
-      parseMetaData: function(val) {
         var lines = val.split('\n');
         var newLines = [];
         var changed = false;
@@ -381,20 +354,13 @@
           var line = lines[i];
           if(line.indexOf('##FONT:') === 0) {
             var font = line.replace('##FONT:', '').replace(/"/g, '').trim();
-            if (font) {
-              updateSelectValue('fSel', font);
-              changed = true;
-            }
-            continue;
+            updateSelectValue('fSel', font);
+            changed = true; continue;
           }
           if(line.indexOf('##SIZE:') === 0) {
             var sizeRaw = parseInt(line.replace('##SIZE:', '').trim());
             if(!isNaN(sizeRaw)) {
-              var norm = normalizeSize(sizeRaw);
-              if (supportedSizes.indexOf(sizeRaw) === -1) {
-                queueToast('未実装フォントサイズが使われています：' + sizeRaw + 'px');
-              }
-              updateSelectValue('sSel', norm);
+              updateSelectValue('sSel', normalizeSize(sizeRaw));
               changed = true;
             }
             continue;
@@ -402,24 +368,17 @@
           newLines.push(line);
         }
 
-        var finalBody = newLines.join('\n');
+        state.text = newLines.join('\n');
         if (changed) {
-          $('edit').value = finalBody;
+          $('edit').value = state.text;
           applyStyles();
         }
-        return finalBody;
-      },
-      processFooterLogic: function() {
+
         clearTimeout(state.hideTimer);
         var edit = $('edit');
-        var isBottom = edit.scrollHeight - (edit.scrollTop + edit.clientHeight) < 50;
-        
-        if (state.text.length > 0 && isBottom) {
+        if (state.text.length > 0 && (edit.scrollHeight - (edit.scrollTop + edit.clientHeight) < 50)) {
           state.isFooterHidden = true;
-          state.hideTimer = setTimeout(function() {
-            state.isFooterHidden = false;
-            render(); 
-          }, 1000);
+          state.hideTimer = setTimeout(function() { state.isFooterHidden = false; render(); }, 1000);
         } else {
           state.isFooterHidden = false;
         }
@@ -428,287 +387,98 @@
 
     function isFontAvailable(font) {
       if (!font) return false;
-      if (document.fonts && document.fonts.check) {
-        try { if (document.fonts.check('12px "' + font + '"')) return true; } catch (e) {}
-      }
       try {
         var canvas = document.createElement('canvas');
         var ctx = canvas.getContext('2d');
-        var text = 'abcdefghijklmnopqrstuvwxyz';
         ctx.font = '72px monospace';
-        var w1 = ctx.measureText(text).width;
+        var w1 = ctx.measureText('abcdefg').width;
         ctx.font = '72px ' + font + ', monospace';
-        var w2 = ctx.measureText(text).width;
+        var w2 = ctx.measureText('abcdefg').width;
         return w1 !== w2;
       } catch (e) { return false; }
     }
 
     function updateSelectValue(id, value) {
       var sel = $(id);
-      var exists = false;
       for(var i=0; i<sel.options.length; i++){
         if(sel.options[i].value == value) {
           sel.selectedIndex = i;
-          exists = true;
-          break;
+          return;
         }
       }
-
-      if(id === 'fSel') {
-        var allowed = supportedFonts.indexOf(value) !== -1;
-        function fallbackToArial() {
-          queueToast('未実装フォントが使われています：' + value);
-          value = 'Arial';
-          for (var k = 0; k < sel.options.length; k++) {
-            if (sel.options[k].value === 'Arial') { sel.selectedIndex = k; break; }
-          }
-        }
-
-        if (!allowed) {
-          fallbackToArial();
-        } else {
-          if (document.fonts && document.fonts.ready) {
-            document.fonts.ready.then(function() {
-              if (!isFontAvailable(value)) {
-                fallbackToArial();
-              } else if (!exists) {
-                sel.add(new Option(value, value));
-                sel.selectedIndex = sel.options.length - 1;
-              }
-            });
-          } else {
-            if (!isFontAvailable(value)) {
-              fallbackToArial();
-            } else if (!exists) {
-              sel.add(new Option(value, value));
-              sel.selectedIndex = sel.options.length - 1;
-            }
-          }
-        }
-      } else if (!exists && id === 'sSel') {
-        sel.add(new Option(value + "px", value));
-        sel.value = String(value);
+      if(id === 'fSel' && isFontAvailable(value)) {
+        sel.add(new Option(value, value));
+        sel.selectedIndex = sel.options.length - 1;
       }
     }
 
     function normalizeSize(size) {
-      var min = 12, max = 80;
-      if (isNaN(size)) return 18;
       size = Math.round(size);
-      if (size % 2 !== 0) {
-        var down = size - 1, up = size + 1;
-        if (down < min) size = up; else if (up > max) size = down; else size = (Math.abs(size - down) <= Math.abs(up - size)) ? down : up;
-      }
-      if (size < min) size = min;
-      if (size > max) size = max;
-      return size;
+      if (size % 2 !== 0) size = (size < 18) ? size + 1 : size - 1;
+      return Math.min(80, Math.max(12, size));
     }
 
     function sanitizeFileName(name) {
-      name = String(name || '').trim();
-      name = name.replace(/[/\\:\*\?"<>\|]/g, '').replace(/\s+/g, ' ');
-      if (!name) return 'memo.txt';
-      if (!name.toLowerCase().endsWith('.txt')) name += '.txt';
-      if (name.length > 200) name = name.slice(0, 200) + '.txt';
-      return name;
+      name = (name || 'memo.txt').trim().replace(/[/\\:\*\?"<>\|]/g, '');
+      return name.toLowerCase().endsWith('.txt') ? name : name + '.txt';
     }
 
     function debounce(fn, wait) {
-      var t;
-      return function() {
+      var t; return function() {
         var ctx = this, args = arguments;
-        clearTimeout(t);
-        t = setTimeout(function() { fn.apply(ctx, args); }, wait);
+        clearTimeout(t); t = setTimeout(function() { fn.apply(ctx, args); }, wait);
       };
     }
 
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        if (state.isModalOpen || state.isOptionsOpen) {
-          ActionHandlers.closeOverlays();
-          render();
-        }
-        return;
-      }
-
-      if (e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
-        var fontMap = {
-          '1': 'Arial', '2': 'Noto Sans JP', '3': 'Noto Serif JP', '4': 'Zen Maru Gothic', '5': 'Dela Gothic One'
-        };
-        var f = fontMap[e.key];
-        if (f) {
-          e.preventDefault();
-          updateSelectValue('fSel', f);
-          applyStyles();
-          queueToast('フォント：' + f, 1000);
-        }
-      }
-    });
-
-    window.act = function(type) {
-      if (ActionHandlers[type]) ActionHandlers[type]();
-      render();
-    };
-
+    window.act = function(type) { ActionHandlers[type](); render(); };
     window.closeConfirm = function(yes) {
-      if (yes) {
-        if (state.modalType === 'new') {
-          $('edit').value = ""; 
-          ActionHandlers.updateText("");
-          state.curFile = 'memo.txt';
-        }
-      }
-      ActionHandlers.closeOverlays();
-      render();
+      if (yes && state.modalType === 'new') { $('edit').value = ""; ActionHandlers.updateText(""); state.curFile = 'memo.txt'; }
+      ActionHandlers.closeOverlays(); render();
     };
-
-    function renderEditor() {
-      var edit = $('edit');
-      $('f-info').textContent = state.curFile + " · " + state.text.length + " 文字";
-      $('b-info').textContent = state.browser;
-      edit.placeholder = state.browser + " >";
-    }
-
-    function renderOverlays() {
-      var bd = $('backdrop');
-      var isAnyOpen = state.isOptionsOpen || state.isModalOpen;
-      
-      if (state.modalType === 'new') {
-        $('modalMsg').textContent = '内容をすべて消去しますか？';
-        $('fileNameInput').style.display = 'none';
-        $('modalConfirmBtn').textContent = '消去';
-      }
-
-      var opt = $('options');
-      if (state.isOptionsOpen) {
-        opt.className = 'glass show';
-        opt.setAttribute('aria-hidden', 'false');
-        positionOptions();
-      } else {
-        opt.className = 'glass';
-        opt.setAttribute('aria-hidden', 'true');
-        scheduleClearPositionAfterHide(opt);
-      }
-      $('confirmModal').className = 'glass modal' + (state.isModalOpen ? ' show' : '');
-      bd.className = (isAnyOpen ? 'show' : '');
-
-      if (state.isModalOpen) {
-        setTimeout(function(){
-          $('confirmModal').focus();
-        }, 50);
-      }
-    }
-
-    // center the options popup on screen
-    function positionOptions() {
-      var opt = $('options');
-      if (!opt) return;
-
-      // measure after layout so width/height are accurate (handles transitions)
-      window.requestAnimationFrame(function() {
-        var optRect = opt.getBoundingClientRect();
-        var optWidth = optRect.width || opt.offsetWidth || 200;
-        var optHeight = optRect.height || opt.offsetHeight || 120;
-
-        // center on screen
-        var left = (window.innerWidth - optWidth) / 2;
-        var top = (window.innerHeight - optHeight) / 2;
-
-        opt.style.left = Math.max(8, Math.round(left)) + 'px';
-        opt.style.top = Math.max(8, Math.round(top)) + 'px';
-      });
-    }
-
-    // clear position after hide animation
-    function scheduleClearPositionAfterHide(opt) {
-      if (!opt) return;
-      if (opt._clearHandler) {
-        opt.removeEventListener('transitionend', opt._clearHandler);
-        clearTimeout(opt._clearTimeout);
-        opt._clearHandler = null;
-        opt._clearTimeout = null;
-      }
-
-      opt._clearHandler = function(ev) {
-        if (ev && (ev.propertyName.indexOf('opacity') === -1 && ev.propertyName.indexOf('transform') === -1 && ev.propertyName.indexOf('max-height') === -1)) return;
-        if (opt.className.indexOf('show') === -1) {
-          opt.style.left = '';
-          opt.style.top = '';
-        }
-        opt.removeEventListener('transitionend', opt._clearHandler);
-        opt._clearHandler = null;
-        if (opt._clearTimeout) { 
-          clearTimeout(opt._clearTimeout); 
-          opt._clearTimeout = null; 
-        }
-      };
-
-      opt.addEventListener('transitionend', opt._clearHandler);
-      opt._clearTimeout = setTimeout(function() {
-        if (opt.className.indexOf('show') === -1) {
-          opt.style.left = '';
-          opt.style.top = '';
-        }
-        if (opt._clearHandler) { 
-          opt.removeEventListener('transitionend', opt._clearHandler); 
-          opt._clearHandler = null; 
-        }
-        opt._clearTimeout = null;
-      }, 360);
-    }
-
-    function renderFooter() {
-      $('ft').className = 'glass' + (state.isFooterHidden ? ' hidden' : '');
-    }
 
     function render() {
-      renderEditor();
-      renderOverlays();
-      renderFooter();
+      var edit = $('edit');
+      $('f-info').textContent = state.curFile + " · " + edit.value.length + " 文字";
+      $('b-info').textContent = state.browser;
+      edit.placeholder = state.browser + " >";
+
+      var isAnyOpen = state.isOptionsOpen || state.isModalOpen;
+      $('options').className = 'glass' + (state.isOptionsOpen ? ' show' : '');
+      $('confirmModal').className = 'glass modal' + (state.isModalOpen ? ' show' : '');
+      $('backdrop').className = (isAnyOpen ? 'show' : '');
+      $('ft').className = 'glass' + (state.isFooterHidden ? ' hidden' : '');
     }
 
     function applyStyles() {
       var edit = $('edit');
-      var f = $('fSel').value;
-      var s = $('sSel').value;
-      edit.style.fontFamily = f;
-      edit.style.fontSize = s + 'px';
+      edit.style.fontFamily = $('fSel').value;
+      edit.style.fontSize = $('sSel').value + 'px';
     }
 
     (function init() {
       var fSel = $('fSel'), sSel = $('sSel'), edit = $('edit');
-      for (var i = 0; i < supportedFonts.length; i++) fSel.add(new Option(supportedFonts[i], supportedFonts[i]));
+      supportedFonts.forEach(function(f) { fSel.add(new Option(f, f)); });
       for (var j = 12; j <= 80; j += 2) sSel.add(new Option(j + "px", j));
       sSel.value = 18;
 
-      var debouncedUpdate = debounce(function() { ActionHandlers.updateText(edit.value); render(); }, 200);
-      var debouncedScroll = debounce(function() { ActionHandlers.updateText(edit.value); render(); }, 100);
-
-      edit.oninput = debouncedUpdate;
-      edit.onscroll = debouncedScroll;
-      edit.onclick = function() { ActionHandlers.updateText(edit.value); render(); };
+      var upd = debounce(function() { ActionHandlers.updateText(edit.value); render(); }, 200);
+      edit.oninput = upd;
+      edit.onscroll = upd;
+      edit.onclick = upd;
       fSel.onchange = applyStyles;
       sSel.onchange = applyStyles;
 
       edit.addEventListener('wheel', function(e) {
-        try {
-          if (!e.ctrlKey) return;
-          e.preventDefault();
-          var delta = e.deltaY;
-          var current = parseInt(sSel.value, 10) || 18;
-          var step = 2;
-          var newSize = current + (delta < 0 ? step : -step);
-          newSize = normalizeSize(newSize);
-          if (newSize === current) return;
+        if (!e.ctrlKey) return;
+        e.preventDefault();
+        var current = parseInt(sSel.value, 10) || 18;
+        var newSize = normalizeSize(current + (e.deltaY < 0 ? 2 : -2));
+        if (newSize !== current) {
           sSel.value = String(newSize);
           applyStyles();
-
           clearTimeout(sizeToastTimer);
-          sizeToastTimer = setTimeout(function() {
-            queueToast('フォントサイズ: ' + newSize + 'px', 1000);
-            sizeToastTimer = null;
-          }, 600);
-        } catch (err) { /* ignore */ }
+          sizeToastTimer = setTimeout(function() { queueToast('フォントサイズ: ' + newSize + 'px', 1000); }, 600);
+        }
       }, { passive: false });
 
       $('fileInput').onchange = function(e) {
@@ -716,29 +486,15 @@
         if (!file) return;
         state.curFile = file.name;
         var reader = new FileReader();
-        reader.onload = function() { 
-          edit.value = reader.result; 
-          ActionHandlers.updateText(edit.value); 
-          render(); 
-          try { e.target.value = ''; } catch (err) {}
-        };
+        reader.onload = function() { edit.value = reader.result; ActionHandlers.updateText(edit.value); render(); };
         reader.readAsText(file);
       };
 
-      applyStyles();
-
-      // ESC key to close overlays
       document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && (state.isOptionsOpen || state.isModalOpen)) {
-          ActionHandlers.closeOverlays();
-          render();
-        }
+        if (e.key === 'Escape' && (state.isOptionsOpen || state.isModalOpen)) { ActionHandlers.closeOverlays(); render(); }
       });
 
-      // reposition options when viewport changes while it's open
-      window.addEventListener('resize', function() { if (state.isOptionsOpen) positionOptions(); });
-      window.addEventListener('scroll', function() { if (state.isOptionsOpen) positionOptions(); }, true);
-
+      applyStyles();
       render();
     })();
   </script>
