@@ -12,12 +12,30 @@
     :root {
       --bg: #ffffff; --text: #333; --ui-bg: rgba(255, 255, 255, 0.5);
       --hover: rgba(0,0,0,0.05); --dim: #888; --radius: 25px;
-      --accent: #007aff;
+      --accent: #243d30;
     }
     @media (prefers-color-scheme: dark) {
       :root { --bg: #121212; --text: #e0e0e0; --ui-bg: rgba(40, 40, 40, 0.5); --hover: rgba(255,255,255,0.08); }
-      select, input[type="text"] { background: #333; color: #fff; border: 1px solid rgba(255,255,255,0.1); }
     }
+    
+    select, input[type="text"] { 
+      border-radius: 8px; 
+      padding: 4px 4px; 
+      font-size: 12px; 
+      font-family: inherit; 
+      border: 1px solid rgba(128,128,128,0.2);
+      background: rgba(255,255,255,0.1);
+      color: var(--text);
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      select, input[type="text"] { 
+        background: #333; 
+        color: #fff; 
+        border: 1px solid rgba(255,255,255,0.1); 
+      }
+    }
+    
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     body {
@@ -51,12 +69,31 @@
     }
 
     #options {
-      position: fixed; top: 68px; left: 50%; transform: translateX(-50%);
-      width: 280px; padding: 0 20px; overflow: hidden; max-height: 0; opacity: 0;
-      pointer-events: none;
+      position: fixed; top: -9999px; left: -9999px; z-index: 120; 
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      min-width: 150px; max-width: 220px; width: fit-content; 
+      padding: 10px 12px; padding-top: 32px; overflow: hidden;
+      border-radius: 14px;
+      transform: scale(0.9);
+      opacity: 0; pointer-events: none; will-change: opacity, transform;
+      transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s cubic-bezier(0.4,0,0.2,1);
     }
-    #options.show { max-height: 250px; padding: 16px 20px; opacity: 1; pointer-events: auto; }
+    #options.show {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+    .close-dot {
+      position: absolute; top: 12px; left: 12px; width: 14px; height: 14px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ff6b6b, #e53935);
+      border: 1px solid rgba(0,0,0,0.25); box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      cursor: pointer; padding: 0; display: inline-block;
+    }
+    .close-dot:hover { transform: scale(1.06); }
+    .close-dot:focus { outline: none; }
+
     #options div { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    @media (max-width: 480px) { #options div { gap: 8px; } }
     .label { width: 60px; color: var(--dim); font-size: 11px; }
 
     .modal {
@@ -138,8 +175,6 @@
 
     .toast .count { position: absolute; left: 0; top: 0; height: 4px; background: var(--accent); width: 100%; transition: width linear; }
     .toast .msg { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-    @media (max-width: 768px) { #b-info { display: inline; } }
   </style>
 </head>
 <body>
@@ -152,10 +187,13 @@
   </header>
 
   <div id="options" class="glass">
+    <button class="close-dot" onclick="act('toggle')" aria-label="閉じる" title="閉じる"></button>
+
     <div><span class="label">Font</span><select id="fSel"></select></div>
     <div><span class="label">Size</span><select id="sSel"></select></div>
-    <div style="font-size: 10px; color: var(--dim); justify-content: center; border-top: 1px solid rgba(128,128,128,0.1); padding-top: 8px; margin-top: 8px;">
-      Build TH202602050515 · Version 7.1
+    <div style="font-size: 10px; color: var(--dim); justify-content: center; border-top: 1px solid rgba(128,128,128,0.1); padding-top: 8px; margin-top: 8px; text-align:center;">
+      <div>Build SA2026020712115</div>
+      <div>Version 7.2</div>
     </div>
   </div>
 
@@ -541,7 +579,16 @@
         $('modalConfirmBtn').textContent = '消去';
       }
 
-      $('options').className = 'glass' + (state.isOptionsOpen ? ' show' : '');
+      var opt = $('options');
+      if (state.isOptionsOpen) {
+        opt.className = 'glass show';
+        opt.setAttribute('aria-hidden', 'false');
+        positionOptions();
+      } else {
+        opt.className = 'glass';
+        opt.setAttribute('aria-hidden', 'true');
+        scheduleClearPositionAfterHide(opt);
+      }
       $('confirmModal').className = 'glass modal' + (state.isModalOpen ? ' show' : '');
       bd.className = (isAnyOpen ? 'show' : '');
 
@@ -550,6 +597,64 @@
           $('confirmModal').focus();
         }, 50);
       }
+    }
+
+    // center the options popup on screen
+    function positionOptions() {
+      var opt = $('options');
+      if (!opt) return;
+
+      // measure after layout so width/height are accurate (handles transitions)
+      window.requestAnimationFrame(function() {
+        var optRect = opt.getBoundingClientRect();
+        var optWidth = optRect.width || opt.offsetWidth || 200;
+        var optHeight = optRect.height || opt.offsetHeight || 120;
+
+        // center on screen
+        var left = (window.innerWidth - optWidth) / 2;
+        var top = (window.innerHeight - optHeight) / 2;
+
+        opt.style.left = Math.max(8, Math.round(left)) + 'px';
+        opt.style.top = Math.max(8, Math.round(top)) + 'px';
+      });
+    }
+
+    // clear position after hide animation
+    function scheduleClearPositionAfterHide(opt) {
+      if (!opt) return;
+      if (opt._clearHandler) {
+        opt.removeEventListener('transitionend', opt._clearHandler);
+        clearTimeout(opt._clearTimeout);
+        opt._clearHandler = null;
+        opt._clearTimeout = null;
+      }
+
+      opt._clearHandler = function(ev) {
+        if (ev && (ev.propertyName.indexOf('opacity') === -1 && ev.propertyName.indexOf('transform') === -1 && ev.propertyName.indexOf('max-height') === -1)) return;
+        if (opt.className.indexOf('show') === -1) {
+          opt.style.left = '';
+          opt.style.top = '';
+        }
+        opt.removeEventListener('transitionend', opt._clearHandler);
+        opt._clearHandler = null;
+        if (opt._clearTimeout) { 
+          clearTimeout(opt._clearTimeout); 
+          opt._clearTimeout = null; 
+        }
+      };
+
+      opt.addEventListener('transitionend', opt._clearHandler);
+      opt._clearTimeout = setTimeout(function() {
+        if (opt.className.indexOf('show') === -1) {
+          opt.style.left = '';
+          opt.style.top = '';
+        }
+        if (opt._clearHandler) { 
+          opt.removeEventListener('transitionend', opt._clearHandler); 
+          opt._clearHandler = null; 
+        }
+        opt._clearTimeout = null;
+      }, 360);
     }
 
     function renderFooter() {
@@ -564,8 +669,10 @@
 
     function applyStyles() {
       var edit = $('edit');
-      edit.style.fontFamily = $('fSel').value;
-      edit.style.fontSize = $('sSel').value + 'px';
+      var f = $('fSel').value;
+      var s = $('sSel').value;
+      edit.style.fontFamily = f;
+      edit.style.fontSize = s + 'px';
     }
 
     (function init() {
@@ -619,6 +726,19 @@
       };
 
       applyStyles();
+
+      // ESC key to close overlays
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && (state.isOptionsOpen || state.isModalOpen)) {
+          ActionHandlers.closeOverlays();
+          render();
+        }
+      });
+
+      // reposition options when viewport changes while it's open
+      window.addEventListener('resize', function() { if (state.isOptionsOpen) positionOptions(); });
+      window.addEventListener('scroll', function() { if (state.isOptionsOpen) positionOptions(); }, true);
+
       render();
     })();
   </script>
