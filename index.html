@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <title>Notepad</title>
+  <title>Notepad_Ver7.3.1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +12,7 @@
     :root {
       --bg: #ffffff; --text: #333; --ui-bg: rgba(255, 255, 255, 0.5);
       --hover: rgba(0,0,0,0.05); --dim: #888; --radius: 25px;
-      --accent: #ffffff;
+      --accent: #006956;
     }
     @media (prefers-color-scheme: dark) {
       :root { --bg: #121212; --text: #e0e0e0; --ui-bg: rgba(40, 40, 40, 0.5); --hover: rgba(255,255,255,0.08); }
@@ -68,7 +68,6 @@
       header button { padding: 6px 10px; font-size: 11px; }
     }
 
-    /* 設定ウィンドウの中央配置修正 */
     #options {
       position: fixed; 
       top: 50%; 
@@ -79,7 +78,6 @@
       padding: 12px; 
       padding-top: 36px; 
       border-radius: 18px;
-      /* transformで正確に中央へ。初期状態は少し小さくしてフェードアウト */
       transform: translate(-50%, -50%) scale(0.9);
       opacity: 0; 
       pointer-events: none; 
@@ -227,12 +225,14 @@
     <div><span class="label">検索</span><select id="searchSel">
       <option value="google">Google</option>
       <option value="duckduckgo">DuckDuckGo</option>
+      <option value="startpage">StartPage</option>
+      <option value="yahooJP">Yahoo! Japan</option>
       <option value="bing">Bing</option>
     </select></div>
     <div style="font-size: 10px; color: var(--dim); justify-content: center; border-top: 1px solid rgba(128,128,128,0.1); padding-top: 8px; margin-top: 8px; text-align:center; display: flex; flex-direction: column;">
-      <span>Build WD202602111640</span>
-      <span>Version 7.3</span>
-      <span>↓Creator↓<br>Cloude<br>Chat GPT<br>Gemini<br>Copilot<br>Tikuwa</span>
+      <span>Build WE202602112232</span>
+      <span>Version 7.3.1</span>
+      <span>↓Creator↓<br>Claude<br>Chat GPT<br>Gemini<br>Copilot<br>Tikuwa</span>
     </div>
   </div>
 
@@ -385,18 +385,19 @@
         state.isModalOpen = false;
       },
       updateText: function(val) {
-        var lines = val.split('\n');
-        var newLines = [];
+        // パース処理：モダンブラウザでの改行コード差異を考慮
+        var lines = val.split(/\r?\n/);
+        var bodyLines = [];
         var changed = false;
 
         for(var i=0; i<lines.length; i++) {
           var line = lines[i];
-          if(line.indexOf('##FONT:') === 0) {
+          if(line.startsWith('##FONT:')) {
             var font = line.replace('##FONT:', '').replace(/"/g, '').trim();
             updateSelectValue('fSel', font);
             changed = true; continue;
           }
-          if(line.indexOf('##SIZE:') === 0) {
+          if(line.startsWith('##SIZE:')) {
             var sizeRaw = parseInt(line.replace('##SIZE:', '').trim());
             if(!isNaN(sizeRaw)) {
               updateSelectValue('sSel', normalizeSize(sizeRaw));
@@ -404,13 +405,17 @@
             }
             continue;
           }
-          newLines.push(line);
+          bodyLines.push(line);
         }
 
-        state.text = newLines.join('\n');
+        var processedText = bodyLines.join('\n');
+        
         if (changed) {
-          $('edit').value = state.text;
-          applyStyles();
+            state.text = processedText;
+            $('edit').value = state.text;
+            applyStyles();
+        } else {
+            state.text = val;
         }
 
         clearTimeout(state.hideTimer);
@@ -431,7 +436,7 @@
         var ctx = canvas.getContext('2d');
         ctx.font = '72px monospace';
         var w1 = ctx.measureText('abcdefg').width;
-        ctx.font = '72px ' + font + ', monospace';
+        ctx.font = '72px "' + font + '", monospace';
         var w2 = ctx.measureText('abcdefg').width;
         return w1 !== w2;
       } catch (e) { return false; }
@@ -477,7 +482,9 @@
         var searchUrls = {
           'google': 'https://www.google.com/search?q=',
           'duckduckgo': 'https://duckduckgo.com/?q=',
-          'bing': 'https://www.bing.com/search?q='
+          'bing': 'https://www.bing.com/search?q=',
+          'yahooJP': 'https://search.yahoo.co.jp/search?p=',
+          'startpage': 'https://www.startpage.com/do/search?q='
         };
         var url = searchUrls[state.searchEngine] || searchUrls['google'];
         window.open(url + encodeURIComponent(selectedText), '_blank');
@@ -486,15 +493,11 @@
     };
 
     function hideContextMenu() {
-      if (contextMenu) {
-        contextMenu.style.display = 'none';
-      }
+      if (contextMenu) contextMenu.style.display = 'none';
     }
 
     function showContextMenu(x, y) {
-      if (!contextMenu) {
-        contextMenu = $('contextMenu');
-      }
+      if (!contextMenu) contextMenu = $('contextMenu');
       contextMenu.style.left = x + 'px';
       contextMenu.style.top = y + 'px';
       contextMenu.style.display = 'block';
@@ -502,7 +505,11 @@
 
     window.act = function(type) { ActionHandlers[type](); render(); };
     window.closeConfirm = function(yes) {
-      if (yes && state.modalType === 'new') { $('edit').value = ""; ActionHandlers.updateText(""); state.curFile = 'memo.txt'; }
+      if (yes && state.modalType === 'new') { 
+          $('edit').value = ""; 
+          ActionHandlers.updateText(""); 
+          state.curFile = 'memo.txt'; 
+      }
       ActionHandlers.closeOverlays(); render();
     };
 
@@ -531,20 +538,27 @@
       for (var j = 12; j <= 80; j += 2) sSel.add(new Option(j + "px", j));
       sSel.value = 18;
       
-      // Initialize search engine select from localStorage
       searchSel.value = state.searchEngine;
       searchSel.onchange = function() {
         state.searchEngine = searchSel.value;
         localStorage.setItem('searchEngine', searchSel.value);
       };
 
-      var upd = debounce(function() { ActionHandlers.updateText(edit.value); render(); }, 200);
+      var upd = debounce(function() { ActionHandlers.updateText(edit.value); render(); }, 150);
       edit.oninput = upd;
-      edit.onscroll = upd;
-      edit.onclick = upd;
+      edit.onclick = function() {
+          hideContextMenu();
+          upd();
+      };
+      
+      edit.onscroll = function() {
+          hideContextMenu();
+      };
+
       fSel.onchange = applyStyles;
       sSel.onchange = applyStyles;
 
+      // Chrome 100+ compatible passive listener
       edit.addEventListener('wheel', function(e) {
         if (!e.ctrlKey) return;
         e.preventDefault();
@@ -563,7 +577,11 @@
         if (!file) return;
         state.curFile = file.name;
         var reader = new FileReader();
-        reader.onload = function() { edit.value = reader.result; ActionHandlers.updateText(edit.value); render(); };
+        reader.onload = function() { 
+            edit.value = reader.result; 
+            ActionHandlers.updateText(edit.value); 
+            render(); 
+        };
         reader.readAsText(file);
       };
 
@@ -571,77 +589,34 @@
         if (e.key === 'Escape' && (state.isOptionsOpen || state.isModalOpen)) { ActionHandlers.closeOverlays(); render(); }
       });
 
-      // Context menu for text selection
+      // Context Menu logic for Chrome
       edit.addEventListener('contextmenu', function(e) {
-        var selection = window.getSelection();
-        var text = selection.toString().trim();
-        
+        var text = window.getSelection().toString().trim();
         if (text.length > 0) {
           e.preventDefault();
           selectedText = text;
-          
-          // Position menu at mouse cursor
-          var menuX = e.clientX;
-          var menuY = e.clientY;
-          
-          // Adjust if menu would go off screen
-          var menuWidth = 120; // min-width from CSS
-          var menuHeight = 40; // approximate button height
-          
-          if (menuX + menuWidth > window.innerWidth) {
-            menuX = window.innerWidth - menuWidth - 10;
-          }
-          if (menuY + menuHeight > window.innerHeight) {
-            menuY = window.innerHeight - menuHeight - 10;
-          }
-          
-          showContextMenu(menuX, menuY);
+          showContextMenu(e.clientX, e.clientY);
         } else {
           hideContextMenu();
         }
       });
 
-      // Show menu automatically on text selection
       edit.addEventListener('mouseup', function(e) {
         setTimeout(function() {
-          var selection = window.getSelection();
-          var text = selection.toString().trim();
-          
+          var text = window.getSelection().toString().trim();
           if (text.length > 0) {
             selectedText = text;
-            
-            // Position menu near mouse cursor
-            var menuX = e.clientX;
-            var menuY = e.clientY;
-            
-            // Adjust if menu would go off screen
-            var menuWidth = 120;
-            var menuHeight = 40;
-            
-            if (menuX + menuWidth > window.innerWidth) {
-              menuX = window.innerWidth - menuWidth - 10;
-            }
-            if (menuY + menuHeight > window.innerHeight) {
-              menuY = window.innerHeight - menuHeight - 10;
-            }
-            
-            showContextMenu(menuX, menuY);
+            showContextMenu(e.clientX, e.clientY);
           } else {
-            hideContextMenu();
+            if (contextMenu && !contextMenu.contains(e.target)) hideContextMenu();
           }
-        }, 10);
+        }, 20);
       });
 
-      // Hide context menu on click outside
-      document.addEventListener('click', function(e) {
-        if (contextMenu && !contextMenu.contains(e.target)) {
+      document.addEventListener('mousedown', function(e) {
+        if (contextMenu && !contextMenu.contains(e.target) && e.target !== edit) {
           hideContextMenu();
         }
-      });
-
-      // Hide context menu on scroll
-      edit.addEventListener('scroll', function() {
-        hideContextMenu();
       });
 
       applyStyles();
