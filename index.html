@@ -12,7 +12,7 @@
     :root {
       --bg: #ffffff; --text: #333; --ui-bg: rgba(255, 255, 255, 0.5);
       --hover: rgba(0,0,0,0.05); --dim: #888; --radius: 25px;
-      --accent: #243d30;
+      --accent: #ffffff;
     }
     @media (prefers-color-scheme: dark) {
       :root { --bg: #121212; --text: #e0e0e0; --ui-bg: rgba(40, 40, 40, 0.5); --hover: rgba(255,255,255,0.08); }
@@ -181,6 +181,33 @@
 
     .toast .count { position: absolute; left: 0; top: 0; height: 4px; background: var(--accent); width: 100%; transition: width linear; }
     .toast .msg { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    
+    #contextMenu {
+      position: fixed;
+      z-index: 1000;
+      display: none;
+      min-width: 120px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      border-radius: 20px;
+      overflow: hidden;
+      padding: 4px;
+    }
+    #contextMenu button {
+      width: 100%;
+      padding: 8px 16px;
+      background: transparent;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text);
+      font-family: inherit;
+      transition: 0.2s;
+      border-radius: 16px;
+    }
+    #contextMenu button:hover {
+      background: var(--hover);
+    }
   </style>
 </head>
 <body>
@@ -197,9 +224,15 @@
 
     <div><span class="label">Font</span><select id="fSel"></select></div>
     <div><span class="label">Size</span><select id="sSel"></select></div>
+    <div><span class="label">検索</span><select id="searchSel">
+      <option value="google">Google</option>
+      <option value="duckduckgo">DuckDuckGo</option>
+      <option value="bing">Bing</option>
+    </select></div>
     <div style="font-size: 10px; color: var(--dim); justify-content: center; border-top: 1px solid rgba(128,128,128,0.1); padding-top: 8px; margin-top: 8px; text-align:center; display: flex; flex-direction: column;">
-      <span>Build SA2026020712115</span>
-      <span>Version 7.2</span>
+      <span>Build WD202602111640</span>
+      <span>Version 7.3</span>
+      <span>↓Creator↓<br>Cloude<br>Chat GPT<br>Gemini<br>Copilot<br>Tikuwa</span>
     </div>
   </div>
 
@@ -213,6 +246,11 @@
   </div>
 
   <div id="backdrop" onclick="act('closeOverlays')"></div>
+  
+  <div id="contextMenu" class="glass">
+    <button onclick="searchGoogle()">検索</button>
+  </div>
+  
   <textarea id="edit" spellcheck="false"></textarea>
 
   <footer id="ft" class="glass">
@@ -245,7 +283,8 @@
       isModalOpen: false,
       modalType: 'new',
       isFooterHidden: false,
-      hideTimer: null
+      hideTimer: null,
+      searchEngine: localStorage.getItem('searchEngine') || 'google'
     };
 
     var supportedFonts = ['Arial', 'Noto Sans JP', 'Noto Serif JP', 'Zen Maru Gothic', 'Dela Gothic One'];
@@ -430,6 +469,37 @@
       };
     }
 
+    var selectedText = '';
+    var contextMenu = null;
+
+    window.searchGoogle = function() {
+      if (selectedText) {
+        var searchUrls = {
+          'google': 'https://www.google.com/search?q=',
+          'duckduckgo': 'https://duckduckgo.com/?q=',
+          'bing': 'https://www.bing.com/search?q='
+        };
+        var url = searchUrls[state.searchEngine] || searchUrls['google'];
+        window.open(url + encodeURIComponent(selectedText), '_blank');
+      }
+      hideContextMenu();
+    };
+
+    function hideContextMenu() {
+      if (contextMenu) {
+        contextMenu.style.display = 'none';
+      }
+    }
+
+    function showContextMenu(x, y) {
+      if (!contextMenu) {
+        contextMenu = $('contextMenu');
+      }
+      contextMenu.style.left = x + 'px';
+      contextMenu.style.top = y + 'px';
+      contextMenu.style.display = 'block';
+    }
+
     window.act = function(type) { ActionHandlers[type](); render(); };
     window.closeConfirm = function(yes) {
       if (yes && state.modalType === 'new') { $('edit').value = ""; ActionHandlers.updateText(""); state.curFile = 'memo.txt'; }
@@ -456,10 +526,17 @@
     }
 
     (function init() {
-      var fSel = $('fSel'), sSel = $('sSel'), edit = $('edit');
+      var fSel = $('fSel'), sSel = $('sSel'), edit = $('edit'), searchSel = $('searchSel');
       supportedFonts.forEach(function(f) { fSel.add(new Option(f, f)); });
       for (var j = 12; j <= 80; j += 2) sSel.add(new Option(j + "px", j));
       sSel.value = 18;
+      
+      // Initialize search engine select from localStorage
+      searchSel.value = state.searchEngine;
+      searchSel.onchange = function() {
+        state.searchEngine = searchSel.value;
+        localStorage.setItem('searchEngine', searchSel.value);
+      };
 
       var upd = debounce(function() { ActionHandlers.updateText(edit.value); render(); }, 200);
       edit.oninput = upd;
@@ -492,6 +569,79 @@
 
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && (state.isOptionsOpen || state.isModalOpen)) { ActionHandlers.closeOverlays(); render(); }
+      });
+
+      // Context menu for text selection
+      edit.addEventListener('contextmenu', function(e) {
+        var selection = window.getSelection();
+        var text = selection.toString().trim();
+        
+        if (text.length > 0) {
+          e.preventDefault();
+          selectedText = text;
+          
+          // Position menu at mouse cursor
+          var menuX = e.clientX;
+          var menuY = e.clientY;
+          
+          // Adjust if menu would go off screen
+          var menuWidth = 120; // min-width from CSS
+          var menuHeight = 40; // approximate button height
+          
+          if (menuX + menuWidth > window.innerWidth) {
+            menuX = window.innerWidth - menuWidth - 10;
+          }
+          if (menuY + menuHeight > window.innerHeight) {
+            menuY = window.innerHeight - menuHeight - 10;
+          }
+          
+          showContextMenu(menuX, menuY);
+        } else {
+          hideContextMenu();
+        }
+      });
+
+      // Show menu automatically on text selection
+      edit.addEventListener('mouseup', function(e) {
+        setTimeout(function() {
+          var selection = window.getSelection();
+          var text = selection.toString().trim();
+          
+          if (text.length > 0) {
+            selectedText = text;
+            
+            // Position menu near mouse cursor
+            var menuX = e.clientX;
+            var menuY = e.clientY;
+            
+            // Adjust if menu would go off screen
+            var menuWidth = 120;
+            var menuHeight = 40;
+            
+            if (menuX + menuWidth > window.innerWidth) {
+              menuX = window.innerWidth - menuWidth - 10;
+            }
+            if (menuY + menuHeight > window.innerHeight) {
+              menuY = window.innerHeight - menuHeight - 10;
+            }
+            
+            showContextMenu(menuX, menuY);
+          } else {
+            hideContextMenu();
+          }
+        }, 10);
+      });
+
+      // Hide context menu on click outside
+      document.addEventListener('click', function(e) {
+        if (contextMenu && !contextMenu.contains(e.target)) {
+          hideContextMenu();
+        }
+      });
+
+      // Hide context menu on scroll
+      edit.addEventListener('scroll', function() {
+        hideContextMenu();
       });
 
       applyStyles();
