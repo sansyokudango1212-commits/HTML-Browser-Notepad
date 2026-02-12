@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <title>Notepad_Ver7.4.1</title>
+  <title>Notepad_Ver7.4.2</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,12 +27,21 @@
       background: rgba(255,255,255,0.1);
       color: var(--text);
     }
+    /* セレクトボックスのプルダウンメニューも設定ウィンドウのスタイルに合わせる */
+    select option {
+      background: #ffffff;
+      color: #333333;
+    }
     
     @media (prefers-color-scheme: dark) {
       select, input[type="text"] { 
         background: #333; 
         color: #fff; 
         border: 1px solid rgba(255,255,255,0.1); 
+      }
+      select option {
+        background: #333333;
+        color: #ffffff;
       }
     }
     
@@ -259,6 +268,99 @@
     #searchBar button:hover { background: var(--hover); color: var(--text); }
     #searchBar .s-divider { width: 1px; height: 16px; background: rgba(128,128,128,0.25); }
 
+    /* モバイル向け textarea パディング */
+    @media (max-width: 480px) {
+      textarea {
+        padding: 72px 16px 90px 16px;
+        font-size: 16px;
+      }
+      #searchHighlightMirror {
+        padding: 72px 16px 90px 16px;
+        font-size: 16px;
+      }
+      #contextMenu {
+        /* 画面端に被らないようmax-widthを制限 */
+        max-width: calc(100vw - 24px);
+      }
+    }
+
+    /* 翻訳ウィンドウ */
+    #translatePanel {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(0.92);
+      width: min(480px, 92vw);
+      max-height: 70vh;
+      z-index: 1100;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.22);
+      display: flex; flex-direction: column;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.28s cubic-bezier(0.4,0,0.2,1),
+                  transform 0.28s cubic-bezier(0.4,0,0.2,1);
+      overflow: hidden;
+    }
+    #translatePanel.show {
+      opacity: 1; pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    #translatePanel .tp-header {
+      display: flex; align-items: center;
+      padding: 10px 14px 8px;
+      border-bottom: 1px solid rgba(128,128,128,0.15);
+      flex-shrink: 0;
+      position: relative;
+    }
+    /* Mac風赤丸 */
+    #translatePanel .tp-dot {
+      width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+      background: radial-gradient(circle at 30% 30%, #ff6b6b, #e53935);
+      border: 1px solid rgba(0,0,0,0.2);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      cursor: pointer; transition: 0.15s; z-index: 1;
+    }
+    #translatePanel .tp-dot:hover { transform: scale(1.15); }
+    /* 言語ペア選択 — ヘッダー中央に絶対配置 */
+    #translatePanel .tp-lang {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--dim);
+      pointer-events: auto;
+    }
+    #translatePanel .tp-lang select {
+      border-radius: 10px; padding: 3px 6px;
+      font-size: 12px; font-family: inherit;
+      border: 1px solid rgba(128,128,128,0.2);
+      background: rgba(255,255,255,0.1);
+      color: var(--text); cursor: pointer;
+    }
+    #translatePanel .tp-lang .tp-arrow {
+      font-size: 13px; color: var(--dim); user-select: none;
+    }
+    #translatePanel .tp-body {
+      padding: 14px 18px 18px;
+      overflow-y: auto; flex: 1;
+      scrollbar-width: none;
+    }
+    #translatePanel .tp-body::-webkit-scrollbar { display: none; }
+    #translatePanel .tp-src {
+      font-size: 13px; color: var(--dim); margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(128,128,128,0.12);
+      line-height: 1.6; word-break: break-all;
+    }
+    #translatePanel .tp-result {
+      font-size: 17px; line-height: 1.75; word-break: break-all;
+      color: var(--text);
+    }
+    #translatePanel .tp-loading {
+      text-align: center; padding: 24px 0;
+      color: var(--dim); font-size: 13px;
+    }
+    #translatePanel .tp-error {
+      color: #e53935; font-size: 13px; padding: 16px 0;
+    }
+
     /* テーマカラースウォッチ */
     .color-swatches { display: flex; gap: 6px; flex-wrap: wrap; }
     .swatch {
@@ -340,7 +442,6 @@
     <div><span class="label">翻訳</span><select id="translateSel">
       <option value="google">Google 翻訳</option>
       <option value="bing">Bing 翻訳</option>
-      <option value="weblio">Weblio</option>
     </select></div>
     <div><span class="label">テーマ</span>
       <div class="color-swatches" id="colorSwatches"></div>
@@ -352,9 +453,9 @@
       </select>
     </div>
     <div style="font-size: 10px; color: var(--dim); justify-content: center; border-top: 1px solid rgba(128,128,128,0.1); padding-top: 8px; margin-top: 8px; text-align:center; display: flex; flex-direction: column;">
-      <span>Build TH202602121610</span>
-      <span>Version 7.4.1</span>
-      <span>↓Creator↓<br>Claude<br>Chat GPT<br>Gemini<br>Copilot<br>Tikuwa</span>
+      <span>Build TH202602122020</span>
+      <span>Version 7.4.2</span>
+      <span>↓Creator↓<br>Claude<br>Chat GPT<br>Gemini<br>Copilot<br>Cursor<br>Tikuwa</span>
     </div>
   </div>
 
@@ -364,6 +465,39 @@
     <div class="modal-btns">
       <button class="btn-sub" onclick="closeConfirm(false)">キャンセル</button>
       <button id="modalConfirmBtn" class="btn-main" onclick="closeConfirm(true)">確定</button>
+    </div>
+  </div>
+
+  <!-- 翻訳パネル -->
+  <div id="translatePanel" class="glass">
+    <div class="tp-header">
+      <button class="tp-dot" onclick="closeTranslatePanel()" aria-label="閉じる"></button>
+      <div class="tp-lang">
+        <select id="tpSrcLang">
+          <option value="auto">自動検出</option>
+          <option value="ja">日本語</option>
+          <option value="en">英語</option>
+          <option value="zh-CN">中国語</option>
+          <option value="ko">韓国語</option>
+          <option value="fr">フランス語</option>
+          <option value="de">ドイツ語</option>
+          <option value="es">スペイン語</option>
+        </select>
+        <span class="tp-arrow">→</span>
+        <select id="tpTgtLang">
+          <option value="ja">日本語</option>
+          <option value="en">英語</option>
+          <option value="zh-CN">中国語</option>
+          <option value="ko">韓国語</option>
+          <option value="fr">フランス語</option>
+          <option value="de">ドイツ語</option>
+          <option value="es">スペイン語</option>
+        </select>
+      </div>
+    </div>
+    <div class="tp-body">
+      <div class="tp-src" id="tpSrc"></div>
+      <div class="tp-result" id="tpResult"></div>
     </div>
   </div>
 
@@ -524,7 +658,13 @@
       },
       toggle: function() { 
         state.isOptionsOpen = !state.isOptionsOpen; 
-        if (state.isOptionsOpen) state.isModalOpen = false;
+        if (state.isOptionsOpen) {
+          state.isModalOpen = false;
+          // 設定ウィンドウを開くときに翻訳系UIは必ず閉じる
+          hideContextMenu();
+          var tp = $('translatePanel');
+          if (tp) tp.classList.remove('show');
+        }
       },
       toggleSearch: function() {
         state.isSearchOpen = !state.isSearchOpen;
@@ -542,6 +682,8 @@
       closeOverlays: function() {
         state.isOptionsOpen = false;
         state.isModalOpen = false;
+        var tp = $('translatePanel');
+        if (tp) tp.classList.remove('show');
       },
       updateText: function(val) {
         var lines = val.split(/\r?\n/);
@@ -672,17 +814,53 @@
     };
 
     window.translateText = function() {
-      if (selectedText) {
-        var engine = $('translateSel') ? $('translateSel').value : 'google';
-        var translateUrls = {
-          'google': 'https://translate.google.com/?sl=auto&tl=ja&text=',
-          'bing': 'https://www.bing.com/translator?text=',
-          'weblio': 'https://ejje.weblio.jp/content/'
-        };
-        var url = translateUrls[engine] || translateUrls['google'];
-        window.open(url + encodeURIComponent(selectedText), '_blank');
-      }
+      if (!selectedText) { hideContextMenu(); return; }
       hideContextMenu();
+
+      var src    = selectedText;
+      var panel  = $('translatePanel');
+      var tpSrc  = $('tpSrc');
+      var tpResult = $('tpResult');
+
+      var sl = $('tpSrcLang') ? $('tpSrcLang').value : 'auto';
+      var tl = $('tpTgtLang') ? $('tpTgtLang').value : 'ja';
+
+      // 元テキスト表示（長い場合は省略）
+      tpSrc.textContent = src.length > 120 ? src.slice(0, 120) + '…' : src;
+      tpResult.innerHTML = '<div class="tp-loading">翻訳中…</div>';
+
+      panel.classList.add('show');
+
+      // 言語変更時に再翻訳
+      var doFetch = function() {
+        var slVal = $('tpSrcLang').value;
+        var tlVal = $('tpTgtLang').value;
+        var url = 'https://translate.googleapis.com/translate_a/single'
+                + '?client=gtx&sl=' + slVal + '&tl=' + tlVal
+                + '&dt=t&q=' + encodeURIComponent(src);
+        tpResult.innerHTML = '<div class="tp-loading">翻訳中…</div>';
+        fetch(url)
+          .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
+          .then(function(data) {
+            var result = '';
+            if (data && data[0]) data[0].forEach(function(seg) { if (seg && seg[0]) result += seg[0]; });
+            tpResult.textContent = result || '翻訳結果が取得できませんでした';
+          })
+          .catch(function() {
+            tpResult.innerHTML = '<div class="tp-error">翻訳に失敗しました。<br>ネットワーク接続を確認してください。</div>';
+          });
+      };
+
+      // セレクター変更で再翻訳
+      $('tpSrcLang').onchange = doFetch;
+      $('tpTgtLang').onchange = doFetch;
+
+      // 初回翻訳実行
+      doFetch();
+    };
+
+    window.closeTranslatePanel = function() {
+      $('translatePanel').classList.remove('show');
     };
 
     function hideContextMenu() {
@@ -692,8 +870,12 @@
     function showContextMenu(x, y) {
       if (!contextMenu) contextMenu = $('contextMenu');
       contextMenu.style.left = x + 'px';
-      contextMenu.style.top = y + 'px';
+      contextMenu.style.top  = y + 'px';
       contextMenu.style.display = 'block';
+      // 画面端からはみ出さないよう位置補正
+      var rect = contextMenu.getBoundingClientRect();
+      if (rect.right  > window.innerWidth  - 8) contextMenu.style.left = (x - rect.width  - 4) + 'px';
+      if (rect.bottom > window.innerHeight - 8) contextMenu.style.top  = (y - rect.height - 4) + 'px';
     }
 
     window.act = function(type) { ActionHandlers[type](); render(); };
@@ -876,7 +1058,15 @@
         s.dataset.color = t.color;
         s.style.background = t.color;
         s.title = t.label;
-        s.onclick = function() { applyAccentColor(t.color); };
+        s.onclick = function(e) {
+          // テーマ選択時に誤って翻訳メニューが出ないように全て閉じる
+          e.preventDefault();
+          e.stopPropagation();
+          hideContextMenu();
+          var tp = $('translatePanel');
+          if (tp) tp.classList.remove('show');
+          applyAccentColor(t.color);
+        };
         swatchContainer.appendChild(s);
       });
       applyAccentColor(state.accentColor);
@@ -1009,10 +1199,43 @@
         if (contextMenu && !contextMenu.contains(e.target) && e.target !== edit) {
           hideContextMenu();
         }
+        // 翻訳パネル外クリックで閉じる
+        var tp = $('translatePanel');
+        if (tp && tp.classList.contains('show') && !tp.contains(e.target)) {
+          tp.classList.remove('show');
+        }
       });
+
+      // モバイル：touchendでテキスト選択検出
+      edit.addEventListener('touchend', function(e) {
+        setTimeout(function() {
+          var text = window.getSelection().toString().trim();
+          if (text.length > 0) {
+            selectedText = text;
+            var touch = e.changedTouches[0];
+            showContextMenu(touch.clientX, touch.clientY);
+          }
+        }, 50);
+      });
+
+      // モバイル：翻訳パネル外タップで閉じる
+      document.addEventListener('touchstart', function(e) {
+        var tp = $('translatePanel');
+        if (tp && tp.classList.contains('show') && !tp.contains(e.target)) {
+          tp.classList.remove('show');
+        }
+        if (contextMenu && !contextMenu.contains(e.target) && e.target !== edit) {
+          hideContextMenu();
+        }
+      }, { passive: true });
 
       applyStyles();
       render();
+
+      // 起動時通知：ローカル環境の注意
+      setTimeout(function() {
+        queueToast('エラー : 一部機能が動作しない可能性があります', 5000);
+      }, 800);
     })();
     // ── ファイル比較 (Diff) ──────────────────────────────────
 
@@ -1139,26 +1362,33 @@
       // ① メインヘッダーをフェードアウト＆縮小
       var mainHeader = document.querySelector('header');
       mainHeader.classList.remove('diff-restore');
-      mainHeader.classList.add('diff-exit');
+      // 強制リフロー後にクラス付与でtransitionを確実に発火
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          mainHeader.classList.add('diff-exit');
+        });
+      });
 
-      // ② diffHeaderを初期状態(非表示・縮小)にセット → 少し遅らせてフェードイン
+      // ② diffHeaderを初期状態(非表示・縮小)にリセット
       var hdr = $('diffHeader');
       hdr.classList.remove('diff-visible');
       hdr.classList.add('diff-enter');
 
-      // ③ overlayフェードイン
+      // ③ overlayフェードイン（rAF2重で確実にトランジション発火）
       requestAnimationFrame(function() {
-        $('diffOverlay').classList.add('diff-overlay-visible');
+        requestAnimationFrame(function() {
+          $('diffOverlay').classList.add('diff-overlay-visible');
 
-        // パディング調整
-        var rect = hdr.getBoundingClientRect();
-        diffContent.style.paddingTop = (rect.bottom + 16) + 'px';
+          // パディング調整
+          var rect = hdr.getBoundingClientRect();
+          diffContent.style.paddingTop = (rect.bottom + 16) + 'px';
 
-        // メインヘッダーのtransitionが終わる頃(350ms)にdiffHeaderを登場させる
-        setTimeout(function() {
-          hdr.classList.remove('diff-enter');
-          hdr.classList.add('diff-visible');
-        }, 200);
+          // メインヘッダーが消えた後にdiffHeaderを登場
+          setTimeout(function() {
+            hdr.classList.remove('diff-enter');
+            hdr.classList.add('diff-visible');
+          }, 220);
+        });
       });
     }
 
@@ -1174,16 +1404,23 @@
       // overlayフェードアウト
       overlay.classList.remove('diff-overlay-visible');
 
-      // メインヘッダーを少し遅らせてフェードイン
+      // メインヘッダーをフェードイン（diff-exitを外してdiff-restoreを付ける）
       setTimeout(function() {
         mainHeader.classList.remove('diff-exit');
-        mainHeader.classList.add('diff-restore');
-      }, 150);
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            mainHeader.classList.add('diff-restore');
+          });
+        });
+      }, 120);
 
-      // アニメーション完了後にdisplay:noneに戻す
+      // アニメーション完了後にdisplay:noneに戻し、クラスをすべてリセット
       setTimeout(function() {
         overlay.style.display = 'none';
-      }, 300);
+        // 次回開いたときのために全クラスをリセット
+        hdr.classList.remove('diff-enter', 'diff-visible');
+        mainHeader.classList.remove('diff-exit', 'diff-restore');
+      }, 350);
     };
 
   </script>
