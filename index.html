@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <title>Notepad_Ver7.4</title>
+  <title>Notepad_Ver7.4.1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,6 +48,7 @@
       border: 1px solid rgba(255,255,255,0.2); z-index: 10;
     }
     header, #options, footer, .modal, .toast { border-radius: var(--radius); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    header { transition: opacity 0.32s cubic-bezier(0.4,0,0.2,1), transform 0.32s cubic-bezier(0.4,0,0.2,1), border-radius 0.3s cubic-bezier(0.4,0,0.2,1); }
     
     header { 
       position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
@@ -267,6 +268,41 @@
     .swatch:hover { transform: scale(1.15); }
     .swatch.active { border-color: var(--text); }
 
+    /* diff ヘッダー アニメーション */
+    #diffHeader {
+      transition: opacity 0.35s cubic-bezier(0.4,0,0.2,1),
+                  transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+    #diffHeader.diff-enter {
+      opacity: 0;
+      transform: translateX(-50%) scale(0.82);
+    }
+    #diffHeader.diff-visible {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+    }
+
+    /* メインヘッダー 退場アニメーション */
+    header.diff-exit {
+      opacity: 0;
+      transform: translateX(-50%) scale(0.82);
+      pointer-events: none;
+    }
+    header.diff-restore {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+      pointer-events: auto;
+    }
+
+    /* diffOverlay フェード */
+    #diffOverlay {
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    #diffOverlay.diff-overlay-visible {
+      opacity: 1;
+    }
+
   </style>
 </head>
 <body>
@@ -311,13 +347,13 @@
     </div>
     <div><span class="label">自動保存</span>
       <select id="autoSaveToggle">
-        <option value="on">ON</option>
         <option value="off">OFF</option>
+        <option value="on">ON</option>
       </select>
     </div>
     <div style="font-size: 10px; color: var(--dim); justify-content: center; border-top: 1px solid rgba(128,128,128,0.1); padding-top: 8px; margin-top: 8px; text-align:center; display: flex; flex-direction: column;">
-      <span>Build TH202602120151</span>
-      <span>Version 7.4</span>
+      <span>Build TH202602121610</span>
+      <span>Version 7.4.1</span>
       <span>↓Creator↓<br>Claude<br>Chat GPT<br>Gemini<br>Copilot<br>Tikuwa</span>
     </div>
   </div>
@@ -336,6 +372,7 @@
   <div id="contextMenu" class="glass">
     <button onclick="searchGoogle()">検索</button>
     <button onclick="translateText()">翻訳</button>
+    <button onclick="openCompareFromContextMenu()">比較</button>
   </div>
   
   <div id="searchHighlightMirror"></div>
@@ -347,6 +384,24 @@
   </footer>
 
   <input type="file" id="fileInput" hidden accept=".txt">
+  <input type="file" id="compareFileInput" hidden accept=".txt">
+
+  <!-- Diff 比較オーバーレイ -->
+  <div id="diffOverlay" style="display:none; position:fixed; inset:0; z-index:300; overflow:hidden; background:var(--bg);">
+    <div id="diffHeader" class="glass" style="position:fixed; top:12px; left:50%; transform:translateX(-50%); padding:4px 8px; display:flex; align-items:center; gap:6px; z-index:310; border-radius:25px;">
+      <span style="font-size:12px; color:var(--dim); white-space:nowrap;">比較結果</span>
+      <span style="width:1px;height:16px;background:rgba(128,128,128,0.25);display:inline-block;"></span>
+      <span id="diffLegendAdd" style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--dim);">
+        <span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:rgba(100,210,100,0.45);"></span>追加
+      </span>
+      <span id="diffLegendDel" style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--dim);">
+        <span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:rgba(255,80,80,0.45);"></span>削除
+      </span>
+      <span style="width:1px;height:16px;background:rgba(128,128,128,0.25);display:inline-block;"></span>
+      <button onclick="closeDiffOverlay()" style="background:transparent;border:none;cursor:pointer;font-size:13px;color:var(--dim);padding:2px 8px;border-radius:20px;font-family:inherit;transition:0.15s;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background='transparent'">✕ 閉じる</button>
+    </div>
+    <div id="diffContent" style="position:absolute;inset:0;padding:80px 30px 40px;overflow:auto;line-height:1.8;font-size:18px;white-space:pre-wrap;word-wrap:break-word;scrollbar-width:none;-ms-overflow-style:none;"></div>
+  </div>
 
   <div id="toastContainer"></div>
 
@@ -792,7 +847,7 @@
         localStorage.setItem('autosave_text', text);
         localStorage.setItem('autosave_file', state.curFile);
         var time = new Date().toLocaleTimeString('ja-JP', {hour:'2-digit', minute:'2-digit'});
-        queueToast('自動保存済み |' + time, 2000);
+        queueToast('自動保存済み ' + time, 2000);
       }, 2000);
     }
 
@@ -835,7 +890,7 @@
           edit.value = saved;
           if (savedFile) state.curFile = savedFile;
           ActionHandlers.updateText(edit.value);
-          queueToast('自動保存されたデータを復元しました', 3000);
+          queueToast('自動保存データを復元しました', 3000);
         }
       }
       autoSaveToggle.onchange = function() {
@@ -959,7 +1014,178 @@
       applyStyles();
       render();
     })();
+    // ── ファイル比較 (Diff) ──────────────────────────────────
+
+    // Myers diff アルゴリズム（行単位）
+    function computeDiff(aLines, bLines) {
+      var n = aLines.length, m = bLines.length;
+      var max = n + m;
+      if (max === 0) return [];
+      var v = new Array(2 * max + 1).fill(0);
+      var trace = [];
+
+      outer:
+      for (var d = 0; d <= max; d++) {
+        trace.push(v.slice());
+        for (var k = -d; k <= d; k += 2) {
+          var idx = k + max;
+          var x;
+          if (k === -d || (k !== d && v[idx - 1] < v[idx + 1])) {
+            x = v[idx + 1];
+          } else {
+            x = v[idx - 1] + 1;
+          }
+          var y = x - k;
+          while (x < n && y < m && aLines[x] === bLines[y]) { x++; y++; }
+          v[idx] = x;
+          if (x >= n && y >= m) { trace.push(v.slice()); break outer; }
+        }
+      }
+
+      // back-track
+      var ops = [];
+      var x = n, y = m;
+      for (var dd = trace.length - 1; dd >= 0; dd--) {
+        var vv = trace[dd];
+        var kk = x - y;
+        var kidx = kk + max;
+        var prevK;
+        if (kk === -dd || (kk !== dd && vv[kidx - 1] < vv[kidx + 1])) {
+          prevK = kk + 1;
+        } else {
+          prevK = kk - 1;
+        }
+        var prevX = vv[prevK + max];
+        var prevY = prevX - prevK;
+        while (x > prevX && y > prevY) { x--; y--; ops.push({ op: '=', line: aLines[x] }); }
+        if (dd > 0) {
+          if (x > prevX) { x--; ops.push({ op: '-', line: aLines[x] }); }
+          else if (y > prevY) { y--; ops.push({ op: '+', line: bLines[y] }); }
+        }
+      }
+      return ops.reverse();
+    }
+
+    function openCompareFile() {
+      var ci = $('compareFileInput');
+      try { ci.value = ''; } catch(e) {}
+      ci.click();
+    }
+
+    // 右クリックメニューの「比較」ボタン
+    window.openCompareFromContextMenu = function() {
+      hideContextMenu();
+      openCompareFile();
+    };
+
+    $('compareFileInput').onchange = function(e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function() {
+        showDiff($('edit').value, reader.result, file.name);
+      };
+      reader.readAsText(file);
+    };
+
+    function stripMeta(text) {
+      // ##FONT / ##SIZE メタ行を除去
+      return text.replace(/^##FONT:.*\n?/m, '').replace(/^##SIZE:.*\n?/m, '');
+    }
+
+    function showDiff(origText, newText, newFileName) {
+      var aRaw = stripMeta(origText);
+      var bRaw = stripMeta(newText);
+      var aLines = aRaw.split(/\r?\n/);
+      var bLines = bRaw.split(/\r?\n/);
+
+      var ops = computeDiff(aLines, bLines);
+
+      var edit   = $('edit');
+      var fs     = edit.style.fontSize   || '18px';
+      var ff     = edit.style.fontFamily || 'sans-serif';
+
+      var diffContent = $('diffContent');
+      diffContent.style.fontSize   = fs;
+      diffContent.style.fontFamily = ff;
+
+      var addCount = 0, delCount = 0;
+      var html = '';
+      ops.forEach(function(op) {
+        var safe = escapeHtml(op.line);
+        if (op.op === '+') {
+          addCount++;
+          html += '<span style="background:rgba(100,210,100,0.3);display:block;">+ ' + safe + '</span>';
+        } else if (op.op === '-') {
+          delCount++;
+          html += '<span style="background:rgba(255,80,80,0.3);display:block;">- ' + safe + '</span>';
+        } else {
+          html += '<span style="opacity:0.7;display:block;">　' + safe + '</span>';
+        }
+      });
+
+      diffContent.innerHTML = html;
+
+      // ヘッダー凡例に件数追加
+      $('diffLegendAdd').innerHTML =
+        '<span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:rgba(100,210,100,0.45);"></span>' +
+        '追加 ' + addCount + '行';
+      $('diffLegendDel').innerHTML =
+        '<span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:rgba(255,80,80,0.45);"></span>' +
+        '削除 ' + delCount + '行';
+
+      $('diffOverlay').style.display = 'block';
+
+      // ① メインヘッダーをフェードアウト＆縮小
+      var mainHeader = document.querySelector('header');
+      mainHeader.classList.remove('diff-restore');
+      mainHeader.classList.add('diff-exit');
+
+      // ② diffHeaderを初期状態(非表示・縮小)にセット → 少し遅らせてフェードイン
+      var hdr = $('diffHeader');
+      hdr.classList.remove('diff-visible');
+      hdr.classList.add('diff-enter');
+
+      // ③ overlayフェードイン
+      requestAnimationFrame(function() {
+        $('diffOverlay').classList.add('diff-overlay-visible');
+
+        // パディング調整
+        var rect = hdr.getBoundingClientRect();
+        diffContent.style.paddingTop = (rect.bottom + 16) + 'px';
+
+        // メインヘッダーのtransitionが終わる頃(350ms)にdiffHeaderを登場させる
+        setTimeout(function() {
+          hdr.classList.remove('diff-enter');
+          hdr.classList.add('diff-visible');
+        }, 200);
+      });
+    }
+
+    window.closeDiffOverlay = function() {
+      var mainHeader = document.querySelector('header');
+      var hdr = $('diffHeader');
+      var overlay = $('diffOverlay');
+
+      // diffHeaderをフェードアウト＆縮小
+      hdr.classList.remove('diff-visible');
+      hdr.classList.add('diff-enter');
+
+      // overlayフェードアウト
+      overlay.classList.remove('diff-overlay-visible');
+
+      // メインヘッダーを少し遅らせてフェードイン
+      setTimeout(function() {
+        mainHeader.classList.remove('diff-exit');
+        mainHeader.classList.add('diff-restore');
+      }, 150);
+
+      // アニメーション完了後にdisplay:noneに戻す
+      setTimeout(function() {
+        overlay.style.display = 'none';
+      }, 300);
+    };
+
   </script>
 </body>
 </html>
-
