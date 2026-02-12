@@ -6,73 +6,103 @@
   <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <title>Notepad_Ver7.4.2.1</title>
+  <title>Notepad_Ver7.4.2.2</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP&family=Zen+Maru+Gothic&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #ffffff; --text: #333; --ui-bg: rgba(255, 255, 255, 0.5);
-      --hover: rgba(0,0,0,0.05); --dim: #888; --radius: 25px;
+      --bg: #ffffff;
+      --text: #333;
+      --ui-bg: rgba(255, 255, 255, 0.5);
+      --hover: rgba(0, 0, 0, 0.05);
+      --dim: #888;
+      --radius: 25px;
       --accent: #006956;
     }
     @media (prefers-color-scheme: dark) {
-      :root { --bg: #121212; --text: #e0e0e0; --ui-bg: rgba(40, 40, 40, 0.5); --hover: rgba(255,255,255,0.08); }
-    }
-    
-    select, input[type="text"] { 
-      border-radius: 8px; 
-      padding: 4px 4px; 
-      font-size: 12px; 
-      font-family: inherit; 
-      border: 1px solid rgba(128,128,128,0.2);
-      background: rgba(255,255,255,0.1);
-      color: var(--text);
-    }
-    /* セレクトボックスのプルダウンメニューも設定ウィンドウのスタイルに合わせる */
-    select option {
-      background: #ffffff;
-      color: #333333;
-    }
-    
-    @media (prefers-color-scheme: dark) {
-      select, input[type="text"] { 
-        background: #333; 
-        color: #fff; 
-        border: 1px solid rgba(255,255,255,0.1); 
+      :root {
+        --bg: #121212;
+        --text: #e0e0e0;
+        --ui-bg: rgba(40, 40, 40, 0.5);
+        --hover: rgba(255, 255, 255, 0.08);
+      }
+      select, input[type="text"] {
+        background: #333;
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
       select option {
-        background: #333333;
+        background: #2d2d2d;
         color: #ffffff;
       }
     }
-    
+
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    
+
+    select, input[type="text"] {
+      border-radius: 8px;
+      padding: 4px;
+      font-size: 12px;
+      font-family: inherit;
+      border: 1px solid rgba(128, 128, 128, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+    }
+    select option {
+      background: #2d2d2d;
+      color: #ffffff;
+    }
+
     body {
-      margin: 0; background: var(--bg); color: var(--text);
-      font-family: sans-serif; height: 100vh; overflow: hidden;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: sans-serif;
+      height: 100vh;
+      overflow: hidden;
     }
 
     .glass {
-      background: var(--ui-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.2); z-index: 10;
+      background: var(--ui-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      z-index: 10;
     }
-    header, #options, footer, .modal, .toast { border-radius: var(--radius); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    header { transition: opacity 0.32s cubic-bezier(0.4,0,0.2,1), transform 0.32s cubic-bezier(0.4,0,0.2,1), border-radius 0.3s cubic-bezier(0.4,0,0.2,1); }
-    
-    header { 
-      position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
-      padding: 4px; display: flex; gap: 4px; width: fit-content;
+
+    header, #options, footer, .modal, .toast {
+      border-radius: var(--radius);
+      transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    header {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px;
+      display: flex;
+      gap: 4px;
+      width: fit-content;
       max-width: 95vw;
       justify-content: center;
-      z-index: 160; /* 検索バーより上に設定 */
+      z-index: 160;
+      transition: opacity 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+                  border-radius 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    header button { 
-      background: transparent; border: none; cursor: pointer; 
-      padding: 8px 16px; font-size: 13px; color: inherit;
-      border-radius: 20px; transition: 0.2s; font-family: inherit;
+    header button {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 8px 16px;
+      font-size: 13px;
+      color: inherit;
+      border-radius: 20px;
+      transition: 0.2s;
+      font-family: inherit;
       white-space: nowrap;
     }
     header button:hover { background: var(--hover); }
@@ -83,102 +113,175 @@
     }
 
     #options {
-      position: fixed; 
-      top: 50%; 
-      left: 50%; 
-      z-index: 170; 
-      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-      min-width: 220px; 
-      padding: 12px; 
-      padding-top: 36px; 
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      z-index: 170;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      min-width: 220px;
+      padding: 12px;
+      padding-top: 36px;
       border-radius: 18px;
       transform: translate(-50%, -50%) scale(0.9);
-      opacity: 0; 
-      pointer-events: none; 
+      opacity: 0;
+      pointer-events: none;
       will-change: opacity, transform;
-      transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     #options.show {
       opacity: 1;
       transform: translate(-50%, -50%) scale(1);
       pointer-events: auto;
     }
+    #options div { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
 
     .close-dot {
-      position: absolute; top: 12px; left: 12px; width: 14px; height: 14px; border-radius: 50%;
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, #ff6b6b, #e53935);
-      border: 1px solid rgba(0,0,0,0.25); box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-      cursor: pointer; padding: 0; display: inline-block;
+      border: 1px solid rgba(0, 0, 0, 0.25);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+      cursor: pointer;
+      padding: 0;
+      display: inline-block;
     }
     .close-dot:hover { transform: scale(1.1); }
     .close-dot:focus { outline: none; }
 
-    #options div { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .label { width: 60px; color: var(--dim); font-size: 11px; }
 
     .modal {
-      position: fixed; top: 50%; left: 50%; 
+      position: fixed;
+      top: 50%;
+      left: 50%;
       transform: translate(-50%, -50%) scale(0.9);
-      width: fit-content; min-width: 280px; padding: 24px 30px; text-align: center; opacity: 0; pointer-events: none;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 180;
+      width: fit-content;
+      min-width: 280px;
+      padding: 24px 30px;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      z-index: 180;
       transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .modal.show { 
-      opacity: 1; 
-      transform: translate(-50%, -50%) scale(1); 
-      pointer-events: auto; 
+    .modal.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      pointer-events: auto;
     }
     .modal p { margin: 0 0 15px 0; font-size: 14px; white-space: nowrap; font-weight: bold; }
-    
+
     #fileNameInput {
-      width: 100%; border-radius: 12px;
-      border: 1px solid rgba(128,128,128,0.2); background: rgba(255,255,255,0.1);
-      color: inherit; font-family: inherit; font-size: 14px; margin-bottom: 20px;
-      outline: none; text-align: center;
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid rgba(128, 128, 128, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      color: inherit;
+      font-family: inherit;
+      font-size: 14px;
+      margin-bottom: 20px;
+      outline: none;
+      text-align: center;
     }
 
     .modal-btns { display: flex; gap: 10px; width: 100%; }
-    .modal-btns button { 
-      flex: 1; padding: 10px 0; border-radius: 15px; border: none; cursor: pointer; 
-      font-size: 14px; font-family: inherit; transition: 0.2s;
+    .modal-btns button {
+      flex: 1;
+      padding: 10px 0;
+      border-radius: 15px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+      transition: 0.2s;
     }
     .btn-main { background: var(--accent); color: white; }
     .btn-sub { background: var(--hover); color: var(--text); }
 
     textarea {
-      position: absolute; inset: 0;
-      border: none; outline: none; box-sizing: border-box;
-      padding: 80px 30px 100px 30px;
-      background: transparent; color: inherit; line-height: 1.8; font-size: 18px; resize: none;
-      width: 100%; height: auto; overflow: auto;
+      position: absolute;
+      inset: 0;
+      border: none;
+      outline: none;
+      padding: 80px 30px 100px;
+      background: transparent;
+      color: inherit;
+      line-height: 1.8;
+      font-size: 18px;
+      resize: none;
+      width: 100%;
+      height: auto;
+      overflow: auto;
       scrollbar-width: none;
       -ms-overflow-style: none;
-      transition: padding-top 0.3s ease; /* パディング変更を滑らかに */
+      transition: padding-top 0.3s ease;
     }
-    textarea::-webkit-scrollbar { width: 0; height: 0; display: none; }
+    textarea::-webkit-scrollbar { display: none; }
 
     footer {
-      position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
-      padding: 5px 14px; font-size: 11px; color: var(--dim); display: flex; gap: 8px;
-      max-width: 90vw; justify-content: center; white-space: nowrap;
+      position: fixed;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 5px 14px;
+      font-size: 11px;
+      color: var(--dim);
+      display: flex;
+      gap: 8px;
+      max-width: 90vw;
+      justify-content: center;
+      white-space: nowrap;
     }
     footer.hidden { transform: translate(-50%, 50px); opacity: 0; pointer-events: none; }
-    
-    #backdrop { 
-      position: fixed; inset: 0; background: rgba(0,0,0,0.15); 
-      z-index: 9; display: none; 
+
+    #backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.15);
+      z-index: 9;
+      display: none;
     }
     #backdrop.show { display: block; }
 
     .toast {
-      position: fixed; right: 16px; top: 12px; min-width: 260px; max-width: 420px;
-      background: var(--ui-bg); color: var(--text); z-index: 200; overflow: hidden;
-      transform: translateX(120%); transition: transform 0.36s cubic-bezier(0.2,0,0.2,1), opacity 0.2s; opacity: 0;
-      display: flex; align-items: center; padding: 10px 14px; gap: 10px; font-size: 13px;
+      position: fixed;
+      right: 16px;
+      top: 12px;
+      min-width: 260px;
+      max-width: 420px;
+      background: var(--ui-bg);
+      color: var(--text);
+      z-index: 200;
+      overflow: hidden;
+      transform: translateX(120%);
+      transition: transform 0.36s cubic-bezier(0.2, 0, 0.2, 1), opacity 0.2s;
+      opacity: 0;
+      display: flex;
+      align-items: center;
+      padding: 10px 14px;
+      gap: 10px;
+      font-size: 13px;
     }
     .toast.show { transform: translateX(0); opacity: 1; }
-    
+
     @media (max-width: 480px) {
+      textarea {
+        padding: 72px 16px 90px;
+        font-size: 16px;
+      }
+      #searchHighlightMirror {
+        padding: 72px 16px 90px;
+        font-size: 16px;
+      }
+      #contextMenu {
+        max-width: calc(100vw - 24px);
+      }
       .toast {
         left: 50%;
         right: auto;
@@ -194,13 +297,13 @@
 
     .toast .count { position: absolute; left: 0; top: 0; height: 4px; background: var(--accent); width: 100%; transition: width linear; }
     .toast .msg { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    
+
     #contextMenu {
       position: fixed;
       z-index: 1000;
       display: none;
       min-width: 120px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       border-radius: 20px;
       overflow: hidden;
       padding: 4px;
@@ -218,19 +321,20 @@
       transition: 0.2s;
       border-radius: 16px;
     }
-    #contextMenu button:hover {
-      background: var(--hover);
-    }
+    #contextMenu button:hover { background: var(--hover); }
 
-    /* 検索ハイライト ミラーdiv */
     #searchHighlightMirror {
-      position: absolute; inset: 0;
-      pointer-events: none; z-index: 1;
-      padding: 80px 30px 100px 30px;
-      line-height: 1.8; font-size: 18px;
-      white-space: pre-wrap; word-wrap: break-word;
-      overflow: hidden; color: transparent;
-      box-sizing: border-box;
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      padding: 80px 30px 100px;
+      line-height: 1.8;
+      font-size: 18px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow: hidden;
+      color: transparent;
       transition: padding-top 0.3s ease;
     }
     #searchHighlightMirror mark {
@@ -239,144 +343,162 @@
       background: var(--accent);
       opacity: 0.18;
     }
-    #searchHighlightMirror mark.current {
-      opacity: 0.38;
-    }
+    #searchHighlightMirror mark.current { opacity: 0.38; }
 
-    /* 検索バー */
     #searchBar {
-      position: fixed; left: 50%;
-      display: flex; align-items: center; gap: 6px;
-      padding: 6px 10px; z-index: 150;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.25s cubic-bezier(0.4,0,0.2,1), transform 0.25s cubic-bezier(0.4,0,0.2,1), top 0.3s ease;
+      position: fixed;
+      left: 50%;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      z-index: 150;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                  top 0.3s ease;
       transform: translateX(-50%) translateY(-6px);
       border-radius: var(--radius);
     }
     #searchBar.show {
-      opacity: 1; pointer-events: auto;
+      opacity: 1;
+      pointer-events: auto;
       transform: translateX(-50%) translateY(0);
     }
     #searchBar input {
-      border: none; outline: none; background: transparent;
-      font-size: 14px; color: var(--text); font-family: inherit;
-      width: 200px; padding: 2px 4px;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 14px;
+      color: var(--text);
+      font-family: inherit;
+      width: 200px;
+      padding: 2px 4px;
     }
     #searchBar .s-count { font-size: 11px; color: var(--dim); white-space: nowrap; min-width: 40px; }
     #searchBar button {
-      background: transparent; border: none; cursor: pointer;
-      font-size: 13px; color: var(--dim); padding: 2px 6px;
-      border-radius: 8px; font-family: inherit; transition: 0.15s;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--dim);
+      padding: 2px 6px;
+      border-radius: 8px;
+      font-family: inherit;
+      transition: 0.15s;
     }
     #searchBar button:hover { background: var(--hover); color: var(--text); }
-    #searchBar .s-divider { width: 1px; height: 16px; background: rgba(128,128,128,0.25); }
+    #searchBar .s-divider { width: 1px; height: 16px; background: rgba(128, 128, 128, 0.25); }
 
-    /* モバイル向け textarea パディング */
-    @media (max-width: 480px) {
-      textarea {
-        padding: 72px 16px 90px 16px;
-        font-size: 16px;
-      }
-      #searchHighlightMirror {
-        padding: 72px 16px 90px 16px;
-        font-size: 16px;
-      }
-      #contextMenu {
-        /* 画面端に被らないようmax-widthを制限 */
-        max-width: calc(100vw - 24px);
-      }
-    }
-
-    /* 翻訳ウィンドウ */
     #translatePanel {
       position: fixed;
-      top: 50%; left: 50%;
+      top: 50%;
+      left: 50%;
       transform: translate(-50%, -50%) scale(0.92);
       width: min(480px, 92vw);
       max-height: 70vh;
       z-index: 1100;
       border-radius: 20px;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.22);
-      display: flex; flex-direction: column;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.28s cubic-bezier(0.4,0,0.2,1),
-                  transform 0.28s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22);
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
       overflow: hidden;
     }
     #translatePanel.show {
-      opacity: 1; pointer-events: auto;
+      opacity: 1;
+      pointer-events: auto;
       transform: translate(-50%, -50%) scale(1);
     }
     #translatePanel .tp-header {
-      display: flex; align-items: center;
+      display: flex;
+      align-items: center;
       padding: 10px 14px 8px;
-      border-bottom: 1px solid rgba(128,128,128,0.15);
+      border-bottom: 1px solid rgba(128, 128, 128, 0.15);
       flex-shrink: 0;
       position: relative;
     }
-    /* Mac風赤丸 */
     #translatePanel .tp-dot {
-      width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      flex-shrink: 0;
       background: radial-gradient(circle at 30% 30%, #ff6b6b, #e53935);
-      border: 1px solid rgba(0,0,0,0.2);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-      cursor: pointer; transition: 0.15s; z-index: 1;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      transition: 0.15s;
+      z-index: 1;
     }
     #translatePanel .tp-dot:hover { transform: scale(1.15); }
-    /* 言語ペア選択 — ヘッダー中央に絶対配置 */
     #translatePanel .tp-lang {
-      position: absolute; left: 50%; transform: translateX(-50%);
-      display: flex; align-items: center; gap: 6px;
-      font-size: 12px; color: var(--dim);
-      pointer-events: auto;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--dim);
     }
     #translatePanel .tp-lang select {
-      border-radius: 10px; padding: 3px 6px;
-      font-size: 12px; font-family: inherit;
-      border: 1px solid rgba(128,128,128,0.2);
-      background: rgba(255,255,255,0.1);
-      color: var(--text); cursor: pointer;
+      border-radius: 10px;
+      padding: 3px 6px;
+      font-size: 12px;
+      font-family: inherit;
+      border: 1px solid rgba(128, 128, 128, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+      cursor: pointer;
     }
-    #translatePanel .tp-lang .tp-arrow {
-      font-size: 13px; color: var(--dim); user-select: none;
-    }
+    #translatePanel .tp-lang .tp-arrow { font-size: 13px; color: var(--dim); user-select: none; }
     #translatePanel .tp-body {
       padding: 14px 18px 18px;
-      overflow-y: auto; flex: 1;
+      overflow-y: auto;
+      flex: 1;
       scrollbar-width: none;
     }
     #translatePanel .tp-body::-webkit-scrollbar { display: none; }
     #translatePanel .tp-src {
-      font-size: 13px; color: var(--dim); margin-bottom: 10px;
+      font-size: 13px;
+      color: var(--dim);
+      margin-bottom: 10px;
       padding-bottom: 10px;
-      border-bottom: 1px solid rgba(128,128,128,0.12);
-      line-height: 1.6; word-break: break-all;
+      border-bottom: 1px solid rgba(128, 128, 128, 0.12);
+      line-height: 1.6;
+      word-break: break-all;
     }
-    #translatePanel .tp-result {
-      font-size: 17px; line-height: 1.75; word-break: break-all;
-      color: var(--text);
-    }
-    #translatePanel .tp-loading {
-      text-align: center; padding: 24px 0;
-      color: var(--dim); font-size: 13px;
-    }
-    #translatePanel .tp-error {
-      color: #e53935; font-size: 13px; padding: 16px 0;
-    }
+    #translatePanel .tp-result { font-size: 17px; line-height: 1.75; word-break: break-all; color: var(--text); }
+    #translatePanel .tp-loading { text-align: center; padding: 24px 0; color: var(--dim); font-size: 13px; }
+    #translatePanel .tp-error { color: #e53935; font-size: 13px; padding: 16px 0; }
 
-    /* テーマカラースウォッチ */
     .color-swatches { display: flex; gap: 6px; flex-wrap: wrap; }
     .swatch {
-      width: 20px; height: 20px; border-radius: 50%; cursor: pointer;
-      border: 2px solid transparent; transition: 0.15s; flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: 0.15s;
+      flex-shrink: 0;
     }
     .swatch:hover { transform: scale(1.15); }
     .swatch.active { border-color: var(--text); }
 
-    /* diff ヘッダー アニメーション */
+    /* Diff オーバーレイ */
+    #diffOverlay {
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    #diffOverlay.diff-overlay-visible { opacity: 1; }
+
     #diffHeader {
-      transition: opacity 0.35s cubic-bezier(0.4,0,0.2,1),
-                  transform 0.35s cubic-bezier(0.4,0,0.2,1);
+      transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
     #diffHeader.diff-enter {
       opacity: 0;
@@ -387,7 +509,6 @@
       transform: translateX(-50%) scale(1);
     }
 
-    /* メインヘッダー 退場アニメーション */
     header.diff-exit {
       opacity: 0;
       transform: translateX(-50%) scale(0.82);
@@ -399,15 +520,84 @@
       pointer-events: auto;
     }
 
-    /* diffOverlay フェード */
-    #diffOverlay {
-      opacity: 0;
-      transition: opacity 0.25s ease;
-    }
-    #diffOverlay.diff-overlay-visible {
-      opacity: 1;
+    /* diffContent のスタイル */
+    #diffContent {
+      position: absolute;
+      inset: 0;
+      padding: 80px 30px 40px;
+      overflow: auto;
+      line-height: 1.8;
+      font-size: 18px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     }
 
+    /* diffHeader のスタイル */
+    #diffHeader {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 310;
+      border-radius: 25px;
+    }
+    #diffHeader .diff-label {
+      font-size: 12px;
+      color: var(--dim);
+      white-space: nowrap;
+    }
+    #diffHeader .diff-divider {
+      width: 1px;
+      height: 16px;
+      background: rgba(128, 128, 128, 0.25);
+      display: inline-block;
+    }
+    #diffHeader .diff-legend {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--dim);
+    }
+    #diffHeader .diff-legend-dot {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+    }
+    #diffHeader .diff-legend-dot.add { background: rgba(100, 210, 100, 0.45); }
+    #diffHeader .diff-legend-dot.del { background: rgba(255, 80, 80, 0.45); }
+    #diffHeader .diff-close-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--dim);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-family: inherit;
+      transition: 0.15s;
+    }
+    #diffHeader .diff-close-btn:hover { background: var(--hover); }
+
+    /* options の version 情報 */
+    .options-version {
+      font-size: 10px;
+      color: var(--dim);
+      justify-content: center;
+      border-top: 1px solid rgba(128, 128, 128, 0.1);
+      padding-top: 8px;
+      margin-top: 8px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+    }
   </style>
 </head>
 <body>
@@ -432,20 +622,23 @@
 
   <div id="options" class="glass">
     <button class="close-dot" onclick="act('toggle')" aria-label="閉じる" title="閉じる"></button>
-
     <div><span class="label">Font</span><select id="fSel"></select></div>
     <div><span class="label">Size</span><select id="sSel"></select></div>
-    <div><span class="label">検索</span><select id="searchSel">
-      <option value="google">Google</option>
-      <option value="duckduckgo">DuckDuckGo</option>
-      <option value="startpage">StartPage</option>
-      <option value="yahooJP">Yahoo! Japan</option>
-      <option value="bing">Bing</option>
-    </select></div>
-    <div><span class="label">翻訳</span><select id="translateSel">
-      <option value="google">Google 翻訳</option>
-      <option value="bing">Bing 翻訳</option>
-    </select></div>
+    <div><span class="label">検索</span>
+      <select id="searchSel">
+        <option value="google">Google</option>
+        <option value="duckduckgo">DuckDuckGo</option>
+        <option value="startpage">StartPage</option>
+        <option value="yahooJP">Yahoo! Japan</option>
+        <option value="bing">Bing</option>
+      </select>
+    </div>
+    <div><span class="label">翻訳</span>
+      <select id="translateSel">
+        <option value="google">Google 翻訳</option>
+        <option value="bing">Bing 翻訳</option>
+      </select>
+    </div>
     <div><span class="label">テーマ</span>
       <div class="color-swatches" id="colorSwatches"></div>
     </div>
@@ -455,9 +648,9 @@
         <option value="on">ON</option>
       </select>
     </div>
-    <div style="font-size: 10px; color: var(--dim); justify-content: center; border-top: 1px solid rgba(128,128,128,0.1); padding-top: 8px; margin-top: 8px; text-align:center; display: flex; flex-direction: column;">
-      <span>Build TH202602122025</span>
-      <span>Version 7.4.2.1</span>
+    <div class="options-version">
+      <span>Build TH202602130308</span>
+      <span>Version 7.4.2.2</span>
       <span>↓Creator↓<br>Claude<br>Chat GPT<br>Gemini<br>Copilot<br>Cursor<br>Tikuwa</span>
     </div>
   </div>
@@ -471,7 +664,6 @@
     </div>
   </div>
 
-  <!-- 翻訳パネル -->
   <div id="translatePanel" class="glass">
     <div class="tp-header">
       <button class="tp-dot" onclick="closeTranslatePanel()" aria-label="閉じる"></button>
@@ -505,13 +697,13 @@
   </div>
 
   <div id="backdrop" onclick="act('closeOverlays')"></div>
-  
+
   <div id="contextMenu" class="glass">
     <button onclick="searchGoogle()">検索</button>
     <button onclick="translateText()">翻訳</button>
     <button onclick="openCompareFromContextMenu()">比較</button>
   </div>
-  
+
   <div id="searchHighlightMirror"></div>
   <textarea id="edit" spellcheck="false"></textarea>
 
@@ -523,34 +715,33 @@
   <input type="file" id="fileInput" hidden accept=".txt">
   <input type="file" id="compareFileInput" hidden accept=".txt">
 
-  <!-- Diff 比較オーバーレイ -->
   <div id="diffOverlay" style="display:none; position:fixed; inset:0; z-index:300; overflow:hidden; background:var(--bg);">
-    <div id="diffHeader" class="glass" style="position:fixed; top:12px; left:50%; transform:translateX(-50%); padding:4px 8px; display:flex; align-items:center; gap:6px; z-index:310; border-radius:25px;">
-      <span style="font-size:12px; color:var(--dim); white-space:nowrap;">比較結果</span>
-      <span style="width:1px;height:16px;background:rgba(128,128,128,0.25);display:inline-block;"></span>
-      <span id="diffLegendAdd" style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--dim);">
-        <span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:rgba(100,210,100,0.45);"></span>追加
+    <div id="diffHeader" class="glass diff-enter">
+      <span class="diff-label">比較結果</span>
+      <span class="diff-divider"></span>
+      <span id="diffLegendAdd" class="diff-legend">
+        <span class="diff-legend-dot add"></span>追加
       </span>
-      <span id="diffLegendDel" style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--dim);">
-        <span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:rgba(255,80,80,0.45);"></span>削除
+      <span id="diffLegendDel" class="diff-legend">
+        <span class="diff-legend-dot del"></span>削除
       </span>
-      <span style="width:1px;height:16px;background:rgba(128,128,128,0.25);display:inline-block;"></span>
-      <button onclick="closeDiffOverlay()" style="background:transparent;border:none;cursor:pointer;font-size:13px;color:var(--dim);padding:2px 8px;border-radius:20px;font-family:inherit;transition:0.15s;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background='transparent'">✕ 閉じる</button>
+      <span class="diff-divider"></span>
+      <button class="diff-close-btn" onclick="closeDiffOverlay()">✕ 閉じる</button>
     </div>
-    <div id="diffContent" style="position:absolute;inset:0;padding:80px 30px 40px;overflow:auto;line-height:1.8;font-size:18px;white-space:pre-wrap;word-wrap:break-word;scrollbar-width:none;-ms-overflow-style:none;"></div>
+    <div id="diffContent"></div>
   </div>
 
   <div id="toastContainer"></div>
 
   <script>
     var $ = function(id) { return document.getElementById(id); };
-    
+
     var getBrowser = function() {
       var ua = navigator.userAgent.toLowerCase();
       if (ua.indexOf('opr') !== -1 || ua.indexOf('opera') !== -1) return 'Opera';
       if (ua.indexOf('edg') !== -1) return 'Edge';
       if (ua.indexOf('firefox') !== -1) return 'Firefox';
-      if (ua.indexOf('chrome') !== -1) return 'Chrome'; 
+      if (ua.indexOf('chrome') !== -1) return 'Chrome';
       if (ua.indexOf('safari') !== -1) return 'Safari';
       return 'Browser';
     };
@@ -571,15 +762,14 @@
     };
 
     var supportedFonts = ['Arial', 'Noto Sans JP', 'Noto Serif JP', 'Zen Maru Gothic', 'Dela Gothic One'];
-    var supportedSizes = (function(){ var a=[]; for(var s=12;s<=80;s+=2) a.push(s); return a; })();
 
     var toastQueue = [];
     var isToastShowing = false;
     var sizeToastTimer = null;
-    var hasShownOfflineToast = false; // オフライン通知の連続表示防止用フラグ
+    var hasShownOfflineToast = false;
 
     function queueToast(message, duration) {
-      toastQueue.push({ message, duration: duration || 4000 });
+      toastQueue.push({ message: message, duration: duration || 4000 });
       processToastQueue();
     }
 
@@ -594,6 +784,7 @@
       var container = $('toastContainer');
       var el = document.createElement('div');
       el.className = 'glass toast';
+
       var count = document.createElement('div');
       count.className = 'count';
       var msg = document.createElement('div');
@@ -628,26 +819,24 @@
     }
 
     var ActionHandlers = {
-      new: function() { 
+      new: function() {
         state.modalType = 'new';
-        state.isModalOpen = true; 
+        state.isModalOpen = true;
       },
-      open: function() { 
+      open: function() {
         state.isModalOpen = false;
         state.isOptionsOpen = false;
         render();
         var fi = $('fileInput');
         try { fi.value = ''; } catch(e) {}
-        fi.click(); 
+        fi.click();
       },
       save: function() {
-        var editEl = $('edit');
-        state.text = editEl.value;
+        state.text = $('edit').value;
         try {
           var fontMeta = '##FONT:"' + $('fSel').value + '"';
           var sizeMeta = '##SIZE:' + $('sSel').value;
           var fullText = fontMeta + '\n' + sizeMeta + '\n' + state.text;
-
           var a = document.createElement('a');
           var blob = new Blob([fullText], { type: 'text/plain' });
           var url = URL.createObjectURL(blob);
@@ -656,15 +845,14 @@
           a.click();
           URL.revokeObjectURL(url);
           queueToast('保存を開始しました：' + state.curFile, 2500);
-        } catch (e) {
+        } catch(e) {
           queueToast('保存に失敗しました。');
         }
       },
-      toggle: function() { 
-        state.isOptionsOpen = !state.isOptionsOpen; 
+      toggle: function() {
+        state.isOptionsOpen = !state.isOptionsOpen;
         if (state.isOptionsOpen) {
           state.isModalOpen = false;
-          // 設定ウィンドウを開くときに翻訳系UIは必ず閉じる
           hideContextMenu();
           var tp = $('translatePanel');
           if (tp) tp.classList.remove('show');
@@ -679,7 +867,7 @@
           clearSearchHighlight();
           $('searchCount').textContent = '';
         }
-        updateTextareaPadding(); // 検索バーの有無でパディングと読み取り専用を切り替え
+        updateTextareaPadding();
       },
       searchNext: function() { doSearch(1); },
       searchPrev: function() { doSearch(-1); },
@@ -694,16 +882,17 @@
         var bodyLines = [];
         var changed = false;
 
-        for(var i=0; i<lines.length; i++) {
+        for (var i = 0; i < lines.length; i++) {
           var line = lines[i];
-          if(line.startsWith('##FONT:')) {
+          if (line.startsWith('##FONT:')) {
             var font = line.replace('##FONT:', '').replace(/"/g, '').trim();
             updateSelectValue('fSel', font);
-            changed = true; continue;
+            changed = true;
+            continue;
           }
-          if(line.startsWith('##SIZE:')) {
+          if (line.startsWith('##SIZE:')) {
             var sizeRaw = parseInt(line.replace('##SIZE:', '').trim());
-            if(!isNaN(sizeRaw)) {
+            if (!isNaN(sizeRaw)) {
               updateSelectValue('sSel', normalizeSize(sizeRaw));
               changed = true;
             }
@@ -713,13 +902,12 @@
         }
 
         var processedText = bodyLines.join('\n');
-        
         if (changed) {
-            state.text = processedText;
-            $('edit').value = state.text;
-            applyStyles();
+          state.text = processedText;
+          $('edit').value = state.text;
+          applyStyles();
         } else {
-            state.text = val;
+          state.text = val;
         }
 
         clearTimeout(state.hideTimer);
@@ -733,24 +921,22 @@
       }
     };
 
-    // 検索バーに合わせてtextareaのパディングと入力を制御
     function updateTextareaPadding() {
       var edit = $('edit');
       var mirror = $('searchHighlightMirror');
       var searchBar = $('searchBar');
-      
+
       if (state.isSearchOpen) {
         var barHeight = searchBar.offsetHeight || 44;
         var barTop = parseInt(searchBar.style.top) || 68;
-        var totalPadding = barTop + barHeight + 20; 
-        
-        edit.style.paddingTop = totalPadding + "px";
-        mirror.style.paddingTop = totalPadding + "px";
-        edit.readOnly = true; // 入力不可にする
+        var totalPadding = barTop + barHeight + 20;
+        edit.style.paddingTop = totalPadding + 'px';
+        mirror.style.paddingTop = totalPadding + 'px';
+        edit.readOnly = true;
       } else {
-        edit.style.paddingTop = "80px";
-        mirror.style.paddingTop = "80px";
-        edit.readOnly = false; // 入力許可に戻す
+        edit.style.paddingTop = '80px';
+        mirror.style.paddingTop = '80px';
+        edit.readOnly = false;
       }
     }
 
@@ -764,18 +950,18 @@
         ctx.font = '72px "' + font + '", monospace';
         var w2 = ctx.measureText('abcdefg').width;
         return w1 !== w2;
-      } catch (e) { return false; }
+      } catch(e) { return false; }
     }
 
     function updateSelectValue(id, value) {
       var sel = $(id);
-      for(var i=0; i<sel.options.length; i++){
-        if(sel.options[i].value == value) {
+      for (var i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value == value) {
           sel.selectedIndex = i;
           return;
         }
       }
-      if(id === 'fSel' && isFontAvailable(value)) {
+      if (id === 'fSel' && isFontAvailable(value)) {
         sel.add(new Option(value, value));
         sel.selectedIndex = sel.options.length - 1;
       }
@@ -793,9 +979,11 @@
     }
 
     function debounce(fn, wait) {
-      var t; return function() {
+      var t;
+      return function() {
         var ctx = this, args = arguments;
-        clearTimeout(t); t = setTimeout(function() { fn.apply(ctx, args); }, wait);
+        clearTimeout(t);
+        t = setTimeout(function() { fn.apply(ctx, args); }, wait);
       };
     }
 
@@ -805,11 +993,11 @@
     window.searchGoogle = function() {
       if (selectedText) {
         var searchUrls = {
-          'google': 'https://www.google.com/search?q=',
+          'google':     'https://www.google.com/search?q=',
           'duckduckgo': 'https://duckduckgo.com/?q=',
-          'bing': 'https://www.bing.com/search?q=',
-          'yahooJP': 'https://search.yahoo.co.jp/search?p=',
-          'startpage': 'https://www.startpage.com/do/search?q='
+          'bing':       'https://www.bing.com/search?q=',
+          'yahooJP':    'https://search.yahoo.co.jp/search?p=',
+          'startpage':  'https://www.startpage.com/do/search?q='
         };
         var url = searchUrls[state.searchEngine] || searchUrls['google'];
         window.open(url + encodeURIComponent(selectedText), '_blank');
@@ -821,21 +1009,15 @@
       if (!selectedText) { hideContextMenu(); return; }
       hideContextMenu();
 
-      var src    = selectedText;
-      var panel  = $('translatePanel');
-      var tpSrc  = $('tpSrc');
+      var src = selectedText;
+      var panel = $('translatePanel');
+      var tpSrc = $('tpSrc');
       var tpResult = $('tpResult');
 
-      var sl = $('tpSrcLang') ? $('tpSrcLang').value : 'auto';
-      var tl = $('tpTgtLang') ? $('tpTgtLang').value : 'ja';
-
-      // 元テキスト表示（長い場合は省略）
       tpSrc.textContent = src.length > 120 ? src.slice(0, 120) + '…' : src;
       tpResult.innerHTML = '<div class="tp-loading">翻訳中…</div>';
-
       panel.classList.add('show');
 
-      // 言語変更時に再翻訳
       var doFetch = function() {
         var slVal = $('tpSrcLang').value;
         var tlVal = $('tpTgtLang').value;
@@ -855,11 +1037,8 @@
           });
       };
 
-      // セレクター変更で再翻訳
       $('tpSrcLang').onchange = doFetch;
       $('tpTgtLang').onchange = doFetch;
-
-      // 初回翻訳実行
       doFetch();
     };
 
@@ -876,7 +1055,6 @@
       contextMenu.style.left = x + 'px';
       contextMenu.style.top  = y + 'px';
       contextMenu.style.display = 'block';
-      // 画面端からはみ出さないよう位置補正
       var rect = contextMenu.getBoundingClientRect();
       if (rect.right  > window.innerWidth  - 8) contextMenu.style.left = (x - rect.width  - 4) + 'px';
       if (rect.bottom > window.innerHeight - 8) contextMenu.style.top  = (y - rect.height - 4) + 'px';
@@ -884,38 +1062,38 @@
 
     window.act = function(type) { ActionHandlers[type](); render(); };
     window.closeConfirm = function(yes) {
-      if (yes && state.modalType === 'new') { 
-          $('edit').value = ""; 
-          ActionHandlers.updateText(""); 
-          state.curFile = 'memo.txt'; 
+      if (yes && state.modalType === 'new') {
+        $('edit').value = '';
+        ActionHandlers.updateText('');
+        state.curFile = 'memo.txt';
       }
-      ActionHandlers.closeOverlays(); render();
+      ActionHandlers.closeOverlays();
+      render();
     };
 
     function render() {
       var edit = $('edit');
-      $('f-info').textContent = state.curFile + " · " + edit.value.length + " 文字";
+      $('f-info').textContent = state.curFile + ' · ' + edit.value.length + ' 文字';
       $('b-info').textContent = state.browser;
-      edit.placeholder = state.browser + " >";
+      edit.placeholder = state.browser + ' >';
 
       var isAnyOpen = state.isOptionsOpen || state.isModalOpen;
-      $('options').className = 'glass' + (state.isOptionsOpen ? ' show' : '');
-      $('confirmModal').className = 'glass modal' + (state.isModalOpen ? ' show' : '');
-      $('backdrop').className = (isAnyOpen ? 'show' : '');
-      $('ft').className = 'glass' + (state.isFooterHidden ? ' hidden' : '');
-      $('searchBar').className = 'glass' + (state.isSearchOpen ? ' show' : '');
+      $('options').className       = 'glass' + (state.isOptionsOpen ? ' show' : '');
+      $('confirmModal').className  = 'glass modal' + (state.isModalOpen ? ' show' : '');
+      $('backdrop').className      = isAnyOpen ? 'show' : '';
+      $('ft').className            = 'glass' + (state.isFooterHidden ? ' hidden' : '');
+      $('searchBar').className     = 'glass' + (state.isSearchOpen ? ' show' : '');
     }
 
     function applyStyles() {
       var edit = $('edit');
       edit.style.fontFamily = $('fSel').value;
-      edit.style.fontSize = $('sSel').value + 'px';
+      edit.style.fontSize   = $('sSel').value + 'px';
       updateMirror();
     }
 
-    // ── テーマカラー ──
     var themeColors = [
-      { color: '#006956', label: 'グリーン' },
+      { color: '#006956', label: 'ティールグリーン' },
       { color: '#1a73e8', label: 'ブルー' },
       { color: '#9c27b0', label: 'パープル' },
       { color: '#e53935', label: 'レッド' },
@@ -932,15 +1110,11 @@
       });
     }
 
-    // ── テキスト内検索 ──
     var searchMatches = [];
     var searchIndex = 0;
 
     function escapeHtml(str) {
-      return str
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
     function updateMirror() {
@@ -967,8 +1141,8 @@
 
       searchMatches.forEach(function(pos, i) {
         html += escapeHtml(text.substring(cursor, pos));
-        var cls = (i === searchIndex) ? 'current' : '';
-        html += '<mark class="' + cls + '">' + escapeHtml(text.substring(pos, pos + qLen)) + '</mark>';
+        html += '<mark class="' + (i === searchIndex ? 'current' : '') + '">'
+              + escapeHtml(text.substring(pos, pos + qLen)) + '</mark>';
         cursor = pos + qLen;
       });
       html += escapeHtml(text.substring(cursor));
@@ -986,6 +1160,7 @@
         updateMirror();
         return;
       }
+
       var text      = edit.value;
       var lowerText = text.toLowerCase();
       var lowerQ    = query.toLowerCase();
@@ -994,11 +1169,13 @@
         searchMatches.push(pos);
         pos += lowerQ.length;
       }
+
       if (searchMatches.length === 0) {
         $('searchCount').textContent = '0 / 0';
         updateMirror();
         return;
       }
+
       if      (dir ===  1) searchIndex = (searchIndex + 1) % searchMatches.length;
       else if (dir === -1) searchIndex = (searchIndex - 1 + searchMatches.length) % searchMatches.length;
       else                 searchIndex = 0;
@@ -1007,8 +1184,6 @@
       edit.setSelectionRange(matchPos, matchPos + query.length);
       var lineHeight = parseFloat(getComputedStyle(edit).lineHeight) || 28;
       var lineNum    = edit.value.substring(0, matchPos).split('\n').length - 1;
-      
-      // スクロール位置調整（パディングを考慮）
       var paddingTop = parseInt(edit.style.paddingTop) || 80;
       edit.scrollTop = Math.max(0, lineNum * lineHeight - (edit.clientHeight - paddingTop) / 2);
 
@@ -1032,17 +1207,18 @@
         var text = $('edit').value;
         localStorage.setItem('autosave_text', text);
         localStorage.setItem('autosave_file', state.curFile);
-        var time = new Date().toLocaleTimeString('ja-JP', {hour:'2-digit', minute:'2-digit'});
+        var time = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
         queueToast('自動保存済み ' + time, 2000);
       }, 2000);
     }
 
     (function init() {
       var fSel = $('fSel'), sSel = $('sSel'), edit = $('edit'), searchSel = $('searchSel');
+
       supportedFonts.forEach(function(f) { fSel.add(new Option(f, f)); });
-      for (var j = 12; j <= 80; j += 2) sSel.add(new Option(j + "px", j));
+      for (var j = 12; j <= 80; j += 2) sSel.add(new Option(j + 'px', j));
       sSel.value = 18;
-      
+
       searchSel.value = state.searchEngine;
       searchSel.onchange = function() {
         state.searchEngine = searchSel.value;
@@ -1063,7 +1239,6 @@
         s.style.background = t.color;
         s.title = t.label;
         s.onclick = function(e) {
-          // テーマ選択時に誤って翻訳メニューが出ないように全て閉じる
           e.preventDefault();
           e.stopPropagation();
           hideContextMenu();
@@ -1093,14 +1268,11 @@
         if (!state.autoSave) clearTimeout(autoSaveTimer);
       };
 
-      var searchInput = $('searchInput');
-
       function positionSearchBar() {
         var header = document.querySelector('header');
         var bar = $('searchBar');
         if (header && bar) {
           var rect = header.getBoundingClientRect();
-          // メニューバーの直下（12px）に配置
           bar.style.top = (rect.bottom + 12) + 'px';
           if (state.isSearchOpen) updateTextareaPadding();
         }
@@ -1108,6 +1280,7 @@
       positionSearchBar();
       window.addEventListener('resize', positionSearchBar);
 
+      var searchInput = $('searchInput');
       searchInput.oninput = function() { doSearch(0); };
       searchInput.addEventListener('keydown', function(e) {
         if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
@@ -1116,30 +1289,23 @@
           doSearch(e.key === 'ArrowDown' ? 1 : -1);
           setTimeout(function() { searchInput.focus(); }, 0);
         }
-        if (e.key === 'Enter') { e.preventDefault(); doSearch(e.shiftKey ? -1 : 1); }
+        if (e.key === 'Enter')  { e.preventDefault(); doSearch(e.shiftKey ? -1 : 1); }
         if (e.key === 'Escape') { act('toggleSearch'); render(); }
       });
 
-      var upd = debounce(function() { 
-        if (!edit.readOnly) { // 読み取り専用時は更新しない
-          ActionHandlers.updateText(edit.value); 
-          scheduleAutoSave(); 
-          render(); 
+      var upd = debounce(function() {
+        if (!edit.readOnly) {
+          ActionHandlers.updateText(edit.value);
+          scheduleAutoSave();
+          render();
         }
       }, 150);
       edit.oninput = upd;
-      edit.onclick = function() {
-          hideContextMenu();
-          upd();
-      };
-      
-      edit.onscroll = function() {
-        hideContextMenu();
-        updateMirror();
-      };
+      edit.onclick = function() { hideContextMenu(); upd(); };
+      edit.onscroll = function() { hideContextMenu(); updateMirror(); };
 
       if (window.ResizeObserver) {
-        new ResizeObserver(function() { updateMirror(); }).observe($('edit'));
+        new ResizeObserver(function() { updateMirror(); }).observe(edit);
       }
 
       fSel.onchange = applyStyles;
@@ -1163,10 +1329,10 @@
         if (!file) return;
         state.curFile = file.name;
         var reader = new FileReader();
-        reader.onload = function() { 
-            edit.value = reader.result; 
-            ActionHandlers.updateText(edit.value); 
-            render(); 
+        reader.onload = function() {
+          edit.value = reader.result;
+          ActionHandlers.updateText(edit.value);
+          render();
         };
         reader.readAsText(file);
       };
@@ -1203,14 +1369,12 @@
         if (contextMenu && !contextMenu.contains(e.target) && e.target !== edit) {
           hideContextMenu();
         }
-        // 翻訳パネル外クリックで閉じる
         var tp = $('translatePanel');
         if (tp && tp.classList.contains('show') && !tp.contains(e.target)) {
           tp.classList.remove('show');
         }
       });
 
-      // モバイル：touchendでテキスト選択検出
       edit.addEventListener('touchend', function(e) {
         setTimeout(function() {
           var text = window.getSelection().toString().trim();
@@ -1222,7 +1386,6 @@
         }, 50);
       });
 
-      // モバイル：翻訳パネル外タップで閉じる
       document.addEventListener('touchstart', function(e) {
         var tp = $('translatePanel');
         if (tp && tp.classList.contains('show') && !tp.contains(e.target)) {
@@ -1236,20 +1399,18 @@
       applyStyles();
       render();
 
-      // オンライン / オフライン状態の監視
-      window.addEventListener('offline', function () {
+      window.addEventListener('offline', function() {
         if (!hasShownOfflineToast) {
           hasShownOfflineToast = true;
           queueToast('エラー : インターネット接続が遮断されました', 5000);
         }
       });
-      window.addEventListener('online', function () {
+      window.addEventListener('online', function() {
         hasShownOfflineToast = false;
       });
     })();
-    // ── ファイル比較 (Diff) ──────────────────────────────────
 
-    // Myers diff アルゴリズム（行単位）
+    // ── ファイル比較 (Diff) ──
     function computeDiff(aLines, bLines) {
       var n = aLines.length, m = bLines.length;
       var max = n + m;
@@ -1275,7 +1436,6 @@
         }
       }
 
-      // back-track
       var ops = [];
       var x = n, y = m;
       for (var dd = trace.length - 1; dd >= 0; dd--) {
@@ -1292,7 +1452,7 @@
         var prevY = prevX - prevK;
         while (x > prevX && y > prevY) { x--; y--; ops.push({ op: '=', line: aLines[x] }); }
         if (dd > 0) {
-          if (x > prevX) { x--; ops.push({ op: '-', line: aLines[x] }); }
+          if (x > prevX)      { x--; ops.push({ op: '-', line: aLines[x] }); }
           else if (y > prevY) { y--; ops.push({ op: '+', line: bLines[y] }); }
         }
       }
@@ -1305,7 +1465,6 @@
       ci.click();
     }
 
-    // 右クリックメニューの「比較」ボタン
     window.openCompareFromContextMenu = function() {
       hideContextMenu();
       openCompareFile();
@@ -1322,25 +1481,18 @@
     };
 
     function stripMeta(text) {
-      // ##FONT / ##SIZE メタ行を除去
       return text.replace(/^##FONT:.*\n?/m, '').replace(/^##SIZE:.*\n?/m, '');
     }
 
     function showDiff(origText, newText, newFileName) {
-      var aRaw = stripMeta(origText);
-      var bRaw = stripMeta(newText);
-      var aLines = aRaw.split(/\r?\n/);
-      var bLines = bRaw.split(/\r?\n/);
-
+      var aLines = stripMeta(origText).split(/\r?\n/);
+      var bLines = stripMeta(newText).split(/\r?\n/);
       var ops = computeDiff(aLines, bLines);
 
-      var edit   = $('edit');
-      var fs     = edit.style.fontSize   || '18px';
-      var ff     = edit.style.fontFamily || 'sans-serif';
-
+      var edit        = $('edit');
       var diffContent = $('diffContent');
-      diffContent.style.fontSize   = fs;
-      diffContent.style.fontFamily = ff;
+      diffContent.style.fontSize   = edit.style.fontSize   || '18px';
+      diffContent.style.fontFamily = edit.style.fontFamily || 'sans-serif';
 
       var addCount = 0, delCount = 0;
       var html = '';
@@ -1356,44 +1508,34 @@
           html += '<span style="opacity:0.7;display:block;">　' + safe + '</span>';
         }
       });
-
       diffContent.innerHTML = html;
 
-      // ヘッダー凡例に件数追加
       $('diffLegendAdd').innerHTML =
-        '<span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:rgba(100,210,100,0.45);"></span>' +
-        '追加 ' + addCount + '行';
+        '<span class="diff-legend-dot add"></span>追加 ' + addCount + '行';
       $('diffLegendDel').innerHTML =
-        '<span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:rgba(255,80,80,0.45);"></span>' +
-        '削除 ' + delCount + '行';
+        '<span class="diff-legend-dot del"></span>削除 ' + delCount + '行';
 
       $('diffOverlay').style.display = 'block';
 
-      // ① メインヘッダーをフェードアウト＆縮小
       var mainHeader = document.querySelector('header');
       mainHeader.classList.remove('diff-restore');
-      // 強制リフロー後にクラス付与でtransitionを確実に発火
       requestAnimationFrame(function() {
         requestAnimationFrame(function() {
           mainHeader.classList.add('diff-exit');
         });
       });
 
-      // ② diffHeaderを初期状態(非表示・縮小)にリセット
       var hdr = $('diffHeader');
       hdr.classList.remove('diff-visible');
       hdr.classList.add('diff-enter');
 
-      // ③ overlayフェードイン（rAF2重で確実にトランジション発火）
       requestAnimationFrame(function() {
         requestAnimationFrame(function() {
           $('diffOverlay').classList.add('diff-overlay-visible');
 
-          // パディング調整
           var rect = hdr.getBoundingClientRect();
           diffContent.style.paddingTop = (rect.bottom + 16) + 'px';
 
-          // メインヘッダーが消えた後にdiffHeaderを登場
           setTimeout(function() {
             hdr.classList.remove('diff-enter');
             hdr.classList.add('diff-visible');
@@ -1404,17 +1546,13 @@
 
     window.closeDiffOverlay = function() {
       var mainHeader = document.querySelector('header');
-      var hdr = $('diffHeader');
-      var overlay = $('diffOverlay');
+      var hdr        = $('diffHeader');
+      var overlay    = $('diffOverlay');
 
-      // diffHeaderをフェードアウト＆縮小
       hdr.classList.remove('diff-visible');
       hdr.classList.add('diff-enter');
-
-      // overlayフェードアウト
       overlay.classList.remove('diff-overlay-visible');
 
-      // メインヘッダーをフェードイン（diff-exitを外してdiff-restoreを付ける）
       setTimeout(function() {
         mainHeader.classList.remove('diff-exit');
         requestAnimationFrame(function() {
@@ -1424,15 +1562,12 @@
         });
       }, 120);
 
-      // アニメーション完了後にdisplay:noneに戻し、クラスをすべてリセット
       setTimeout(function() {
         overlay.style.display = 'none';
-        // 次回開いたときのために全クラスをリセット
         hdr.classList.remove('diff-enter', 'diff-visible');
         mainHeader.classList.remove('diff-exit', 'diff-restore');
       }, 350);
     };
-
   </script>
 </body>
 </html>
