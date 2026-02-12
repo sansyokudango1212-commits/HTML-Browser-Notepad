@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <title>Notepad_Ver7.4.2</title>
+  <title>Notepad_Ver7.4.2.1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -453,8 +453,8 @@
       </select>
     </div>
     <div style="font-size: 10px; color: var(--dim); justify-content: center; border-top: 1px solid rgba(128,128,128,0.1); padding-top: 8px; margin-top: 8px; text-align:center; display: flex; flex-direction: column;">
-      <span>Build TH202602122020</span>
-      <span>Version 7.4.2</span>
+      <span>Build TH202602122025</span>
+      <span>Version 7.4.2.1</span>
       <span>↓Creator↓<br>Claude<br>Chat GPT<br>Gemini<br>Copilot<br>Cursor<br>Tikuwa</span>
     </div>
   </div>
@@ -573,6 +573,7 @@
     var toastQueue = [];
     var isToastShowing = false;
     var sizeToastTimer = null;
+    var hasShownOfflineToast = false; // オフライン通知の連続表示防止用フラグ
 
     function queueToast(message, duration) {
       toastQueue.push({ message, duration: duration || 4000 });
@@ -1232,10 +1233,16 @@
       applyStyles();
       render();
 
-      // 起動時通知：ローカル環境の注意
-      setTimeout(function() {
-        queueToast('エラー : 一部機能が動作しない可能性があります', 5000);
-      }, 800);
+      // オンライン / オフライン状態の監視
+      window.addEventListener('offline', function () {
+        if (!hasShownOfflineToast) {
+          hasShownOfflineToast = true;
+          queueToast('エラー : インターネット接続が遮断されました', 5000);
+        }
+      });
+      window.addEventListener('online', function () {
+        hasShownOfflineToast = false;
+      });
     })();
     // ── ファイル比較 (Diff) ──────────────────────────────────
 
