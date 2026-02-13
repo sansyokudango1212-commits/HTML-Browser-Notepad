@@ -6,12 +6,13 @@
   <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <title>Notepad_Ver7.4.2.2</title>
+  <title>Notepad_Ver7.4.3</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP&family=Zen+Maru+Gothic&display=swap" rel="stylesheet">
   <style>
+    /* ── 変数 ── */
     :root {
       --bg: #ffffff;
       --text: #333;
@@ -33,27 +34,11 @@
         color: #fff;
         border: 1px solid rgba(255, 255, 255, 0.1);
       }
-      select option {
-        background: #2d2d2d;
-        color: #ffffff;
-      }
+      select option { background: #2d2d2d; color: #fff; }
     }
 
+    /* ── ベース ── */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-    select, input[type="text"] {
-      border-radius: 8px;
-      padding: 4px;
-      font-size: 12px;
-      font-family: inherit;
-      border: 1px solid rgba(128, 128, 128, 0.2);
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text);
-    }
-    select option {
-      background: #2d2d2d;
-      color: #ffffff;
-    }
 
     body {
       margin: 0;
@@ -64,6 +49,18 @@
       overflow: hidden;
     }
 
+    select, input[type="text"] {
+      border-radius: 8px;
+      padding: 4px;
+      font-size: 12px;
+      font-family: inherit;
+      border: 1px solid rgba(128, 128, 128, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+    }
+    select option { background: #2d2d2d; color: #fff; }
+
+    /* ── グラス ── */
     .glass {
       background: var(--ui-bg);
       backdrop-filter: blur(20px);
@@ -72,11 +69,11 @@
       z-index: 10;
     }
 
+    /* ── ヘッダー ── */
     header, #options, footer, .modal, .toast {
       border-radius: var(--radius);
       transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
     header {
       position: fixed;
       top: 12px;
@@ -106,12 +103,12 @@
       white-space: nowrap;
     }
     header button:hover { background: var(--hover); }
-
     @media (max-width: 480px) {
       header { gap: 2px; padding: 4px 6px; }
       header button { padding: 6px 10px; font-size: 11px; }
     }
 
+    /* ── 設定パネル ── */
     #options {
       position: fixed;
       top: 50%;
@@ -135,7 +132,20 @@
       pointer-events: auto;
     }
     #options div { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .label { width: 60px; color: var(--dim); font-size: 11px; }
+    .options-version {
+      font-size: 10px;
+      color: var(--dim);
+      justify-content: center;
+      border-top: 1px solid rgba(128, 128, 128, 0.1);
+      padding-top: 8px;
+      margin-top: 8px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+    }
 
+    /* ── 閉じるドット（共通） ── */
     .close-dot {
       position: absolute;
       top: 12px;
@@ -153,8 +163,7 @@
     .close-dot:hover { transform: scale(1.1); }
     .close-dot:focus { outline: none; }
 
-    .label { width: 60px; color: var(--dim); font-size: 11px; }
-
+    /* ── モーダル ── */
     .modal {
       position: fixed;
       top: 50%;
@@ -176,7 +185,6 @@
       pointer-events: auto;
     }
     .modal p { margin: 0 0 15px 0; font-size: 14px; white-space: nowrap; font-weight: bold; }
-
     #fileNameInput {
       width: 100%;
       border-radius: 12px;
@@ -189,7 +197,6 @@
       outline: none;
       text-align: center;
     }
-
     .modal-btns { display: flex; gap: 10px; width: 100%; }
     .modal-btns button {
       flex: 1;
@@ -202,8 +209,9 @@
       transition: 0.2s;
     }
     .btn-main { background: var(--accent); color: white; }
-    .btn-sub { background: var(--hover); color: var(--text); }
+    .btn-sub  { background: var(--hover); color: var(--text); }
 
+    /* ── テキストエリア ── */
     textarea {
       position: absolute;
       inset: 0;
@@ -224,6 +232,7 @@
     }
     textarea::-webkit-scrollbar { display: none; }
 
+    /* ── フッター ── */
     footer {
       position: fixed;
       bottom: 15px;
@@ -240,6 +249,7 @@
     }
     footer.hidden { transform: translate(-50%, 50px); opacity: 0; pointer-events: none; }
 
+    /* ── バックドロップ ── */
     #backdrop {
       position: fixed;
       inset: 0;
@@ -249,6 +259,7 @@
     }
     #backdrop.show { display: block; }
 
+    /* ── トースト ── */
     .toast {
       position: fixed;
       right: 16px;
@@ -269,35 +280,21 @@
       font-size: 13px;
     }
     .toast.show { transform: translateX(0); opacity: 1; }
-
+    .toast .count { position: absolute; left: 0; top: 0; height: 4px; background: var(--accent); width: 100%; transition: width linear; }
+    .toast .msg   { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     @media (max-width: 480px) {
-      textarea {
-        padding: 72px 16px 90px;
-        font-size: 16px;
-      }
-      #searchHighlightMirror {
-        padding: 72px 16px 90px;
-        font-size: 16px;
-      }
-      #contextMenu {
-        max-width: calc(100vw - 24px);
-      }
+      textarea, #searchHighlightMirror { padding: 72px 16px 90px; font-size: 16px; }
+      #contextMenu { max-width: calc(100vw - 24px); }
       .toast {
-        left: 50%;
-        right: auto;
+        left: 50%; right: auto;
         transform: translate(-50%, -100%);
-        width: 95vw;
-        max-width: 95vw;
+        width: 95vw; max-width: 95vw;
         justify-content: center;
       }
-      .toast.show {
-        transform: translate(-50%, 0);
-      }
+      .toast.show { transform: translate(-50%, 0); }
     }
 
-    .toast .count { position: absolute; left: 0; top: 0; height: 4px; background: var(--accent); width: 100%; transition: width linear; }
-    .toast .msg { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
+    /* ── コンテキストメニュー ── */
     #contextMenu {
       position: fixed;
       z-index: 1000;
@@ -323,6 +320,7 @@
     }
     #contextMenu button:hover { background: var(--hover); }
 
+    /* ── テキスト内検索バー ── */
     #searchHighlightMirror {
       position: absolute;
       inset: 0;
@@ -376,7 +374,8 @@
       width: 200px;
       padding: 2px 4px;
     }
-    #searchBar .s-count { font-size: 11px; color: var(--dim); white-space: nowrap; min-width: 40px; }
+    #searchBar .s-count   { font-size: 11px; color: var(--dim); white-space: nowrap; min-width: 40px; }
+    #searchBar .s-divider { width: 1px; height: 16px; background: rgba(128, 128, 128, 0.25); }
     #searchBar button {
       background: transparent;
       border: none;
@@ -389,8 +388,8 @@
       transition: 0.15s;
     }
     #searchBar button:hover { background: var(--hover); color: var(--text); }
-    #searchBar .s-divider { width: 1px; height: 16px; background: rgba(128, 128, 128, 0.25); }
 
+    /* ── 翻訳パネル ── */
     #translatePanel {
       position: fixed;
       top: 50%;
@@ -472,10 +471,104 @@
       line-height: 1.6;
       word-break: break-all;
     }
-    #translatePanel .tp-result { font-size: 17px; line-height: 1.75; word-break: break-all; color: var(--text); }
+    #translatePanel .tp-result  { font-size: 17px; line-height: 1.75; word-break: break-all; color: var(--text); }
     #translatePanel .tp-loading { text-align: center; padding: 24px 0; color: var(--dim); font-size: 13px; }
-    #translatePanel .tp-error { color: #e53935; font-size: 13px; padding: 16px 0; }
+    #translatePanel .tp-error   { color: #e53935; font-size: 13px; padding: 16px 0; }
 
+    /* ── Wikipedia検索パネル ── */
+    #searchWebPanel {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.92);
+      width: min(520px, 94vw);
+      max-height: min(600px, 82vh);
+      z-index: 1100;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22);
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+    #searchWebPanel.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    #searchWebPanel .swp-header {
+      display: flex;
+      align-items: center;
+      padding: 10px 14px 8px;
+      border-bottom: 1px solid rgba(128, 128, 128, 0.15);
+      flex-shrink: 0;
+      gap: 8px;
+    }
+    #searchWebPanel .swp-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: radial-gradient(circle at 30% 30%, #ff6b6b, #e53935);
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    #searchWebPanel .swp-dot:hover   { transform: scale(1.15); }
+    #searchWebPanel .swp-engine      { font-size: 11px; color: var(--dim); flex-shrink: 0; }
+    #searchWebPanel .swp-query-label { font-size: 12px; color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #searchWebPanel .swp-wiki-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 11px;
+      color: var(--dim);
+      padding: 3px 10px;
+      border-radius: 10px;
+      font-family: inherit;
+      transition: 0.15s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    #searchWebPanel .swp-wiki-btn:hover { background: var(--hover); color: var(--text); }
+    #searchWebPanel .swp-body {
+      flex: 1;
+      overflow-y: auto;
+      scrollbar-width: none;
+      padding: 12px 16px 16px;
+    }
+    #searchWebPanel .swp-body::-webkit-scrollbar { display: none; }
+
+    .swp-loading, .swp-empty { text-align: center; padding: 32px 0; font-size: 13px; color: var(--dim); }
+    .swp-abstract { background: rgba(128,128,128,0.07); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; }
+    .swp-abstract-heading { font-size: 14px; font-weight: bold; margin-bottom: 6px; color: var(--text); }
+    .swp-abstract-desc    { font-size: 12px; color: var(--accent); margin-bottom: 6px; font-weight: bold; }
+    .swp-abstract-text    { font-size: 13px; color: var(--text); line-height: 1.65; }
+    .swp-abstract-src     { font-size: 11px; color: var(--dim); margin-top: 6px; }
+    .swp-abstract-src a   { color: var(--accent); text-decoration: none; }
+    .swp-abstract-src a:hover { text-decoration: underline; }
+    .swp-results-label { font-size: 11px; color: var(--dim); margin-bottom: 8px; padding-left: 2px; }
+    .swp-result-item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s;
+      margin-bottom: 4px;
+    }
+    .swp-result-item:hover { background: var(--hover); }
+    .swp-result-title { font-size: 13px; font-weight: bold; color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .swp-result-desc  { font-size: 12px; color: var(--text); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .swp-result-url   { font-size: 11px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* ── カラースウォッチ ── */
     .color-swatches { display: flex; gap: 6px; flex-wrap: wrap; }
     .swatch {
       width: 20px;
@@ -486,41 +579,13 @@
       transition: 0.15s;
       flex-shrink: 0;
     }
-    .swatch:hover { transform: scale(1.15); }
+    .swatch:hover  { transform: scale(1.15); }
     .swatch.active { border-color: var(--text); }
 
-    /* Diff オーバーレイ */
-    #diffOverlay {
-      opacity: 0;
-      transition: opacity 0.25s ease;
-    }
+    /* ── Diff オーバーレイ ── */
+    #diffOverlay { opacity: 0; transition: opacity 0.25s ease; }
     #diffOverlay.diff-overlay-visible { opacity: 1; }
 
-    #diffHeader {
-      transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-                  transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    #diffHeader.diff-enter {
-      opacity: 0;
-      transform: translateX(-50%) scale(0.82);
-    }
-    #diffHeader.diff-visible {
-      opacity: 1;
-      transform: translateX(-50%) scale(1);
-    }
-
-    header.diff-exit {
-      opacity: 0;
-      transform: translateX(-50%) scale(0.82);
-      pointer-events: none;
-    }
-    header.diff-restore {
-      opacity: 1;
-      transform: translateX(-50%) scale(1);
-      pointer-events: auto;
-    }
-
-    /* diffContent のスタイル */
     #diffContent {
       position: absolute;
       inset: 0;
@@ -534,7 +599,6 @@
       -ms-overflow-style: none;
     }
 
-    /* diffHeader のスタイル */
     #diffHeader {
       position: fixed;
       top: 12px;
@@ -546,31 +610,16 @@
       gap: 6px;
       z-index: 310;
       border-radius: 25px;
+      transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    #diffHeader .diff-label {
-      font-size: 12px;
-      color: var(--dim);
-      white-space: nowrap;
-    }
-    #diffHeader .diff-divider {
-      width: 1px;
-      height: 16px;
-      background: rgba(128, 128, 128, 0.25);
-      display: inline-block;
-    }
-    #diffHeader .diff-legend {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
-      color: var(--dim);
-    }
-    #diffHeader .diff-legend-dot {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      border-radius: 3px;
-    }
+    #diffHeader.diff-enter  { opacity: 0; transform: translateX(-50%) scale(0.82); }
+    #diffHeader.diff-visible{ opacity: 1; transform: translateX(-50%) scale(1); }
+
+    #diffHeader .diff-label    { font-size: 12px; color: var(--dim); white-space: nowrap; }
+    #diffHeader .diff-divider  { width: 1px; height: 16px; background: rgba(128, 128, 128, 0.25); display: inline-block; }
+    #diffHeader .diff-legend   { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--dim); }
+    #diffHeader .diff-legend-dot { display: inline-block; width: 14px; height: 14px; border-radius: 3px; }
     #diffHeader .diff-legend-dot.add { background: rgba(100, 210, 100, 0.45); }
     #diffHeader .diff-legend-dot.del { background: rgba(255, 80, 80, 0.45); }
     #diffHeader .diff-close-btn {
@@ -586,18 +635,8 @@
     }
     #diffHeader .diff-close-btn:hover { background: var(--hover); }
 
-    /* options の version 情報 */
-    .options-version {
-      font-size: 10px;
-      color: var(--dim);
-      justify-content: center;
-      border-top: 1px solid rgba(128, 128, 128, 0.1);
-      padding-top: 8px;
-      margin-top: 8px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-    }
+    header.diff-exit    { opacity: 0; transform: translateX(-50%) scale(0.82); pointer-events: none; }
+    header.diff-restore { opacity: 1; transform: translateX(-50%) scale(1);    pointer-events: auto; }
   </style>
 </head>
 <body>
@@ -624,15 +663,6 @@
     <button class="close-dot" onclick="act('toggle')" aria-label="閉じる" title="閉じる"></button>
     <div><span class="label">Font</span><select id="fSel"></select></div>
     <div><span class="label">Size</span><select id="sSel"></select></div>
-    <div><span class="label">検索</span>
-      <select id="searchSel">
-        <option value="google">Google</option>
-        <option value="duckduckgo">DuckDuckGo</option>
-        <option value="startpage">StartPage</option>
-        <option value="yahooJP">Yahoo! Japan</option>
-        <option value="bing">Bing</option>
-      </select>
-    </div>
     <div><span class="label">翻訳</span>
       <select id="translateSel">
         <option value="google">Google 翻訳</option>
@@ -649,8 +679,8 @@
       </select>
     </div>
     <div class="options-version">
-      <span>Build TH202602130308</span>
-      <span>Version 7.4.2.2</span>
+      <span>Build SA202602140010</span>
+      <span>Version 7.4.3</span>
       <span>↓Creator↓<br>Claude<br>Chat GPT<br>Gemini<br>Copilot<br>Cursor<br>Tikuwa</span>
     </div>
   </div>
@@ -666,7 +696,7 @@
 
   <div id="translatePanel" class="glass">
     <div class="tp-header">
-      <button class="tp-dot" onclick="closeTranslatePanel()" aria-label="閉じる"></button>
+      <button class="tp-dot" onclick="closePanel('translatePanel')" aria-label="閉じる"></button>
       <div class="tp-lang">
         <select id="tpSrcLang">
           <option value="auto">自動検出</option>
@@ -696,10 +726,22 @@
     </div>
   </div>
 
+  <div id="searchWebPanel" class="glass">
+    <div class="swp-header">
+      <button class="swp-dot" onclick="closePanel('searchWebPanel')" aria-label="閉じる"></button>
+      <span class="swp-engine">Wikipedia</span>
+      <span class="swp-query-label" id="swpQueryLabel"></span>
+      <button class="swp-wiki-btn" id="swpWikiBtn">Wikiで開く ↗</button>
+    </div>
+    <div class="swp-body" id="swpBody">
+      <div class="swp-loading">検索中…</div>
+    </div>
+  </div>
+
   <div id="backdrop" onclick="act('closeOverlays')"></div>
 
   <div id="contextMenu" class="glass">
-    <button onclick="searchGoogle()">検索</button>
+    <button onclick="searchWiki()">検索</button>
     <button onclick="translateText()">翻訳</button>
     <button onclick="openCompareFromContextMenu()">比較</button>
   </div>
@@ -712,19 +754,15 @@
     <span id="f-info"></span>
   </footer>
 
-  <input type="file" id="fileInput" hidden accept=".txt">
+  <input type="file" id="fileInput"        hidden accept=".txt">
   <input type="file" id="compareFileInput" hidden accept=".txt">
 
   <div id="diffOverlay" style="display:none; position:fixed; inset:0; z-index:300; overflow:hidden; background:var(--bg);">
     <div id="diffHeader" class="glass diff-enter">
       <span class="diff-label">比較結果</span>
       <span class="diff-divider"></span>
-      <span id="diffLegendAdd" class="diff-legend">
-        <span class="diff-legend-dot add"></span>追加
-      </span>
-      <span id="diffLegendDel" class="diff-legend">
-        <span class="diff-legend-dot del"></span>削除
-      </span>
+      <span id="diffLegendAdd" class="diff-legend"><span class="diff-legend-dot add"></span>追加</span>
+      <span id="diffLegendDel" class="diff-legend"><span class="diff-legend-dot del"></span>削除</span>
       <span class="diff-divider"></span>
       <button class="diff-close-btn" onclick="closeDiffOverlay()">✕ 閉じる</button>
     </div>
@@ -736,95 +774,84 @@
   <script>
     var $ = function(id) { return document.getElementById(id); };
 
+    // ── ブラウザ判定 ──
     var getBrowser = function() {
       var ua = navigator.userAgent.toLowerCase();
-      if (ua.indexOf('opr') !== -1 || ua.indexOf('opera') !== -1) return 'Opera';
-      if (ua.indexOf('edg') !== -1) return 'Edge';
+      if (ua.indexOf('opr')     !== -1) return 'Opera';
+      if (ua.indexOf('edg')     !== -1) return 'Edge';
       if (ua.indexOf('firefox') !== -1) return 'Firefox';
-      if (ua.indexOf('chrome') !== -1) return 'Chrome';
-      if (ua.indexOf('safari') !== -1) return 'Safari';
+      if (ua.indexOf('chrome')  !== -1) return 'Chrome';
+      if (ua.indexOf('safari')  !== -1) return 'Safari';
       return 'Browser';
     };
 
+    // ── アプリ状態 ──
     var state = {
-      curFile: 'memo.txt',
-      browser: getBrowser(),
-      text: '',
+      curFile:       'memo.txt',
+      browser:       getBrowser(),
+      text:          '',
       isOptionsOpen: false,
-      isModalOpen: false,
-      isSearchOpen: false,
-      modalType: 'new',
-      isFooterHidden: false,
-      hideTimer: null,
-      searchEngine: localStorage.getItem('searchEngine') || 'google',
-      accentColor: localStorage.getItem('accentColor') || '#006956',
-      autoSave: localStorage.getItem('autoSave') === 'true'
+      isModalOpen:   false,
+      isSearchOpen:  false,
+      modalType:     'new',
+      isFooterHidden:false,
+      hideTimer:     null,
+      accentColor:   localStorage.getItem('accentColor') || '#006956',
+      autoSave:      localStorage.getItem('autoSave') === 'true'
     };
 
     var supportedFonts = ['Arial', 'Noto Sans JP', 'Noto Serif JP', 'Zen Maru Gothic', 'Dela Gothic One'];
 
-    var toastQueue = [];
-    var isToastShowing = false;
-    var sizeToastTimer = null;
+    // ── トースト ──
+    var toastQueue      = [];
+    var isToastShowing  = false;
+    var sizeToastTimer  = null;
     var hasShownOfflineToast = false;
 
     function queueToast(message, duration) {
       toastQueue.push({ message: message, duration: duration || 4000 });
       processToastQueue();
     }
-
     function processToastQueue() {
       if (isToastShowing || toastQueue.length === 0) return;
       isToastShowing = true;
       var item = toastQueue.shift();
       showToastUI(item.message, item.duration);
     }
-
     function showToastUI(message, duration) {
-      var container = $('toastContainer');
-      var el = document.createElement('div');
+      var el    = document.createElement('div');
       el.className = 'glass toast';
-
-      var count = document.createElement('div');
-      count.className = 'count';
-      var msg = document.createElement('div');
-      msg.className = 'msg';
-      msg.textContent = message;
-      el.appendChild(count);
-      el.appendChild(msg);
-      container.appendChild(el);
+      var count = document.createElement('div'); count.className = 'count';
+      var msg   = document.createElement('div'); msg.className   = 'msg'; msg.textContent = message;
+      el.appendChild(count); el.appendChild(msg);
+      $('toastContainer').appendChild(el);
 
       var header = document.querySelector('header');
       if (header) {
         var rect = header.getBoundingClientRect();
-        el.style.top = rect.top + 'px';
-        el.style.height = rect.height + 'px';
+        el.style.top          = rect.top + 'px';
+        el.style.height       = rect.height + 'px';
         el.style.borderRadius = getComputedStyle(header).borderRadius;
       }
-
       setTimeout(function() {
         el.classList.add('show');
         count.style.transitionDuration = duration + 'ms';
         count.style.width = '0%';
       }, 50);
-
       setTimeout(function() {
         el.classList.remove('show');
-        setTimeout(function() {
-          el.remove();
-          isToastShowing = false;
-          processToastQueue();
-        }, 400);
+        setTimeout(function() { el.remove(); isToastShowing = false; processToastQueue(); }, 400);
       }, duration);
     }
 
+    // ── アクションハンドラ ──
     var ActionHandlers = {
       new: function() {
-        state.modalType = 'new';
+        state.modalType  = 'new';
         state.isModalOpen = true;
       },
       open: function() {
-        state.isModalOpen = false;
+        state.isModalOpen  = false;
         state.isOptionsOpen = false;
         render();
         var fi = $('fileInput');
@@ -834,28 +861,21 @@
       save: function() {
         state.text = $('edit').value;
         try {
-          var fontMeta = '##FONT:"' + $('fSel').value + '"';
-          var sizeMeta = '##SIZE:' + $('sSel').value;
-          var fullText = fontMeta + '\n' + sizeMeta + '\n' + state.text;
-          var a = document.createElement('a');
+          var fullText = '##FONT:"' + $('fSel').value + '"\n##SIZE:' + $('sSel').value + '\n' + state.text;
+          var a    = document.createElement('a');
           var blob = new Blob([fullText], { type: 'text/plain' });
-          var url = URL.createObjectURL(blob);
-          a.href = url;
-          a.download = sanitizeFileName(state.curFile);
-          a.click();
+          var url  = URL.createObjectURL(blob);
+          a.href = url; a.download = sanitizeFileName(state.curFile); a.click();
           URL.revokeObjectURL(url);
           queueToast('保存を開始しました：' + state.curFile, 2500);
-        } catch(e) {
-          queueToast('保存に失敗しました。');
-        }
+        } catch(e) { queueToast('保存に失敗しました。'); }
       },
       toggle: function() {
         state.isOptionsOpen = !state.isOptionsOpen;
         if (state.isOptionsOpen) {
           state.isModalOpen = false;
           hideContextMenu();
-          var tp = $('translatePanel');
-          if (tp) tp.classList.remove('show');
+          closePanel('translatePanel');
         }
       },
       toggleSearch: function() {
@@ -869,46 +889,34 @@
         }
         updateTextareaPadding();
       },
-      searchNext: function() { doSearch(1); },
+      searchNext: function() { doSearch(1);  },
       searchPrev: function() { doSearch(-1); },
       closeOverlays: function() {
         state.isOptionsOpen = false;
-        state.isModalOpen = false;
-        var tp = $('translatePanel');
-        if (tp) tp.classList.remove('show');
+        state.isModalOpen   = false;
+        closePanel('translatePanel');
+        closePanel('searchWebPanel');
       },
       updateText: function(val) {
         var lines = val.split(/\r?\n/);
         var bodyLines = [];
         var changed = false;
-
         for (var i = 0; i < lines.length; i++) {
           var line = lines[i];
           if (line.startsWith('##FONT:')) {
-            var font = line.replace('##FONT:', '').replace(/"/g, '').trim();
-            updateSelectValue('fSel', font);
-            changed = true;
-            continue;
+            updateSelectValue('fSel', line.replace('##FONT:', '').replace(/"/g, '').trim());
+            changed = true; continue;
           }
           if (line.startsWith('##SIZE:')) {
             var sizeRaw = parseInt(line.replace('##SIZE:', '').trim());
-            if (!isNaN(sizeRaw)) {
-              updateSelectValue('sSel', normalizeSize(sizeRaw));
-              changed = true;
-            }
+            if (!isNaN(sizeRaw)) { updateSelectValue('sSel', normalizeSize(sizeRaw)); changed = true; }
             continue;
           }
           bodyLines.push(line);
         }
-
         var processedText = bodyLines.join('\n');
-        if (changed) {
-          state.text = processedText;
-          $('edit').value = state.text;
-          applyStyles();
-        } else {
-          state.text = val;
-        }
+        if (changed) { state.text = processedText; $('edit').value = state.text; applyStyles(); }
+        else         { state.text = val; }
 
         clearTimeout(state.hideTimer);
         var edit = $('edit');
@@ -921,63 +929,50 @@
       }
     };
 
-    function updateTextareaPadding() {
-      var edit = $('edit');
-      var mirror = $('searchHighlightMirror');
-      var searchBar = $('searchBar');
+    // ── パネル共通クローズ ──
+    function closePanel(id) {
+      var el = $(id);
+      if (el) el.classList.remove('show');
+      if (!state.isOptionsOpen && !state.isModalOpen) {
+        var backdrop = $('backdrop');
+        if (backdrop && !$('translatePanel').classList.contains('show') &&
+                        !$('searchWebPanel').classList.contains('show')) {
+          backdrop.classList.remove('show');
+        }
+      }
+    }
 
+    // ── テキストエリア padding 更新 ──
+    function updateTextareaPadding() {
+      var edit      = $('edit');
+      var mirror    = $('searchHighlightMirror');
+      var searchBar = $('searchBar');
       if (state.isSearchOpen) {
-        var barHeight = searchBar.offsetHeight || 44;
-        var barTop = parseInt(searchBar.style.top) || 68;
-        var totalPadding = barTop + barHeight + 20;
-        edit.style.paddingTop = totalPadding + 'px';
+        var barTop      = parseInt(searchBar.style.top) || 68;
+        var totalPadding = barTop + (searchBar.offsetHeight || 44) + 20;
+        edit.style.paddingTop   = totalPadding + 'px';
         mirror.style.paddingTop = totalPadding + 'px';
         edit.readOnly = true;
       } else {
-        edit.style.paddingTop = '80px';
+        edit.style.paddingTop   = '80px';
         mirror.style.paddingTop = '80px';
         edit.readOnly = false;
       }
     }
 
-    function isFontAvailable(font) {
-      if (!font) return false;
-      try {
-        var canvas = document.createElement('canvas');
-        var ctx = canvas.getContext('2d');
-        ctx.font = '72px monospace';
-        var w1 = ctx.measureText('abcdefg').width;
-        ctx.font = '72px "' + font + '", monospace';
-        var w2 = ctx.measureText('abcdefg').width;
-        return w1 !== w2;
-      } catch(e) { return false; }
+    // ── ユーティリティ ──
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
-
-    function updateSelectValue(id, value) {
-      var sel = $(id);
-      for (var i = 0; i < sel.options.length; i++) {
-        if (sel.options[i].value == value) {
-          sel.selectedIndex = i;
-          return;
-        }
-      }
-      if (id === 'fSel' && isFontAvailable(value)) {
-        sel.add(new Option(value, value));
-        sel.selectedIndex = sel.options.length - 1;
-      }
-    }
-
     function normalizeSize(size) {
       size = Math.round(size);
       if (size % 2 !== 0) size = (size < 18) ? size + 1 : size - 1;
       return Math.min(80, Math.max(12, size));
     }
-
     function sanitizeFileName(name) {
       name = (name || 'memo.txt').trim().replace(/[/\\:\*\?"<>\|]/g, '');
       return name.toLowerCase().endsWith('.txt') ? name : name + '.txt';
     }
-
     function debounce(fn, wait) {
       var t;
       return function() {
@@ -986,44 +981,136 @@
         t = setTimeout(function() { fn.apply(ctx, args); }, wait);
       };
     }
-
-    var selectedText = '';
-    var contextMenu = null;
-
-    window.searchGoogle = function() {
-      if (selectedText) {
-        var searchUrls = {
-          'google':     'https://www.google.com/search?q=',
-          'duckduckgo': 'https://duckduckgo.com/?q=',
-          'bing':       'https://www.bing.com/search?q=',
-          'yahooJP':    'https://search.yahoo.co.jp/search?p=',
-          'startpage':  'https://www.startpage.com/do/search?q='
-        };
-        var url = searchUrls[state.searchEngine] || searchUrls['google'];
-        window.open(url + encodeURIComponent(selectedText), '_blank');
+    function isFontAvailable(font) {
+      if (!font) return false;
+      try {
+        var canvas = document.createElement('canvas');
+        var ctx    = canvas.getContext('2d');
+        ctx.font   = '72px monospace';
+        var w1     = ctx.measureText('abcdefg').width;
+        ctx.font   = '72px "' + font + '", monospace';
+        return w1 !== ctx.measureText('abcdefg').width;
+      } catch(e) { return false; }
+    }
+    function updateSelectValue(id, value) {
+      var sel = $(id);
+      for (var i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value == value) { sel.selectedIndex = i; return; }
       }
+      if (id === 'fSel' && isFontAvailable(value)) {
+        sel.add(new Option(value, value));
+        sel.selectedIndex = sel.options.length - 1;
+      }
+    }
+
+    // ── コンテキストメニュー ──
+    var selectedText = '';
+    var contextMenu  = null;
+
+    function hideContextMenu() {
+      if (contextMenu) contextMenu.style.display = 'none';
+    }
+    function showContextMenu(x, y) {
+      if (!contextMenu) contextMenu = $('contextMenu');
+      contextMenu.style.left    = x + 'px';
+      contextMenu.style.top     = y + 'px';
+      contextMenu.style.display = 'block';
+      var rect = contextMenu.getBoundingClientRect();
+      if (rect.right  > window.innerWidth  - 8) contextMenu.style.left = (x - rect.width  - 4) + 'px';
+      if (rect.bottom > window.innerHeight - 8) contextMenu.style.top  = (y - rect.height - 4) + 'px';
+    }
+
+    // ── Wikipedia検索 ──
+    var swpCurrentPageUrl = '';
+
+    window.searchWiki = function() {
+      if (!selectedText) { hideContextMenu(); return; }
       hideContextMenu();
+
+      var query   = selectedText;
+      var body    = $('swpBody');
+      var wikiBtn = $('swpWikiBtn');
+
+      $('swpQueryLabel').textContent = '「' + query + '」';
+      swpCurrentPageUrl = 'https://ja.wikipedia.org/wiki/' + encodeURIComponent(query);
+      wikiBtn.onclick = function() { window.open(swpCurrentPageUrl, '_blank'); };
+
+      body.innerHTML = '<div class="swp-loading">検索中…</div>';
+      $('searchWebPanel').classList.add('show');
+      $('backdrop').classList.add('show');
+
+      fetch('https://ja.wikipedia.org/w/api.php?action=query&list=search&srsearch='
+        + encodeURIComponent(query) + '&srlimit=6&format=json&origin=*')
+        .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
+        .then(function(data) {
+          var results = data.query && data.query.search;
+          if (!results || results.length === 0) {
+            body.innerHTML = '<div class="swp-empty">「' + escapeHtml(query) + '」はWikipediaに見つかりませんでした。</div>';
+            return;
+          }
+          var topTitle = results[0].title;
+          swpCurrentPageUrl = 'https://ja.wikipedia.org/wiki/' + encodeURIComponent(topTitle);
+          wikiBtn.onclick = function() { window.open(swpCurrentPageUrl, '_blank'); };
+
+          return fetch('https://ja.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(topTitle))
+            .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
+            .then(function(summary) { renderWikiResults(summary, results, query); });
+        })
+        .catch(function() {
+          body.innerHTML = '<div class="swp-empty">取得に失敗しました。<br>ネットワーク接続を確認してください。</div>';
+        });
     };
 
+    function renderWikiResults(summary, searchResults, query) {
+      var html = '';
+
+      if (summary && summary.title) {
+        var pageUrl = summary.content_urls && summary.content_urls.desktop
+          ? summary.content_urls.desktop.page
+          : 'https://ja.wikipedia.org/wiki/' + encodeURIComponent(summary.title);
+        html += '<div class="swp-abstract">'
+          + '<div class="swp-abstract-heading">' + escapeHtml(summary.title) + '</div>';
+        if (summary.description)
+          html += '<div class="swp-abstract-desc">' + escapeHtml(summary.description) + '</div>';
+        if (summary.extract) {
+          var extract = summary.extract.length > 400 ? summary.extract.slice(0, 400) + '…' : summary.extract;
+          html += '<div class="swp-abstract-text">' + escapeHtml(extract) + '</div>';
+        }
+        html += '<div class="swp-abstract-src"><a href="' + escapeHtml(pageUrl) + '" target="_blank" rel="noopener">Wikipedia で読む →</a></div>'
+          + '</div>';
+      }
+
+      var related = searchResults.slice(1);
+      if (related.length > 0) {
+        html += '<div class="swp-results-label">関連記事</div>';
+        related.forEach(function(item) {
+          var url     = 'https://ja.wikipedia.org/wiki/' + encodeURIComponent(item.title);
+          var snippet = item.snippet ? item.snippet.replace(/<[^>]+>/g, '') : '';
+          html += '<a class="swp-result-item" href="' + escapeHtml(url) + '" target="_blank" rel="noopener">'
+            + '<div class="swp-result-title">' + escapeHtml(item.title) + '</div>';
+          if (snippet) html += '<div class="swp-result-desc">' + escapeHtml(snippet) + '</div>';
+          html += '<div class="swp-result-url">' + escapeHtml(url) + '</div></a>';
+        });
+      }
+
+      $('swpBody').innerHTML = html || '<div class="swp-empty">「' + escapeHtml(query) + '」はWikipediaに見つかりませんでした。</div>';
+    }
+
+    // ── 翻訳 ──
     window.translateText = function() {
       if (!selectedText) { hideContextMenu(); return; }
       hideContextMenu();
 
-      var src = selectedText;
-      var panel = $('translatePanel');
-      var tpSrc = $('tpSrc');
+      var src      = selectedText;
       var tpResult = $('tpResult');
-
-      tpSrc.textContent = src.length > 120 ? src.slice(0, 120) + '…' : src;
+      $('tpSrc').textContent = src.length > 120 ? src.slice(0, 120) + '…' : src;
       tpResult.innerHTML = '<div class="tp-loading">翻訳中…</div>';
-      panel.classList.add('show');
+      $('translatePanel').classList.add('show');
 
       var doFetch = function() {
-        var slVal = $('tpSrcLang').value;
-        var tlVal = $('tpTgtLang').value;
-        var url = 'https://translate.googleapis.com/translate_a/single'
-                + '?client=gtx&sl=' + slVal + '&tl=' + tlVal
-                + '&dt=t&q=' + encodeURIComponent(src);
+        var url = 'https://translate.googleapis.com/translate_a/single?client=gtx'
+          + '&sl=' + $('tpSrcLang').value + '&tl=' + $('tpTgtLang').value
+          + '&dt=t&q=' + encodeURIComponent(src);
         tpResult.innerHTML = '<div class="tp-loading">翻訳中…</div>';
         fetch(url)
           .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
@@ -1036,31 +1123,13 @@
             tpResult.innerHTML = '<div class="tp-error">翻訳に失敗しました。<br>ネットワーク接続を確認してください。</div>';
           });
       };
-
       $('tpSrcLang').onchange = doFetch;
       $('tpTgtLang').onchange = doFetch;
       doFetch();
     };
 
-    window.closeTranslatePanel = function() {
-      $('translatePanel').classList.remove('show');
-    };
-
-    function hideContextMenu() {
-      if (contextMenu) contextMenu.style.display = 'none';
-    }
-
-    function showContextMenu(x, y) {
-      if (!contextMenu) contextMenu = $('contextMenu');
-      contextMenu.style.left = x + 'px';
-      contextMenu.style.top  = y + 'px';
-      contextMenu.style.display = 'block';
-      var rect = contextMenu.getBoundingClientRect();
-      if (rect.right  > window.innerWidth  - 8) contextMenu.style.left = (x - rect.width  - 4) + 'px';
-      if (rect.bottom > window.innerHeight - 8) contextMenu.style.top  = (y - rect.height - 4) + 'px';
-    }
-
-    window.act = function(type) { ActionHandlers[type](); render(); };
+    // ── render / applyStyles ──
+    window.act          = function(type) { ActionHandlers[type](); render(); };
     window.closeConfirm = function(yes) {
       if (yes && state.modalType === 'new') {
         $('edit').value = '';
@@ -1070,26 +1139,19 @@
       ActionHandlers.closeOverlays();
       render();
     };
+    window.closePanel = closePanel;
 
     function render() {
-      var edit = $('edit');
-      $('f-info').textContent = state.curFile + ' · ' + edit.value.length + ' 文字';
-      $('b-info').textContent = state.browser;
-      edit.placeholder = state.browser + ' >';
-
+      var edit    = $('edit');
       var isAnyOpen = state.isOptionsOpen || state.isModalOpen;
+      $('f-info').textContent      = state.curFile + ' · ' + edit.value.length + ' 文字';
+      $('b-info').textContent      = state.browser;
+      edit.placeholder             = state.browser + ' >';
       $('options').className       = 'glass' + (state.isOptionsOpen ? ' show' : '');
       $('confirmModal').className  = 'glass modal' + (state.isModalOpen ? ' show' : '');
       $('backdrop').className      = isAnyOpen ? 'show' : '';
       $('ft').className            = 'glass' + (state.isFooterHidden ? ' hidden' : '');
       $('searchBar').className     = 'glass' + (state.isSearchOpen ? ' show' : '');
-    }
-
-    function applyStyles() {
-      var edit = $('edit');
-      edit.style.fontFamily = $('fSel').value;
-      edit.style.fontSize   = $('sSel').value + 'px';
-      updateMirror();
     }
 
     var themeColors = [
@@ -1100,7 +1162,6 @@
       { color: '#f57c00', label: 'オレンジ' },
       { color: '#455a64', label: 'スレート' },
     ];
-
     function applyAccentColor(color) {
       document.documentElement.style.setProperty('--accent', color);
       state.accentColor = color;
@@ -1109,36 +1170,32 @@
         s.classList.toggle('active', s.dataset.color === color);
       });
     }
-
-    var searchMatches = [];
-    var searchIndex = 0;
-
-    function escapeHtml(str) {
-      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    function applyStyles() {
+      $('edit').style.fontFamily = $('fSel').value;
+      $('edit').style.fontSize   = $('sSel').value + 'px';
+      updateMirror();
     }
+
+    // ── テキスト内検索 (ハイライト) ──
+    var searchMatches = [];
+    var searchIndex   = 0;
 
     function updateMirror() {
       var mirror = $('searchHighlightMirror');
       var edit   = $('edit');
       if (!mirror) return;
-
       mirror.style.fontFamily = edit.style.fontFamily || '';
       mirror.style.fontSize   = edit.style.fontSize   || '18px';
 
       if (!state.isSearchOpen || searchMatches.length === 0) {
-        mirror.innerHTML = '';
-        mirror.scrollTop = edit.scrollTop;
+        mirror.innerHTML  = '';
+        mirror.scrollTop  = edit.scrollTop;
         return;
       }
-
       var query = $('searchInput').value;
       if (!query) { mirror.innerHTML = ''; return; }
 
-      var text   = edit.value;
-      var qLen   = query.length;
-      var html   = '';
-      var cursor = 0;
-
+      var text = edit.value, qLen = query.length, html = '', cursor = 0;
       searchMatches.forEach(function(pos, i) {
         html += escapeHtml(text.substring(cursor, pos));
         html += '<mark class="' + (i === searchIndex ? 'current' : '') + '">'
@@ -1146,7 +1203,6 @@
         cursor = pos + qLen;
       });
       html += escapeHtml(text.substring(cursor));
-
       mirror.innerHTML = html;
       mirror.scrollTop = edit.scrollTop;
     }
@@ -1155,26 +1211,14 @@
       var query = $('searchInput').value;
       var edit  = $('edit');
       searchMatches = [];
-      if (!query) {
-        $('searchCount').textContent = '';
-        updateMirror();
-        return;
-      }
+      if (!query) { $('searchCount').textContent = ''; updateMirror(); return; }
 
-      var text      = edit.value;
-      var lowerText = text.toLowerCase();
+      var lowerText = edit.value.toLowerCase();
       var lowerQ    = query.toLowerCase();
       var pos = 0;
-      while ((pos = lowerText.indexOf(lowerQ, pos)) !== -1) {
-        searchMatches.push(pos);
-        pos += lowerQ.length;
-      }
+      while ((pos = lowerText.indexOf(lowerQ, pos)) !== -1) { searchMatches.push(pos); pos += lowerQ.length; }
 
-      if (searchMatches.length === 0) {
-        $('searchCount').textContent = '0 / 0';
-        updateMirror();
-        return;
-      }
+      if (searchMatches.length === 0) { $('searchCount').textContent = '0 / 0'; updateMirror(); return; }
 
       if      (dir ===  1) searchIndex = (searchIndex + 1) % searchMatches.length;
       else if (dir === -1) searchIndex = (searchIndex - 1 + searchMatches.length) % searchMatches.length;
@@ -1192,14 +1236,13 @@
     }
 
     function clearSearchHighlight() {
-      searchMatches = [];
-      searchIndex   = 0;
+      searchMatches = []; searchIndex = 0;
       var mirror = $('searchHighlightMirror');
       if (mirror) mirror.innerHTML = '';
     }
 
+    // ── 自動保存 ──
     var autoSaveTimer = null;
-
     function scheduleAutoSave() {
       if (!state.autoSave) return;
       clearTimeout(autoSaveTimer);
@@ -1212,38 +1255,27 @@
       }, 2000);
     }
 
+    // ── 初期化 ──
     (function init() {
-      var fSel = $('fSel'), sSel = $('sSel'), edit = $('edit'), searchSel = $('searchSel');
+      var fSel = $('fSel'), sSel = $('sSel'), edit = $('edit');
 
       supportedFonts.forEach(function(f) { fSel.add(new Option(f, f)); });
       for (var j = 12; j <= 80; j += 2) sSel.add(new Option(j + 'px', j));
       sSel.value = 18;
 
-      searchSel.value = state.searchEngine;
-      searchSel.onchange = function() {
-        state.searchEngine = searchSel.value;
-        localStorage.setItem('searchEngine', searchSel.value);
-      };
-
       var translateSel = $('translateSel');
-      translateSel.value = localStorage.getItem('translateEngine') || 'google';
-      translateSel.onchange = function() {
-        localStorage.setItem('translateEngine', translateSel.value);
-      };
+      translateSel.value    = localStorage.getItem('translateEngine') || 'google';
+      translateSel.onchange = function() { localStorage.setItem('translateEngine', translateSel.value); };
 
       var swatchContainer = $('colorSwatches');
       themeColors.forEach(function(t) {
         var s = document.createElement('button');
-        s.className = 'swatch';
-        s.dataset.color = t.color;
-        s.style.background = t.color;
-        s.title = t.label;
+        s.className = 'swatch'; s.dataset.color = t.color;
+        s.style.background = t.color; s.title = t.label;
         s.onclick = function(e) {
-          e.preventDefault();
-          e.stopPropagation();
+          e.preventDefault(); e.stopPropagation();
           hideContextMenu();
-          var tp = $('translatePanel');
-          if (tp) tp.classList.remove('show');
+          closePanel('translatePanel');
           applyAccentColor(t.color);
         };
         swatchContainer.appendChild(s);
@@ -1270,10 +1302,9 @@
 
       function positionSearchBar() {
         var header = document.querySelector('header');
-        var bar = $('searchBar');
+        var bar    = $('searchBar');
         if (header && bar) {
-          var rect = header.getBoundingClientRect();
-          bar.style.top = (rect.bottom + 12) + 'px';
+          bar.style.top = (header.getBoundingClientRect().bottom + 12) + 'px';
           if (state.isSearchOpen) updateTextareaPadding();
         }
       }
@@ -1284,8 +1315,7 @@
       searchInput.oninput = function() { doSearch(0); };
       searchInput.addEventListener('keydown', function(e) {
         if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-          e.preventDefault();
-          e.stopPropagation();
+          e.preventDefault(); e.stopPropagation();
           doSearch(e.key === 'ArrowDown' ? 1 : -1);
           setTimeout(function() { searchInput.focus(); }, 0);
         }
@@ -1294,19 +1324,13 @@
       });
 
       var upd = debounce(function() {
-        if (!edit.readOnly) {
-          ActionHandlers.updateText(edit.value);
-          scheduleAutoSave();
-          render();
-        }
+        if (!edit.readOnly) { ActionHandlers.updateText(edit.value); scheduleAutoSave(); render(); }
       }, 150);
-      edit.oninput = upd;
-      edit.onclick = function() { hideContextMenu(); upd(); };
+      edit.oninput  = upd;
+      edit.onclick  = function() { hideContextMenu(); upd(); };
       edit.onscroll = function() { hideContextMenu(); updateMirror(); };
 
-      if (window.ResizeObserver) {
-        new ResizeObserver(function() { updateMirror(); }).observe(edit);
-      }
+      if (window.ResizeObserver) new ResizeObserver(function() { updateMirror(); }).observe(edit);
 
       fSel.onchange = applyStyles;
       sSel.onchange = applyStyles;
@@ -1317,8 +1341,7 @@
         var current = parseInt(sSel.value, 10) || 18;
         var newSize = normalizeSize(current + (e.deltaY < 0 ? 2 : -2));
         if (newSize !== current) {
-          sSel.value = String(newSize);
-          applyStyles();
+          sSel.value = String(newSize); applyStyles();
           clearTimeout(sizeToastTimer);
           sizeToastTimer = setTimeout(function() { queueToast('フォントサイズ: ' + newSize + 'px', 1000); }, 600);
         }
@@ -1329,11 +1352,7 @@
         if (!file) return;
         state.curFile = file.name;
         var reader = new FileReader();
-        reader.onload = function() {
-          edit.value = reader.result;
-          ActionHandlers.updateText(edit.value);
-          render();
-        };
+        reader.onload = function() { edit.value = reader.result; ActionHandlers.updateText(edit.value); render(); };
         reader.readAsText(file);
       };
 
@@ -1344,36 +1363,30 @@
 
       edit.addEventListener('contextmenu', function(e) {
         var text = window.getSelection().toString().trim();
-        if (text.length > 0) {
-          e.preventDefault();
-          selectedText = text;
-          showContextMenu(e.clientX, e.clientY);
-        } else {
-          hideContextMenu();
-        }
+        if (text.length > 0) { e.preventDefault(); selectedText = text; showContextMenu(e.clientX, e.clientY); }
+        else { hideContextMenu(); }
       });
 
       edit.addEventListener('mouseup', function(e) {
         setTimeout(function() {
           var text = window.getSelection().toString().trim();
-          if (text.length > 0) {
-            selectedText = text;
-            showContextMenu(e.clientX, e.clientY);
-          } else {
-            if (contextMenu && !contextMenu.contains(e.target)) hideContextMenu();
-          }
+          if (text.length > 0) { selectedText = text; showContextMenu(e.clientX, e.clientY); }
+          else if (contextMenu && !contextMenu.contains(e.target)) { hideContextMenu(); }
         }, 20);
       });
 
-      document.addEventListener('mousedown', function(e) {
-        if (contextMenu && !contextMenu.contains(e.target) && e.target !== edit) {
-          hideContextMenu();
-        }
+      // ウィンドウ外クリック・タップで各パネルを閉じる
+      function handleOutsideClick(e) {
+        if (contextMenu && !contextMenu.contains(e.target) && e.target !== edit) hideContextMenu();
+
         var tp = $('translatePanel');
-        if (tp && tp.classList.contains('show') && !tp.contains(e.target)) {
-          tp.classList.remove('show');
-        }
-      });
+        if (tp && tp.classList.contains('show') && !tp.contains(e.target)) closePanel('translatePanel');
+
+        var swp = $('searchWebPanel');
+        if (swp && swp.classList.contains('show') && !swp.contains(e.target)) closePanel('searchWebPanel');
+      }
+      document.addEventListener('mousedown',  handleOutsideClick);
+      document.addEventListener('touchstart', handleOutsideClick, { passive: true });
 
       edit.addEventListener('touchend', function(e) {
         setTimeout(function() {
@@ -1386,160 +1399,94 @@
         }, 50);
       });
 
-      document.addEventListener('touchstart', function(e) {
-        var tp = $('translatePanel');
-        if (tp && tp.classList.contains('show') && !tp.contains(e.target)) {
-          tp.classList.remove('show');
-        }
-        if (contextMenu && !contextMenu.contains(e.target) && e.target !== edit) {
-          hideContextMenu();
-        }
-      }, { passive: true });
-
       applyStyles();
       render();
 
       window.addEventListener('offline', function() {
-        if (!hasShownOfflineToast) {
-          hasShownOfflineToast = true;
-          queueToast('エラー : インターネット接続が遮断されました', 5000);
-        }
+        if (!hasShownOfflineToast) { hasShownOfflineToast = true; queueToast('エラー : インターネット接続が遮断されました', 5000); }
       });
-      window.addEventListener('online', function() {
-        hasShownOfflineToast = false;
-      });
+      window.addEventListener('online', function() { hasShownOfflineToast = false; });
     })();
 
     // ── ファイル比較 (Diff) ──
     function computeDiff(aLines, bLines) {
-      var n = aLines.length, m = bLines.length;
-      var max = n + m;
+      var n = aLines.length, m = bLines.length, max = n + m;
       if (max === 0) return [];
-      var v = new Array(2 * max + 1).fill(0);
-      var trace = [];
-
+      var v = new Array(2 * max + 1).fill(0), trace = [];
       outer:
       for (var d = 0; d <= max; d++) {
         trace.push(v.slice());
         for (var k = -d; k <= d; k += 2) {
-          var idx = k + max;
-          var x;
-          if (k === -d || (k !== d && v[idx - 1] < v[idx + 1])) {
-            x = v[idx + 1];
-          } else {
-            x = v[idx - 1] + 1;
-          }
+          var idx = k + max, x;
+          x = (k === -d || (k !== d && v[idx - 1] < v[idx + 1])) ? v[idx + 1] : v[idx - 1] + 1;
           var y = x - k;
           while (x < n && y < m && aLines[x] === bLines[y]) { x++; y++; }
           v[idx] = x;
           if (x >= n && y >= m) { trace.push(v.slice()); break outer; }
         }
       }
-
-      var ops = [];
-      var x = n, y = m;
+      var ops = [], x = n, y = m;
       for (var dd = trace.length - 1; dd >= 0; dd--) {
-        var vv = trace[dd];
-        var kk = x - y;
-        var kidx = kk + max;
-        var prevK;
-        if (kk === -dd || (kk !== dd && vv[kidx - 1] < vv[kidx + 1])) {
-          prevK = kk + 1;
-        } else {
-          prevK = kk - 1;
-        }
-        var prevX = vv[prevK + max];
-        var prevY = prevX - prevK;
+        var vv = trace[dd], kk = x - y, kidx = kk + max;
+        var prevK = (kk === -dd || (kk !== dd && vv[kidx - 1] < vv[kidx + 1])) ? kk + 1 : kk - 1;
+        var prevX = vv[prevK + max], prevY = prevX - prevK;
         while (x > prevX && y > prevY) { x--; y--; ops.push({ op: '=', line: aLines[x] }); }
         if (dd > 0) {
-          if (x > prevX)      { x--; ops.push({ op: '-', line: aLines[x] }); }
+          if      (x > prevX) { x--; ops.push({ op: '-', line: aLines[x] }); }
           else if (y > prevY) { y--; ops.push({ op: '+', line: bLines[y] }); }
         }
       }
       return ops.reverse();
     }
 
-    function openCompareFile() {
-      var ci = $('compareFileInput');
-      try { ci.value = ''; } catch(e) {}
-      ci.click();
+    function stripMeta(text) {
+      return text.replace(/^##FONT:.*\n?/m, '').replace(/^##SIZE:.*\n?/m, '');
     }
 
-    window.openCompareFromContextMenu = function() {
-      hideContextMenu();
-      openCompareFile();
-    };
+    window.openCompareFromContextMenu = function() { hideContextMenu(); $('compareFileInput').click(); };
 
     $('compareFileInput').onchange = function(e) {
       var file = e.target.files[0];
       if (!file) return;
       var reader = new FileReader();
-      reader.onload = function() {
-        showDiff($('edit').value, reader.result, file.name);
-      };
+      reader.onload = function() { showDiff($('edit').value, reader.result, file.name); };
       reader.readAsText(file);
     };
-
-    function stripMeta(text) {
-      return text.replace(/^##FONT:.*\n?/m, '').replace(/^##SIZE:.*\n?/m, '');
-    }
 
     function showDiff(origText, newText, newFileName) {
       var aLines = stripMeta(origText).split(/\r?\n/);
       var bLines = stripMeta(newText).split(/\r?\n/);
-      var ops = computeDiff(aLines, bLines);
+      var ops    = computeDiff(aLines, bLines);
 
       var edit        = $('edit');
       var diffContent = $('diffContent');
       diffContent.style.fontSize   = edit.style.fontSize   || '18px';
       diffContent.style.fontFamily = edit.style.fontFamily || 'sans-serif';
 
-      var addCount = 0, delCount = 0;
-      var html = '';
+      var addCount = 0, delCount = 0, html = '';
       ops.forEach(function(op) {
         var safe = escapeHtml(op.line);
-        if (op.op === '+') {
-          addCount++;
-          html += '<span style="background:rgba(100,210,100,0.3);display:block;">+ ' + safe + '</span>';
-        } else if (op.op === '-') {
-          delCount++;
-          html += '<span style="background:rgba(255,80,80,0.3);display:block;">- ' + safe + '</span>';
-        } else {
-          html += '<span style="opacity:0.7;display:block;">　' + safe + '</span>';
-        }
+        if      (op.op === '+') { addCount++; html += '<span style="background:rgba(100,210,100,0.3);display:block;">+ ' + safe + '</span>'; }
+        else if (op.op === '-') { delCount++; html += '<span style="background:rgba(255,80,80,0.3);display:block;">- '  + safe + '</span>'; }
+        else                    {             html += '<span style="opacity:0.7;display:block;">　' + safe + '</span>'; }
       });
       diffContent.innerHTML = html;
-
-      $('diffLegendAdd').innerHTML =
-        '<span class="diff-legend-dot add"></span>追加 ' + addCount + '行';
-      $('diffLegendDel').innerHTML =
-        '<span class="diff-legend-dot del"></span>削除 ' + delCount + '行';
+      $('diffLegendAdd').innerHTML = '<span class="diff-legend-dot add"></span>追加 ' + addCount + '行';
+      $('diffLegendDel').innerHTML = '<span class="diff-legend-dot del"></span>削除 ' + delCount + '行';
 
       $('diffOverlay').style.display = 'block';
-
       var mainHeader = document.querySelector('header');
       mainHeader.classList.remove('diff-restore');
-      requestAnimationFrame(function() {
-        requestAnimationFrame(function() {
-          mainHeader.classList.add('diff-exit');
-        });
-      });
+      requestAnimationFrame(function() { requestAnimationFrame(function() { mainHeader.classList.add('diff-exit'); }); });
 
       var hdr = $('diffHeader');
       hdr.classList.remove('diff-visible');
       hdr.classList.add('diff-enter');
-
       requestAnimationFrame(function() {
         requestAnimationFrame(function() {
           $('diffOverlay').classList.add('diff-overlay-visible');
-
-          var rect = hdr.getBoundingClientRect();
-          diffContent.style.paddingTop = (rect.bottom + 16) + 'px';
-
-          setTimeout(function() {
-            hdr.classList.remove('diff-enter');
-            hdr.classList.add('diff-visible');
-          }, 220);
+          diffContent.style.paddingTop = (hdr.getBoundingClientRect().bottom + 16) + 'px';
+          setTimeout(function() { hdr.classList.remove('diff-enter'); hdr.classList.add('diff-visible'); }, 220);
         });
       });
     }
@@ -1548,20 +1495,13 @@
       var mainHeader = document.querySelector('header');
       var hdr        = $('diffHeader');
       var overlay    = $('diffOverlay');
-
       hdr.classList.remove('diff-visible');
       hdr.classList.add('diff-enter');
       overlay.classList.remove('diff-overlay-visible');
-
       setTimeout(function() {
         mainHeader.classList.remove('diff-exit');
-        requestAnimationFrame(function() {
-          requestAnimationFrame(function() {
-            mainHeader.classList.add('diff-restore');
-          });
-        });
+        requestAnimationFrame(function() { requestAnimationFrame(function() { mainHeader.classList.add('diff-restore'); }); });
       }, 120);
-
       setTimeout(function() {
         overlay.style.display = 'none';
         hdr.classList.remove('diff-enter', 'diff-visible');
