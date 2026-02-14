@@ -6,7 +6,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <title>Notepad_Ver7.4.3.1</title>
+  <title>Notepad_Ver26</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,6 +21,7 @@
       --dim: #888;
       --radius: 25px;
       --accent: #006956;
+      --accent-rgb: 0, 105, 86;
     }
     @media (prefers-color-scheme: dark) {
       :root {
@@ -157,6 +158,89 @@
       flex-direction: column;
     }
 
+    /* ── infoドット（設定右上） ── */
+    .info-dot {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid #494949;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+      cursor: pointer;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: bold;
+      color: var(--text);
+      font-style: italic;
+      font-family: Georgia, serif;
+      line-height: 1;
+      transition: transform 0.15s;
+    }
+    .info-dot:hover { transform: scale(1.1); }
+    .info-dot:focus { outline: none; }
+
+    /* ── 開発者メッセージモーダル ── */
+    #devMessageModal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      width: min(320px, 88vw);
+      padding: 28px 24px 22px;
+      border-radius: 20px;
+      z-index: 210;
+      opacity: 0;
+      pointer-events: none;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #devMessageModal.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      pointer-events: auto;
+    }
+    #devMessageModal .dev-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: var(--text);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    #devMessageModal .dev-title::before {
+      content: "ℹ";
+      font-size: 16px;
+    }
+    #devMessageModal .dev-body {
+      font-size: 13px;
+      line-height: 1.85;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+    #devMessageModal .dev-close {
+      margin-top: 18px;
+      display: block;
+      width: 100%;
+      padding: 9px 0;
+      border-radius: 12px;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-family: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    #devMessageModal .dev-close:hover { background: var(--accent); color: #fff; filter: brightness(1.15); }
+
     /* ── 閉じるドット（共通） ── */
     .close-dot {
       position: absolute;
@@ -172,7 +256,7 @@
       padding: 0;
       display: inline-block;
     }
-    .close-dot:hover { transform: scale(1.1); }
+    .close-dot:hover { transform: scale(1.1); box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.25), 0 2px 8px rgba(0,0,0,0.25); }
     .close-dot:focus { outline: none; }
 
     /* ── モーダル ── */
@@ -673,6 +757,7 @@
 
   <div id="options" class="glass">
     <button class="close-dot" onclick="act('toggle')" aria-label="閉じる" title="閉じる"></button>
+    <button class="info-dot" onclick="showDevMessage()" aria-label="開発者メッセージ" title="開発者メッセージ">i</button>
     <div><span class="label">Font</span><select id="fSel"></select></div>
     <div><span class="label">Size</span><select id="sSel"></select></div>
     <div><span class="label">翻訳</span>
@@ -692,8 +777,8 @@
       <button id="clearAutoSaveBtn" title="保存済みデータを消去"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#e53935;display:block;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
     </div>
     <div class="options-version">
-      <span>Build SA202602140925</span>
-      <span>Version 7.4.3.1</span>
+      <span>Build 2602142332</span>
+      <span>Version 26</span>
       <span>↓Creator↓<br>Claude<br>Chat GPT<br>Gemini<br>Copilot<br>Cursor<br>Tikuwa</span>
     </div>
   </div>
@@ -751,6 +836,20 @@
     </div>
   </div>
 
+  <div id="devMessageModal" class="glass">
+    <div class="dev-title">開発者からのメッセージ</div>
+    <div class="dev-body">アプリを使っている人へ
+私は最近開発にハマっており、このアプリもその一環として制作しました。
+しかし進学に伴い学業が忙しくなるため、今後は大規模な更新は難しくなる可能性があります。
+現在は主に細かな機能追加やバグ修正が中心になる予定ですが、可能な限り改善は続けていきます。
+まとまった時間が確保でき次第、改めて本格的なメンテナンスや機能強化を行う予定です。
+
+ご了承の上今後ともよろしくお願いします。
+<br><br>
+ - Tikuwa - </div>
+    <button class="dev-close" onclick="hideDevMessage()">閉じる</button>
+  </div>
+
   <div id="backdrop" onclick="act('closeOverlays')"></div>
 
   <div id="contextMenu" class="glass">
@@ -786,6 +885,16 @@
 
   <script>
     var $ = function(id) { return document.getElementById(id); };
+
+    // ── 開発者メッセージ ──
+    function showDevMessage() {
+      var modal = $('devMessageModal');
+      if (modal) modal.classList.add('show');
+    }
+    function hideDevMessage() {
+      var modal = $('devMessageModal');
+      if (modal) modal.classList.remove('show');
+    }
 
     // ── ブラウザ判定 ──
     var getBrowser = function() {
@@ -1177,6 +1286,13 @@
     ];
     function applyAccentColor(color) {
       document.documentElement.style.setProperty('--accent', color);
+      // hex → r,g,b に変換して --accent-rgb にセット
+      var hex = color.replace('#', '');
+      if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+      var r = parseInt(hex.substring(0,2),16);
+      var g = parseInt(hex.substring(2,4),16);
+      var b = parseInt(hex.substring(4,6),16);
+      document.documentElement.style.setProperty('--accent-rgb', r+','+g+','+b);
       state.accentColor = color;
       localStorage.setItem('accentColor', color);
       document.querySelectorAll('.swatch').forEach(function(s) {
@@ -1399,6 +1515,7 @@
 
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && (state.isOptionsOpen || state.isModalOpen)) { ActionHandlers.closeOverlays(); render(); }
+        if (e.key === 'Escape') { hideDevMessage(); }
         if ((e.ctrlKey || e.metaKey) && e.key === 'f') { e.preventDefault(); ActionHandlers.toggleSearch(); render(); }
       });
 
