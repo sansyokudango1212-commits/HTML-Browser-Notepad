@@ -6,7 +6,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <title>Notepad_Ver7.4.3</title>
+  <title>Notepad_Ver7.4.3.1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -133,6 +133,18 @@
     }
     #options div { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .label { width: 60px; color: var(--dim); font-size: 11px; }
+    #clearAutoSaveBtn {
+      background: rgba(229, 57, 53, 0.12);
+      border: 1px solid rgba(229, 57, 53, 0.4);
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 0 7px;
+      height: 26px;
+      box-sizing: border-box;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
     .options-version {
       font-size: 10px;
       color: var(--dim);
@@ -677,10 +689,11 @@
         <option value="off">OFF</option>
         <option value="on">ON</option>
       </select>
+      <button id="clearAutoSaveBtn" title="保存済みデータを消去"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#e53935;display:block;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
     </div>
     <div class="options-version">
-      <span>Build SA202602140010</span>
-      <span>Version 7.4.3</span>
+      <span>Build SA202602140925</span>
+      <span>Version 7.4.3.1</span>
       <span>↓Creator↓<br>Claude<br>Chat GPT<br>Gemini<br>Copilot<br>Cursor<br>Tikuwa</span>
     </div>
   </div>
@@ -1243,17 +1256,33 @@
 
     // ── 自動保存 ──
     var autoSaveTimer = null;
+    var AUTO_SAVE_INTERVAL = 2 * 60 * 1000; // 2分
+
+    function doAutoSave() {
+      if (!state.autoSave) return;
+      var text = $('edit').value;
+      localStorage.setItem('autosave_text', text);
+      localStorage.setItem('autosave_file', state.curFile);
+      var time = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+      queueToast('自動保存済み ' + time, 2000);
+    }
+
     function scheduleAutoSave() {
       if (!state.autoSave) return;
       clearTimeout(autoSaveTimer);
       autoSaveTimer = setTimeout(function() {
-        var text = $('edit').value;
-        localStorage.setItem('autosave_text', text);
-        localStorage.setItem('autosave_file', state.curFile);
-        var time = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
-        queueToast('自動保存済み ' + time, 2000);
-      }, 2000);
+        doAutoSave();
+        // 2分ごとに繰り返す
+        autoSaveTimer = setInterval(doAutoSave, AUTO_SAVE_INTERVAL);
+      }, AUTO_SAVE_INTERVAL);
     }
+
+    // タブ・ブラウザを閉じる直前に自動保存
+    window.addEventListener('beforeunload', function() {
+      if (state.autoSave) {
+        doAutoSave();
+      }
+    });
 
     // ── 初期化 ──
     (function init() {
@@ -1297,7 +1326,19 @@
       autoSaveToggle.onchange = function() {
         state.autoSave = autoSaveToggle.value === 'on';
         localStorage.setItem('autoSave', state.autoSave);
-        if (!state.autoSave) clearTimeout(autoSaveTimer);
+        if (!state.autoSave) {
+          clearTimeout(autoSaveTimer);
+          clearInterval(autoSaveTimer);
+          autoSaveTimer = null;
+        } else {
+          scheduleAutoSave();
+        }
+      };
+
+      $('clearAutoSaveBtn').onclick = function() {
+        localStorage.removeItem('autosave_text');
+        localStorage.removeItem('autosave_file');
+        queueToast('自動保存データを消去しました', 2000);
       };
 
       function positionSearchBar() {
