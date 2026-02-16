@@ -832,7 +832,7 @@
       <div class="tp-src" id="tpSrc"></div>
       <div class="tp-result" id="tpResult"></div>
     </div>
-    <div class="tp-powered" id="tpPowered">Powered by Google translation</div>
+    <div class="tp-powered" id="tpPowered">Powered by Google Translate</div>
   </div>
 
   <div id="searchWebPanel" class="glass">
@@ -1341,7 +1341,7 @@
       var doFetch = function() {
         // [Fix] 毎回 localStorage から最新のエンジン設定を取得する
         var currentEngine = localStorage.getItem('translateEngine') || 'google';
-        if (tpPowered) tpPowered.textContent = currentEngine === 'bing' ? 'Powered by Bing translation' : 'Powered by Google translation';
+        if (tpPowered) tpPowered.textContent = currentEngine === 'bing' ? 'Powered by Bing Translate' : 'Powered by Google Translate';
 
         var url = 'https://translate.googleapis.com/translate_a/single?client=gtx'
           + '&sl=' + $('tpSrcLang').value + '&tl=' + $('tpTgtLang').value
@@ -1542,7 +1542,7 @@
         localStorage.setItem('translateEngine', translateSel.value);
         var tpPowered = $('tpPowered');
         if (tpPowered) tpPowered.textContent = translateSel.value === 'bing'
-          ? 'Powered by Bing translation' : 'Powered by Google translation';
+          ? 'Powered by Bing Translate' : 'Powered by Google Translate';
       };
 
       var dictSel = $('dictSel');
@@ -1807,3 +1807,4 @@
   </script>
 </body>
 </html>
+
