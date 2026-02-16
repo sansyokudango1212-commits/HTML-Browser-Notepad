@@ -7,40 +7,26 @@
   <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <title>Notepad_Ver26</title>
+  <title>Notepad26</title>
   <meta name="description" content="学生が個人開発しているメモ帳。">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP&family=Zen+Maru+Gothic&display=swap" rel="stylesheet">
   <style>
-    /* ── 変数 ── */
+    
     :root {
-      --bg: #ffffff;
-      --text: #333;
-      --ui-bg: rgba(255, 255, 255, 0.5);
-      --hover: rgba(0, 0, 0, 0.05);
+      --bg: #121212;
+      --text: #e0e0e0;
+      --ui-bg: rgba(40, 40, 40, 0.5);
+      --hover: rgba(255, 255, 255, 0.08);
       --dim: #888;
       --radius: 25px;
-      --accent: #006956;
-      --accent-rgb: 0, 105, 86;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #121212;
-        --text: #e0e0e0;
-        --ui-bg: rgba(40, 40, 40, 0.5);
-        --hover: rgba(255, 255, 255, 0.08);
-      }
-      select, input[type="text"] {
-        background: #333;
-        color: #fff;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-      }
-      select option { background: #2d2d2d; color: #fff; }
+      --accent: #c9a181;
+      --accent-rgb: 201, 161, 129;
     }
 
-    /* ── ベース ── */
+    
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     body {
@@ -57,13 +43,13 @@
       padding: 4px;
       font-size: 12px;
       font-family: inherit;
-      border: 1px solid rgba(128, 128, 128, 0.2);
-      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #333;
       color: var(--text);
     }
     select option { background: #2d2d2d; color: #fff; }
 
-    /* ── グラス ── */
+    
     .glass {
       background: var(--ui-bg);
       backdrop-filter: blur(20px);
@@ -72,7 +58,7 @@
       z-index: 10;
     }
 
-    /* ── ヘッダー ── */
+    
     header, #options, footer, .modal, .toast {
       border-radius: var(--radius);
       transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -111,7 +97,7 @@
       header button { padding: 6px 10px; font-size: 11px; }
     }
 
-    /* ── 設定パネル ── */
+    
     #options {
       position: fixed;
       top: 50%;
@@ -160,7 +146,7 @@
       flex-direction: column;
     }
 
-    /* ── infoドット（設定右上） ── */
+    
     .info-dot {
       position: absolute;
       top: 12px;
@@ -187,7 +173,7 @@
     .info-dot:hover { transform: scale(1.1); }
     .info-dot:focus { outline: none; }
 
-    /* ── 開発者メッセージモーダル ── */
+    
     #devMessageModal {
       position: fixed;
       top: 50%;
@@ -243,7 +229,7 @@
     }
     #devMessageModal .dev-close:hover { background: var(--accent); color: #fff; filter: brightness(1.15); }
 
-    /* ── 閉じるドット（共通） ── */
+    
     .close-dot {
       position: absolute;
       top: 12px;
@@ -258,10 +244,9 @@
       padding: 0;
       display: inline-block;
     }
-    .close-dot:hover { transform: scale(1.1); box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.25), 0 2px 8px rgba(0,0,0,0.25); }
     .close-dot:focus { outline: none; }
 
-    /* ── モーダル ── */
+    
     .modal {
       position: fixed;
       top: 50%;
@@ -286,8 +271,8 @@
     #fileNameInput {
       width: 100%;
       border-radius: 12px;
-      border: 1px solid rgba(128, 128, 128, 0.2);
-      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #333;
       color: inherit;
       font-family: inherit;
       font-size: 14px;
@@ -309,7 +294,7 @@
     .btn-main { background: var(--accent); color: white; }
     .btn-sub  { background: var(--hover); color: var(--text); }
 
-    /* ── テキストエリア ── */
+    
     textarea {
       position: absolute;
       inset: 0;
@@ -330,7 +315,7 @@
     }
     textarea::-webkit-scrollbar { display: none; }
 
-    /* ── フッター ── */
+    
     footer {
       position: fixed;
       bottom: 15px;
@@ -347,7 +332,7 @@
     }
     footer.hidden { transform: translate(-50%, 50px); opacity: 0; pointer-events: none; }
 
-    /* ── バックドロップ ── */
+    
     #backdrop {
       position: fixed;
       inset: 0;
@@ -357,7 +342,7 @@
     }
     #backdrop.show { display: block; }
 
-    /* ── トースト ── */
+    
     .toast {
       position: fixed;
       right: 16px;
@@ -392,7 +377,7 @@
       .toast.show { transform: translate(-50%, 0); }
     }
 
-    /* ── コンテキストメニュー ── */
+    
     #contextMenu {
       position: fixed;
       z-index: 1000;
@@ -418,7 +403,7 @@
     }
     #contextMenu button:hover { background: var(--hover); }
 
-    /* ── テキスト内検索バー ── */
+    
     #searchHighlightMirror {
       position: absolute;
       inset: 0;
@@ -487,7 +472,7 @@
     }
     #searchBar button:hover { background: var(--hover); color: var(--text); }
 
-    /* ── 翻訳パネル ── */
+    
     #translatePanel {
       position: fixed;
       top: 50%;
@@ -531,7 +516,6 @@
       transition: 0.15s;
       z-index: 1;
     }
-    #translatePanel .tp-dot:hover { transform: scale(1.15); }
     #translatePanel .tp-lang {
       position: absolute;
       left: 50%;
@@ -547,8 +531,8 @@
       padding: 3px 6px;
       font-size: 12px;
       font-family: inherit;
-      border: 1px solid rgba(128, 128, 128, 0.2);
-      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #333;
       color: var(--text);
       cursor: pointer;
     }
@@ -573,7 +557,7 @@
     #translatePanel .tp-loading { text-align: center; padding: 24px 0; color: var(--dim); font-size: 13px; }
     #translatePanel .tp-error   { color: #e53935; font-size: 13px; padding: 16px 0; }
 
-    /* ── Wikipedia検索パネル ── */
+    
     #searchWebPanel {
       position: fixed;
       top: 50%;
@@ -616,7 +600,6 @@
       cursor: pointer;
       transition: 0.15s;
     }
-    #searchWebPanel .swp-dot:hover   { transform: scale(1.15); }
     #searchWebPanel .swp-engine      { font-size: 11px; color: var(--dim); flex-shrink: 0; }
     #searchWebPanel .swp-query-label { font-size: 12px; color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     #searchWebPanel .swp-wiki-btn {
@@ -666,7 +649,7 @@
     .swp-result-desc  { font-size: 12px; color: var(--text); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .swp-result-url   { font-size: 11px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* ── カラースウォッチ ── */
+    
     .color-swatches { display: flex; gap: 6px; flex-wrap: wrap; }
     .swatch {
       width: 20px;
@@ -680,7 +663,7 @@
     .swatch:hover  { transform: scale(1.15); }
     .swatch.active { border-color: var(--text); }
 
-    /* ── Diff オーバーレイ ── */
+    
     #diffOverlay { opacity: 0; transition: opacity 0.25s ease; }
     #diffOverlay.diff-overlay-visible { opacity: 1; }
 
@@ -760,8 +743,14 @@
   <div id="options" class="glass">
     <button class="close-dot" onclick="act('toggle')" aria-label="閉じる" title="閉じる"></button>
     <button class="info-dot" onclick="showDevMessage()" aria-label="開発者メッセージ" title="開発者メッセージ">i</button>
-    <div><span class="label">Font</span><select id="fSel"></select></div>
-    <div><span class="label">Size</span><select id="sSel"></select></div>
+    <div><span class="label">フォント</span><select id="fSel"></select></div>
+    <div><span class="label">サイズ</span><select id="sSel"></select></div>
+    <div><span class="label">検索</span>
+      <select id="dictSel">
+        <option value="wikipedia">Wikipedia_JP</option>
+        <option value="wiktionary">Wiktionary_JP</option>
+      </select>
+    </div>
     <div><span class="label">翻訳</span>
       <select id="translateSel">
         <option value="google">Google 翻訳</option>
@@ -779,8 +768,8 @@
       <button id="clearAutoSaveBtn" title="保存済みデータを消去"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#e53935;display:block;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
     </div>
     <div class="options-version">
-      <span>Build 2602142332</span>
-      <span>Version 26</span>
+      <span>Build 2602161926</span>
+      <span>Version 26.0.1</span>
       <span>↓Creator↓<br>Claude<br>Chat GPT<br>Gemini<br>Copilot<br>Cursor<br>Tikuwa</span>
     </div>
   </div>
@@ -829,9 +818,9 @@
   <div id="searchWebPanel" class="glass">
     <div class="swp-header">
       <button class="swp-dot" onclick="closePanel('searchWebPanel')" aria-label="閉じる"></button>
-      <span class="swp-engine">Wikipedia</span>
+      <span class="swp-engine" id="swpEngine">Wikipedia</span>
       <span class="swp-query-label" id="swpQueryLabel"></span>
-      <button class="swp-wiki-btn" id="swpWikiBtn">Wikiで開く ↗</button>
+      <button class="swp-wiki-btn" id="swpWikiBtn">開く ↗</button>
     </div>
     <div class="swp-body" id="swpBody">
       <div class="swp-loading">検索中…</div>
@@ -889,7 +878,7 @@
   <script>
     var $ = function(id) { return document.getElementById(id); };
 
-    // ── 開発者メッセージ ──
+    
     function showDevMessage() {
       var modal = $('devMessageModal');
       if (modal) modal.classList.add('show');
@@ -899,7 +888,15 @@
       if (modal) modal.classList.remove('show');
     }
 
-    // ── ブラウザ判定 ──
+    
+    var getDevice = function() {
+      var ua = navigator.userAgent.toLowerCase();
+      var isMobile = /mobi|android|iphone|ipad|ipod|windows phone|blackberry|silk/.test(ua)
+        || (navigator.maxTouchPoints > 1 && window.screen.width <= 1024);
+      return isMobile ? 'Mobile' : 'PC';
+    };
+
+    
     var getBrowser = function() {
       var ua = navigator.userAgent.toLowerCase();
       if (ua.indexOf('opr')     !== -1) return 'Opera';
@@ -910,10 +907,11 @@
       return 'Browser';
     };
 
-    // ── アプリ状態 ──
+    
     var state = {
       curFile:       'memo.txt',
       browser:       getBrowser(),
+      device:        getDevice(),
       text:          '',
       isOptionsOpen: false,
       isModalOpen:   false,
@@ -927,7 +925,7 @@
 
     var supportedFonts = ['Arial', 'Noto Sans JP', 'Noto Serif JP', 'Zen Maru Gothic', 'Dela Gothic One'];
 
-    // ── トースト ──
+    
     var toastQueue      = [];
     var isToastShowing  = false;
     var sizeToastTimer  = null;
@@ -969,7 +967,7 @@
       }, duration);
     }
 
-    // ── アクションハンドラ ──
+    
     var ActionHandlers = {
       new: function() {
         state.modalType  = 'new';
@@ -1054,7 +1052,7 @@
       }
     };
 
-    // ── パネル共通クローズ ──
+    
     function closePanel(id) {
       var el = $(id);
       if (el) el.classList.remove('show');
@@ -1067,7 +1065,7 @@
       }
     }
 
-    // ── テキストエリア padding 更新 ──
+    
     function updateTextareaPadding() {
       var edit      = $('edit');
       var mirror    = $('searchHighlightMirror');
@@ -1085,7 +1083,7 @@
       }
     }
 
-    // ── ユーティリティ ──
+    
     function escapeHtml(str) {
       return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
@@ -1128,7 +1126,7 @@
       }
     }
 
-    // ── コンテキストメニュー ──
+    
     var selectedText = '';
     var contextMenu  = null;
 
@@ -1145,24 +1143,44 @@
       if (rect.bottom > window.innerHeight - 8) contextMenu.style.top  = (y - rect.height - 4) + 'px';
     }
 
-    // ── Wikipedia検索 ──
+    
     var swpCurrentPageUrl = '';
+
+    
+    var DICT_CONFIG = {
+      wikipedia: { label: 'Wikipedia',  btnText: 'Wikiで開く ↗' },
+      wiktionary: { label: 'Wiktionary', btnText: 'Wiktで開く ↗' }
+    };
+
+    function getCurrentDict() {
+      return (localStorage.getItem('dictEngine') || 'wikipedia');
+    }
 
     window.searchWiki = function() {
       if (!selectedText) { hideContextMenu(); return; }
       hideContextMenu();
+      var dict  = getCurrentDict();
+      var query = selectedText;
+      var body  = $('swpBody');
+      var cfg   = DICT_CONFIG[dict] || DICT_CONFIG.wikipedia;
 
-      var query   = selectedText;
-      var body    = $('swpBody');
-      var wikiBtn = $('swpWikiBtn');
-
-      $('swpQueryLabel').textContent = '「' + query + '」';
-      swpCurrentPageUrl = 'https://ja.wikipedia.org/wiki/' + encodeURIComponent(query);
-      wikiBtn.onclick = function() { window.open(swpCurrentPageUrl, '_blank'); };
-
+      $('swpEngine').textContent      = cfg.label;
+      $('swpWikiBtn').textContent     = cfg.btnText;
+      $('swpQueryLabel').textContent  = '「' + query + '」';
       body.innerHTML = '<div class="swp-loading">検索中…</div>';
       $('searchWebPanel').classList.add('show');
       $('backdrop').classList.add('show');
+
+      if      (dict === 'wikipedia')  searchWikipedia(query);
+      else if (dict === 'wiktionary') searchWiktionary(query);
+    };
+
+    
+    function searchWikipedia(query) {
+      var body    = $('swpBody');
+      var wikiBtn = $('swpWikiBtn');
+      swpCurrentPageUrl = 'https://ja.wikipedia.org/wiki/' + encodeURIComponent(query);
+      wikiBtn.onclick = function() { window.open(swpCurrentPageUrl, '_blank'); };
 
       fetch('https://ja.wikipedia.org/w/api.php?action=query&list=search&srsearch='
         + encodeURIComponent(query) + '&srlimit=6&format=json&origin=*')
@@ -1176,7 +1194,6 @@
           var topTitle = results[0].title;
           swpCurrentPageUrl = 'https://ja.wikipedia.org/wiki/' + encodeURIComponent(topTitle);
           wikiBtn.onclick = function() { window.open(swpCurrentPageUrl, '_blank'); };
-
           return fetch('https://ja.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(topTitle))
             .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
             .then(function(summary) { renderWikiResults(summary, results, query); });
@@ -1184,18 +1201,17 @@
         .catch(function() {
           body.innerHTML = '<div class="swp-empty">取得に失敗しました。<br>ネットワーク接続を確認してください。</div>';
         });
-    };
+    }
 
     function renderWikiResults(summary, searchResults, query) {
       var html = '';
-
       if (summary && summary.title) {
         var pageUrl = summary.content_urls && summary.content_urls.desktop
           ? summary.content_urls.desktop.page
           : 'https://ja.wikipedia.org/wiki/' + encodeURIComponent(summary.title);
         html += '<div class="swp-abstract">'
           + '<div class="swp-abstract-heading">' + escapeHtml(summary.title) + '</div>';
-        if (summary.description)
+        if (summary.description && summary.description.indexOf('曖昧さ回避') === -1)
           html += '<div class="swp-abstract-desc">' + escapeHtml(summary.description) + '</div>';
         if (summary.extract) {
           var extract = summary.extract.length > 400 ? summary.extract.slice(0, 400) + '…' : summary.extract;
@@ -1204,7 +1220,6 @@
         html += '<div class="swp-abstract-src"><a href="' + escapeHtml(pageUrl) + '" target="_blank" rel="noopener">Wikipedia で読む →</a></div>'
           + '</div>';
       }
-
       var related = searchResults.slice(1);
       if (related.length > 0) {
         html += '<div class="swp-results-label">関連記事</div>';
@@ -1217,11 +1232,81 @@
           html += '<div class="swp-result-url">' + escapeHtml(url) + '</div></a>';
         });
       }
-
       $('swpBody').innerHTML = html || '<div class="swp-empty">「' + escapeHtml(query) + '」はWikipediaに見つかりませんでした。</div>';
     }
 
-    // ── 翻訳 ──
+    
+    function searchWiktionary(query) {
+      var body    = $('swpBody');
+      var wikiBtn = $('swpWikiBtn');
+      swpCurrentPageUrl = 'https://ja.wiktionary.org/wiki/' + encodeURIComponent(query);
+      wikiBtn.onclick = function() { window.open(swpCurrentPageUrl, '_blank'); };
+
+      fetch('https://ja.wiktionary.org/api/rest_v1/page/summary/' + encodeURIComponent(query))
+        .then(function(r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function(data) {
+          var html = '<div class="swp-abstract">'
+            + '<div class="swp-abstract-heading">' + escapeHtml(data.title || query) + '</div>';
+          if (data.description && data.description.indexOf('曖昧さ回避') === -1)
+            html += '<div class="swp-abstract-desc">' + escapeHtml(data.description) + '</div>';
+          if (data.extract) {
+            var ext = data.extract.length > 500 ? data.extract.slice(0, 500) + '…' : data.extract;
+            html += '<div class="swp-abstract-text">' + escapeHtml(ext) + '</div>';
+          }
+          var pageUrl = data.content_urls && data.content_urls.desktop
+            ? data.content_urls.desktop.page : swpCurrentPageUrl;
+          html += '<div class="swp-abstract-src"><a href="' + escapeHtml(pageUrl) + '" target="_blank" rel="noopener">Wiktionary で読む →</a></div>'
+            + '</div>';
+
+          
+          return fetch('https://ja.wiktionary.org/w/api.php?action=query&list=search&srsearch='
+            + encodeURIComponent(query) + '&srlimit=5&format=json&origin=*')
+            .then(function(r) { return r.ok ? r.json() : { query: { search: [] } }; })
+            .then(function(d) {
+              var results = (d.query && d.query.search) ? d.query.search.slice(1) : [];
+              if (results.length > 0) {
+                html += '<div class="swp-results-label">関連語句</div>';
+                results.forEach(function(item) {
+                  var url     = 'https://ja.wiktionary.org/wiki/' + encodeURIComponent(item.title);
+                  var snippet = item.snippet ? item.snippet.replace(/<[^>]+>/g, '') : '';
+                  html += '<a class="swp-result-item" href="' + escapeHtml(url) + '" target="_blank" rel="noopener">'
+                    + '<div class="swp-result-title">' + escapeHtml(item.title) + '</div>';
+                  if (snippet) html += '<div class="swp-result-desc">' + escapeHtml(snippet) + '</div>';
+                  html += '</a>';
+                });
+              }
+              body.innerHTML = html;
+            });
+        })
+        .catch(function() {
+          
+          fetch('https://ja.wiktionary.org/w/api.php?action=query&list=search&srsearch='
+            + encodeURIComponent(query) + '&srlimit=6&format=json&origin=*')
+            .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
+            .then(function(d) {
+              var results = d.query && d.query.search;
+              if (!results || results.length === 0) {
+                body.innerHTML = '<div class="swp-empty">「' + escapeHtml(query) + '」はWiktionaryに見つかりませんでした。</div>';
+                return;
+              }
+              var html = '<div class="swp-results-label">検索結果</div>';
+              results.forEach(function(item) {
+                var url     = 'https://ja.wiktionary.org/wiki/' + encodeURIComponent(item.title);
+                var snippet = item.snippet ? item.snippet.replace(/<[^>]+>/g, '') : '';
+                html += '<a class="swp-result-item" href="' + escapeHtml(url) + '" target="_blank" rel="noopener">'
+                  + '<div class="swp-result-title">' + escapeHtml(item.title) + '</div>';
+                if (snippet) html += '<div class="swp-result-desc">' + escapeHtml(snippet) + '</div>';
+                html += '<div class="swp-result-url">' + escapeHtml(url) + '</div></a>';
+              });
+              body.innerHTML = html;
+            })
+            .catch(function() {
+              body.innerHTML = '<div class="swp-empty">取得に失敗しました。<br>ネットワーク接続を確認してください。</div>';
+            });
+        });
+    }
+
+    
     window.translateText = function() {
       if (!selectedText) { hideContextMenu(); return; }
       hideContextMenu();
@@ -1253,7 +1338,7 @@
       doFetch();
     };
 
-    // ── render / applyStyles ──
+    
     window.act          = function(type) { ActionHandlers[type](); render(); };
     window.closeConfirm = function(yes) {
       if (yes && state.modalType === 'new') {
@@ -1270,8 +1355,8 @@
       var edit    = $('edit');
       var isAnyOpen = state.isOptionsOpen || state.isModalOpen;
       $('f-info').textContent      = state.curFile + ' · ' + edit.value.length + ' 文字';
-      $('b-info').textContent      = state.browser;
-      edit.placeholder             = state.browser + ' >';
+      $('b-info').textContent      = state.browser + '_' + state.device;
+      edit.placeholder             = state.browser + '_' + state.device + ' >';
       $('options').className       = 'glass' + (state.isOptionsOpen ? ' show' : '');
       $('confirmModal').className  = 'glass modal' + (state.isModalOpen ? ' show' : '');
       $('backdrop').className      = isAnyOpen ? 'show' : '';
@@ -1280,16 +1365,14 @@
     }
 
     var themeColors = [
-      { color: '#006956', label: 'ティールグリーン' },
-      { color: '#1a73e8', label: 'ブルー' },
-      { color: '#9c27b0', label: 'パープル' },
-      { color: '#e53935', label: 'レッド' },
-      { color: '#f57c00', label: 'オレンジ' },
-      { color: '#455a64', label: 'スレート' },
+      { color: '#c9a181', label: 'チタニウムデザート' },
+      { color: '#c4bcad', label: 'チタニウムナチュラル' },
+      { color: '#ecc9a6', label: 'ゴールド' },
+      { color: '#f9c0b9', label: 'ゴールドローズ' },
     ];
     function applyAccentColor(color) {
       document.documentElement.style.setProperty('--accent', color);
-      // hex → r,g,b に変換して --accent-rgb にセット
+      
       var hex = color.replace('#', '');
       if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
       var r = parseInt(hex.substring(0,2),16);
@@ -1308,7 +1391,7 @@
       updateMirror();
     }
 
-    // ── テキスト内検索 (ハイライト) ──
+    
     var searchMatches = [];
     var searchIndex   = 0;
 
@@ -1373,9 +1456,9 @@
       if (mirror) mirror.innerHTML = '';
     }
 
-    // ── 自動保存 ──
+    
     var autoSaveTimer = null;
-    var AUTO_SAVE_INTERVAL = 2 * 60 * 1000; // 2分
+    var AUTO_SAVE_INTERVAL = 2 * 60 * 1000; 
 
     function doAutoSave() {
       if (!state.autoSave) return;
@@ -1391,19 +1474,19 @@
       clearTimeout(autoSaveTimer);
       autoSaveTimer = setTimeout(function() {
         doAutoSave();
-        // 2分ごとに繰り返す
+        
         autoSaveTimer = setInterval(doAutoSave, AUTO_SAVE_INTERVAL);
       }, AUTO_SAVE_INTERVAL);
     }
 
-    // タブ・ブラウザを閉じる直前に自動保存
+    
     window.addEventListener('beforeunload', function() {
       if (state.autoSave) {
         doAutoSave();
       }
     });
 
-    // ── 初期化 ──
+    
     (function init() {
       var fSel = $('fSel'), sSel = $('sSel'), edit = $('edit');
 
@@ -1414,6 +1497,10 @@
       var translateSel = $('translateSel');
       translateSel.value    = localStorage.getItem('translateEngine') || 'google';
       translateSel.onchange = function() { localStorage.setItem('translateEngine', translateSel.value); };
+
+      var dictSel = $('dictSel');
+      dictSel.value    = localStorage.getItem('dictEngine') || 'wikipedia';
+      dictSel.onchange = function() { localStorage.setItem('dictEngine', dictSel.value); };
 
       var swatchContainer = $('colorSwatches');
       themeColors.forEach(function(t) {
@@ -1536,7 +1623,7 @@
         }, 20);
       });
 
-      // ウィンドウ外クリック・タップで各パネルを閉じる
+      
       function handleOutsideClick(e) {
         if (contextMenu && !contextMenu.contains(e.target) && e.target !== edit) hideContextMenu();
 
@@ -1569,7 +1656,7 @@
       window.addEventListener('online', function() { hasShownOfflineToast = false; });
     })();
 
-    // ── ファイル比較 (Diff) ──
+    
     function computeDiff(aLines, bLines) {
       var n = aLines.length, m = bLines.length, max = n + m;
       if (max === 0) return [];
