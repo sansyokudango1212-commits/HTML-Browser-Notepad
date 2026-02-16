@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP&family=Zen+Maru+Gothic&display=swap" rel="stylesheet">
   <style>
-    
+    /* ── CSS変数 ── */
     :root {
       --bg: #121212;
       --text: #e0e0e0;
@@ -26,7 +26,7 @@
       --accent-rgb: 201, 161, 129;
     }
 
-    
+    /* ── リセット ── */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     body {
@@ -49,7 +49,7 @@
     }
     select option { background: #2d2d2d; color: #fff; }
 
-    
+    /* ── グラスモーフィズム ── */
     .glass {
       background: var(--ui-bg);
       backdrop-filter: blur(20px);
@@ -58,11 +58,13 @@
       z-index: 10;
     }
 
-    
+    /* ── 共通トランジション ── */
     header, #options, footer, .modal, .toast {
       border-radius: var(--radius);
       transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
+    /* ── ヘッダー ── */
     header {
       position: fixed;
       top: 12px;
@@ -97,7 +99,7 @@
       header button { padding: 6px 10px; font-size: 11px; }
     }
 
-    
+    /* ── 設定パネル ── */
     #options {
       position: fixed;
       top: 50%;
@@ -122,6 +124,7 @@
     }
     #options div { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .label { width: 60px; color: var(--dim); font-size: 11px; }
+
     #clearAutoSaveBtn {
       background: rgba(229, 57, 53, 0.12);
       border: 1px solid rgba(229, 57, 53, 0.4);
@@ -146,7 +149,7 @@
       flex-direction: column;
     }
 
-    
+    /* ── 情報ドット（設定パネル右上）── */
     .info-dot {
       position: absolute;
       top: 12px;
@@ -173,7 +176,7 @@
     .info-dot:hover { transform: scale(1.1); }
     .info-dot:focus { outline: none; }
 
-    
+    /* ── 開発者メッセージモーダル ── */
     #devMessageModal {
       position: fixed;
       top: 50%;
@@ -227,9 +230,9 @@
       cursor: pointer;
       transition: 0.2s;
     }
-    #devMessageModal .dev-close:hover { background: var(--accent); color: #fff; filter: brightness(1.15); }
+    #devMessageModal .dev-close:hover { filter: brightness(1.15); }
 
-    
+    /* ── 閉じるドット（赤丸）── */
     .close-dot {
       position: absolute;
       top: 12px;
@@ -246,7 +249,7 @@
     }
     .close-dot:focus { outline: none; }
 
-    
+    /* ── 確認モーダル ── */
     .modal {
       position: fixed;
       top: 50%;
@@ -294,7 +297,7 @@
     .btn-main { background: var(--accent); color: white; }
     .btn-sub  { background: var(--hover); color: var(--text); }
 
-    
+    /* ── テキストエリア ── */
     textarea {
       position: absolute;
       inset: 0;
@@ -315,7 +318,7 @@
     }
     textarea::-webkit-scrollbar { display: none; }
 
-    
+    /* ── フッター ── */
     footer {
       position: fixed;
       bottom: 15px;
@@ -332,7 +335,7 @@
     }
     footer.hidden { transform: translate(-50%, 50px); opacity: 0; pointer-events: none; }
 
-    
+    /* ── バックドロップ ── */
     #backdrop {
       position: fixed;
       inset: 0;
@@ -342,7 +345,7 @@
     }
     #backdrop.show { display: block; }
 
-    
+    /* ── トースト ── */
     .toast {
       position: fixed;
       right: 16px;
@@ -377,7 +380,7 @@
       .toast.show { transform: translate(-50%, 0); }
     }
 
-    
+    /* ── コンテキストメニュー ── */
     #contextMenu {
       position: fixed;
       z-index: 1000;
@@ -403,7 +406,7 @@
     }
     #contextMenu button:hover { background: var(--hover); }
 
-    
+    /* ── 検索ハイライトミラー ── */
     #searchHighlightMirror {
       position: absolute;
       inset: 0;
@@ -426,6 +429,7 @@
     }
     #searchHighlightMirror mark.current { opacity: 0.38; }
 
+    /* ── 検索バー ── */
     #searchBar {
       position: fixed;
       left: 50%;
@@ -472,7 +476,7 @@
     }
     #searchBar button:hover { background: var(--hover); color: var(--text); }
 
-    
+    /* ── 翻訳パネル ── */
     #translatePanel {
       position: fixed;
       top: 50%;
@@ -499,7 +503,7 @@
     #translatePanel .tp-header {
       display: flex;
       align-items: center;
-      padding: 10px 14px 8px;
+      padding: 11px 14px;
       border-bottom: 1px solid rgba(128, 128, 128, 0.15);
       flex-shrink: 0;
       position: relative;
@@ -538,7 +542,7 @@
     }
     #translatePanel .tp-lang .tp-arrow { font-size: 13px; color: var(--dim); user-select: none; }
     #translatePanel .tp-body {
-      padding: 14px 18px 18px;
+      padding: 14px 18px 10px;
       overflow-y: auto;
       flex: 1;
       scrollbar-width: none;
@@ -556,8 +560,16 @@
     #translatePanel .tp-result  { font-size: 17px; line-height: 1.75; word-break: break-all; color: var(--text); }
     #translatePanel .tp-loading { text-align: center; padding: 24px 0; color: var(--dim); font-size: 13px; }
     #translatePanel .tp-error   { color: #e53935; font-size: 13px; padding: 16px 0; }
+    #translatePanel .tp-powered {
+      font-size: 10px;
+      color: var(--dim);
+      text-align: center;
+      padding: 1px 1px 4px;
+      border-top: 1px solid rgba(128, 128, 128, 0.12);
+      flex-shrink: 0;
+    }
 
-    
+    /* ── Web検索パネル ── */
     #searchWebPanel {
       position: fixed;
       top: 50%;
@@ -649,7 +661,7 @@
     .swp-result-desc  { font-size: 12px; color: var(--text); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .swp-result-url   { font-size: 11px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    
+    /* ── カラースウォッチ ── */
     .color-swatches { display: flex; gap: 6px; flex-wrap: wrap; }
     .swatch {
       width: 20px;
@@ -663,7 +675,7 @@
     .swatch:hover  { transform: scale(1.15); }
     .swatch.active { border-color: var(--text); }
 
-    
+    /* ── Diffオーバーレイ ── */
     #diffOverlay { opacity: 0; transition: opacity 0.25s ease; }
     #diffOverlay.diff-overlay-visible { opacity: 1; }
 
@@ -765,11 +777,18 @@
         <option value="off">OFF</option>
         <option value="on">ON</option>
       </select>
-      <button id="clearAutoSaveBtn" title="保存済みデータを消去"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#e53935;display:block;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+      <button id="clearAutoSaveBtn" title="保存済みデータを消去">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#e53935;display:block;">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+          <path d="M10 11v6"/><path d="M14 11v6"/>
+          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+        </svg>
+      </button>
     </div>
     <div class="options-version">
       <span>Build 2602161926</span>
-      <span>Version 26.0.1</span>
+      <span>Version 26.0.2</span>
       <span>↓Creator↓<br>Claude<br>Chat GPT<br>Gemini<br>Copilot<br>Cursor<br>Tikuwa</span>
     </div>
   </div>
@@ -813,6 +832,7 @@
       <div class="tp-src" id="tpSrc"></div>
       <div class="tp-result" id="tpResult"></div>
     </div>
+    <div class="tp-powered" id="tpPowered">Powered by Google translation</div>
   </div>
 
   <div id="searchWebPanel" class="glass">
@@ -827,9 +847,9 @@
     </div>
   </div>
 
+  <!-- [Fix] dev-title を正しく構造化。重複した dev-body を削除 -->
   <div id="devMessageModal" class="glass">
-<div class="dev-body" style="text-align: center;"><b>Information</b></div>
-    <br>
+    <div class="dev-title">Information</div>
     <div class="dev-body">アプリを使っている人へ
 私は最近開発にハマっており、このアプリもその一環として制作しました。
 しかし進学に伴い学業が忙しくなるため、今後は大規模な更新は難しくなる可能性があります。
@@ -837,7 +857,7 @@
 まとまった時間が確保でき次第、改めて本格的なメンテナンスや機能強化を行う予定です。
 
 ご了承の上今後ともよろしくお願いします。
-<br><br>
+
  - Tikuwa - </div>
     <button class="dev-close" onclick="hideDevMessage()">閉じる</button>
   </div>
@@ -878,7 +898,7 @@
   <script>
     var $ = function(id) { return document.getElementById(id); };
 
-    
+    /* ── 開発者メッセージ ── */
     function showDevMessage() {
       var modal = $('devMessageModal');
       if (modal) modal.classList.add('show');
@@ -888,7 +908,7 @@
       if (modal) modal.classList.remove('show');
     }
 
-    
+    /* ── デバイス・ブラウザ判定 ── */
     var getDevice = function() {
       var ua = navigator.userAgent.toLowerCase();
       var isMobile = /mobi|android|iphone|ipad|ipod|windows phone|blackberry|silk/.test(ua)
@@ -896,7 +916,6 @@
       return isMobile ? 'Mobile' : 'PC';
     };
 
-    
     var getBrowser = function() {
       var ua = navigator.userAgent.toLowerCase();
       if (ua.indexOf('opr')     !== -1) return 'Opera';
@@ -907,28 +926,28 @@
       return 'Browser';
     };
 
-    
+    /* ── アプリ状態 ── */
     var state = {
-      curFile:       'memo.txt',
-      browser:       getBrowser(),
-      device:        getDevice(),
-      text:          '',
-      isOptionsOpen: false,
-      isModalOpen:   false,
-      isSearchOpen:  false,
-      modalType:     'new',
-      isFooterHidden:false,
-      hideTimer:     null,
-      accentColor:   localStorage.getItem('accentColor') || '#006956',
-      autoSave:      localStorage.getItem('autoSave') === 'true'
+      curFile:        'memo.txt',
+      browser:        getBrowser(),
+      device:         getDevice(),
+      text:           '',
+      isOptionsOpen:  false,
+      isModalOpen:    false,
+      isSearchOpen:   false,
+      modalType:      'new',
+      isFooterHidden: false,
+      hideTimer:      null,
+      accentColor:    localStorage.getItem('accentColor') || '#c9a181',  // [Fix] デフォルト値をCSS変数と一致させる
+      autoSave:       localStorage.getItem('autoSave') === 'true'
     };
 
     var supportedFonts = ['Arial', 'Noto Sans JP', 'Noto Serif JP', 'Zen Maru Gothic', 'Dela Gothic One'];
 
-    
-    var toastQueue      = [];
-    var isToastShowing  = false;
-    var sizeToastTimer  = null;
+    /* ── トーストキュー ── */
+    var toastQueue         = [];
+    var isToastShowing     = false;
+    var sizeToastTimer     = null;
     var hasShownOfflineToast = false;
 
     function queueToast(message, duration) {
@@ -946,7 +965,8 @@
       el.className = 'glass toast';
       var count = document.createElement('div'); count.className = 'count';
       var msg   = document.createElement('div'); msg.className   = 'msg'; msg.textContent = message;
-      el.appendChild(count); el.appendChild(msg);
+      el.appendChild(count);
+      el.appendChild(msg);
       $('toastContainer').appendChild(el);
 
       var header = document.querySelector('header');
@@ -967,14 +987,14 @@
       }, duration);
     }
 
-    
+    /* ── アクションハンドラ ── */
     var ActionHandlers = {
       new: function() {
         state.modalType  = 'new';
         state.isModalOpen = true;
       },
       open: function() {
-        state.isModalOpen  = false;
+        state.isModalOpen   = false;
         state.isOptionsOpen = false;
         render();
         var fi = $('fileInput');
@@ -1005,7 +1025,7 @@
         state.isSearchOpen = !state.isSearchOpen;
         if (state.isSearchOpen) {
           setTimeout(function() { $('searchInput').focus(); }, 50);
-          doSearch();
+          doSearch(0);
         } else {
           clearSearchHighlight();
           $('searchCount').textContent = '';
@@ -1021,14 +1041,16 @@
         closePanel('searchWebPanel');
       },
       updateText: function(val) {
-        var lines = val.split(/\r?\n/);
+        var lines     = val.split(/\r?\n/);
         var bodyLines = [];
-        var changed = false;
+        var changed   = false;
+
         for (var i = 0; i < lines.length; i++) {
           var line = lines[i];
           if (line.startsWith('##FONT:')) {
             updateSelectValue('fSel', line.replace('##FONT:', '').replace(/"/g, '').trim());
-            changed = true; continue;
+            changed = true;
+            continue;
           }
           if (line.startsWith('##SIZE:')) {
             var sizeRaw = parseInt(line.replace('##SIZE:', '').trim());
@@ -1037,9 +1059,15 @@
           }
           bodyLines.push(line);
         }
+
         var processedText = bodyLines.join('\n');
-        if (changed) { state.text = processedText; $('edit').value = state.text; applyStyles(); }
-        else         { state.text = val; }
+        if (changed) {
+          state.text = processedText;
+          $('edit').value = state.text;
+          applyStyles();
+        } else {
+          state.text = val;
+        }
 
         clearTimeout(state.hideTimer);
         var edit = $('edit');
@@ -1052,38 +1080,32 @@
       }
     };
 
-    
+    /* ── パネル閉じる ── */
     function closePanel(id) {
       var el = $(id);
       if (el) el.classList.remove('show');
-      if (!state.isOptionsOpen && !state.isModalOpen) {
-        var backdrop = $('backdrop');
-        if (backdrop && !$('translatePanel').classList.contains('show') &&
-                        !$('searchWebPanel').classList.contains('show')) {
-          backdrop.classList.remove('show');
-        }
-      }
+      // バックドロップを非表示にするのは render() に委ねる
+      render();
     }
 
-    
+    /* ── 検索バー表示時のパディング調整 ── */
     function updateTextareaPadding() {
       var edit      = $('edit');
       var mirror    = $('searchHighlightMirror');
       var searchBar = $('searchBar');
       if (state.isSearchOpen) {
-        var barTop      = parseInt(searchBar.style.top) || 68;
+        var barTop       = parseInt(searchBar.style.top) || 68;
         var totalPadding = barTop + (searchBar.offsetHeight || 44) + 20;
         edit.style.paddingTop   = totalPadding + 'px';
         mirror.style.paddingTop = totalPadding + 'px';
-        edit.readOnly = true;
+        // [Fix] 検索中も編集可能にする（readOnly を設定しない）
       } else {
         edit.style.paddingTop   = '80px';
         mirror.style.paddingTop = '80px';
-        edit.readOnly = false;
       }
     }
 
-    
+    /* ── ユーティリティ ── */
     function escapeHtml(str) {
       return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
@@ -1093,7 +1115,7 @@
       return Math.min(80, Math.max(12, size));
     }
     function sanitizeFileName(name) {
-      name = (name || 'memo.txt').trim().replace(/[/\\:\*\?"<>\|]/g, '');
+      name = (name || 'memo.txt').trim().replace(/[/\\:*?"<>|]/g, '');
       return name.toLowerCase().endsWith('.txt') ? name : name + '.txt';
     }
     function debounce(fn, wait) {
@@ -1126,7 +1148,7 @@
       }
     }
 
-    
+    /* ── コンテキストメニュー ── */
     var selectedText = '';
     var contextMenu  = null;
 
@@ -1143,30 +1165,30 @@
       if (rect.bottom > window.innerHeight - 8) contextMenu.style.top  = (y - rect.height - 4) + 'px';
     }
 
-    
+    /* ── Web検索（Wikipedia / Wiktionary）── */
     var swpCurrentPageUrl = '';
 
-    
     var DICT_CONFIG = {
-      wikipedia: { label: 'Wikipedia',  btnText: 'Wikiで開く ↗' },
+      wikipedia:  { label: 'Wikipedia',  btnText: 'Wikiで開く ↗' },
       wiktionary: { label: 'Wiktionary', btnText: 'Wiktで開く ↗' }
     };
 
     function getCurrentDict() {
-      return (localStorage.getItem('dictEngine') || 'wikipedia');
+      return localStorage.getItem('dictEngine') || 'wikipedia';
     }
 
     window.searchWiki = function() {
       if (!selectedText) { hideContextMenu(); return; }
       hideContextMenu();
+
       var dict  = getCurrentDict();
       var query = selectedText;
       var body  = $('swpBody');
       var cfg   = DICT_CONFIG[dict] || DICT_CONFIG.wikipedia;
 
-      $('swpEngine').textContent      = cfg.label;
-      $('swpWikiBtn').textContent     = cfg.btnText;
-      $('swpQueryLabel').textContent  = '「' + query + '」';
+      $('swpEngine').textContent     = cfg.label;
+      $('swpWikiBtn').textContent    = cfg.btnText;
+      $('swpQueryLabel').textContent = '「' + query + '」';
       body.innerHTML = '<div class="swp-loading">検索中…</div>';
       $('searchWebPanel').classList.add('show');
       $('backdrop').classList.add('show');
@@ -1175,7 +1197,6 @@
       else if (dict === 'wiktionary') searchWiktionary(query);
     };
 
-    
     function searchWikipedia(query) {
       var body    = $('swpBody');
       var wikiBtn = $('swpWikiBtn');
@@ -1235,7 +1256,6 @@
       $('swpBody').innerHTML = html || '<div class="swp-empty">「' + escapeHtml(query) + '」はWikipediaに見つかりませんでした。</div>';
     }
 
-    
     function searchWiktionary(query) {
       var body    = $('swpBody');
       var wikiBtn = $('swpWikiBtn');
@@ -1258,7 +1278,6 @@
           html += '<div class="swp-abstract-src"><a href="' + escapeHtml(pageUrl) + '" target="_blank" rel="noopener">Wiktionary で読む →</a></div>'
             + '</div>';
 
-          
           return fetch('https://ja.wiktionary.org/w/api.php?action=query&list=search&srsearch='
             + encodeURIComponent(query) + '&srlimit=5&format=json&origin=*')
             .then(function(r) { return r.ok ? r.json() : { query: { search: [] } }; })
@@ -1279,7 +1298,7 @@
             });
         })
         .catch(function() {
-          
+          // サマリー取得失敗時はリスト検索にフォールバック
           fetch('https://ja.wiktionary.org/w/api.php?action=query&list=search&srsearch='
             + encodeURIComponent(query) + '&srlimit=6&format=json&origin=*')
             .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
@@ -1306,18 +1325,24 @@
         });
     }
 
-    
+    /* ── 翻訳 ── */
     window.translateText = function() {
       if (!selectedText) { hideContextMenu(); return; }
       hideContextMenu();
 
       var src      = selectedText;
-      var tpResult = $('tpResult');
+      var tpResult  = $('tpResult');
+      var tpPowered = $('tpPowered');
       $('tpSrc').textContent = src.length > 120 ? src.slice(0, 120) + '…' : src;
       tpResult.innerHTML = '<div class="tp-loading">翻訳中…</div>';
       $('translatePanel').classList.add('show');
+      $('backdrop').classList.add('show');
 
       var doFetch = function() {
+        // [Fix] 毎回 localStorage から最新のエンジン設定を取得する
+        var currentEngine = localStorage.getItem('translateEngine') || 'google';
+        if (tpPowered) tpPowered.textContent = currentEngine === 'bing' ? 'Powered by Bing translation' : 'Powered by Google translation';
+
         var url = 'https://translate.googleapis.com/translate_a/single?client=gtx'
           + '&sl=' + $('tpSrcLang').value + '&tl=' + $('tpTgtLang').value
           + '&dt=t&q=' + encodeURIComponent(src);
@@ -1338,32 +1363,40 @@
       doFetch();
     };
 
-    
-    window.act          = function(type) { ActionHandlers[type](); render(); };
+    /* ── グローバル公開 ── */
+    window.act = function(type) { ActionHandlers[type](); render(); };
+
+    // [Fix] キャンセル時は isModalOpen だけ閉じる。全パネル閉じない
     window.closeConfirm = function(yes) {
       if (yes && state.modalType === 'new') {
         $('edit').value = '';
         ActionHandlers.updateText('');
         state.curFile = 'memo.txt';
       }
-      ActionHandlers.closeOverlays();
+      state.isModalOpen = false;
       render();
     };
     window.closePanel = closePanel;
 
+    /* ── レンダリング ── */
     function render() {
-      var edit    = $('edit');
+      var edit      = $('edit');
       var isAnyOpen = state.isOptionsOpen || state.isModalOpen;
+      var isPanelOpen = $('translatePanel').classList.contains('show')
+                     || $('searchWebPanel').classList.contains('show');
+
       $('f-info').textContent      = state.curFile + ' · ' + edit.value.length + ' 文字';
       $('b-info').textContent      = state.browser + '_' + state.device;
       edit.placeholder             = state.browser + '_' + state.device + ' >';
       $('options').className       = 'glass' + (state.isOptionsOpen ? ' show' : '');
       $('confirmModal').className  = 'glass modal' + (state.isModalOpen ? ' show' : '');
-      $('backdrop').className      = isAnyOpen ? 'show' : '';
+      // [Fix] バックドロップはパネル表示も含めて制御
+      $('backdrop').className      = (isAnyOpen || isPanelOpen) ? 'show' : '';
       $('ft').className            = 'glass' + (state.isFooterHidden ? ' hidden' : '');
       $('searchBar').className     = 'glass' + (state.isSearchOpen ? ' show' : '');
     }
 
+    /* ── テーマカラー ── */
     var themeColors = [
       { color: '#c9a181', label: 'チタニウムデザート' },
       { color: '#c4bcad', label: 'チタニウムナチュラル' },
@@ -1372,7 +1405,6 @@
     ];
     function applyAccentColor(color) {
       document.documentElement.style.setProperty('--accent', color);
-      
       var hex = color.replace('#', '');
       if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
       var r = parseInt(hex.substring(0,2),16);
@@ -1391,7 +1423,7 @@
       updateMirror();
     }
 
-    
+    /* ── 検索ハイライト ── */
     var searchMatches = [];
     var searchIndex   = 0;
 
@@ -1403,8 +1435,8 @@
       mirror.style.fontSize   = edit.style.fontSize   || '18px';
 
       if (!state.isSearchOpen || searchMatches.length === 0) {
-        mirror.innerHTML  = '';
-        mirror.scrollTop  = edit.scrollTop;
+        mirror.innerHTML = '';
+        mirror.scrollTop = edit.scrollTop;
         return;
       }
       var query = $('searchInput').value;
@@ -1456,9 +1488,20 @@
       if (mirror) mirror.innerHTML = '';
     }
 
-    
-    var autoSaveTimer = null;
-    var AUTO_SAVE_INTERVAL = 2 * 60 * 1000; 
+    /* ── 自動保存 ── */
+    // [Fix] autoSaveTimer は setTimeout / setInterval を切り替えるため
+    //       clearTimeout / clearInterval を統一して管理する
+    var autoSaveTimer   = null;
+    var autoSaveIsInterval = false;
+    var AUTO_SAVE_INTERVAL = 2 * 60 * 1000; // 2分
+
+    function clearAutoSaveTimer() {
+      if (autoSaveTimer === null) return;
+      if (autoSaveIsInterval) clearInterval(autoSaveTimer);
+      else                    clearTimeout(autoSaveTimer);
+      autoSaveTimer      = null;
+      autoSaveIsInterval = false;
+    }
 
     function doAutoSave() {
       if (!state.autoSave) return;
@@ -1471,22 +1514,21 @@
 
     function scheduleAutoSave() {
       if (!state.autoSave) return;
-      clearTimeout(autoSaveTimer);
+      clearAutoSaveTimer();
+      autoSaveIsInterval = false;
       autoSaveTimer = setTimeout(function() {
         doAutoSave();
-        
+        // 初回タイマー後は定期実行に切り替え
+        autoSaveIsInterval = true;
         autoSaveTimer = setInterval(doAutoSave, AUTO_SAVE_INTERVAL);
       }, AUTO_SAVE_INTERVAL);
     }
 
-    
     window.addEventListener('beforeunload', function() {
-      if (state.autoSave) {
-        doAutoSave();
-      }
+      if (state.autoSave) doAutoSave();
     });
 
-    
+    /* ── 初期化 ── */
     (function init() {
       var fSel = $('fSel'), sSel = $('sSel'), edit = $('edit');
 
@@ -1496,7 +1538,12 @@
 
       var translateSel = $('translateSel');
       translateSel.value    = localStorage.getItem('translateEngine') || 'google';
-      translateSel.onchange = function() { localStorage.setItem('translateEngine', translateSel.value); };
+      translateSel.onchange = function() {
+        localStorage.setItem('translateEngine', translateSel.value);
+        var tpPowered = $('tpPowered');
+        if (tpPowered) tpPowered.textContent = translateSel.value === 'bing'
+          ? 'Powered by Bing translation' : 'Powered by Google translation';
+      };
 
       var dictSel = $('dictSel');
       dictSel.value    = localStorage.getItem('dictEngine') || 'wikipedia';
@@ -1510,7 +1557,6 @@
         s.onclick = function(e) {
           e.preventDefault(); e.stopPropagation();
           hideContextMenu();
-          closePanel('translatePanel');
           applyAccentColor(t.color);
         };
         swatchContainer.appendChild(s);
@@ -1520,7 +1566,7 @@
       var autoSaveToggle = $('autoSaveToggle');
       autoSaveToggle.value = state.autoSave ? 'on' : 'off';
       if (state.autoSave) {
-        var saved = localStorage.getItem('autosave_text');
+        var saved     = localStorage.getItem('autosave_text');
         var savedFile = localStorage.getItem('autosave_file');
         if (saved && saved.length > 0 && edit.value.length === 0) {
           edit.value = saved;
@@ -1533,9 +1579,7 @@
         state.autoSave = autoSaveToggle.value === 'on';
         localStorage.setItem('autoSave', state.autoSave);
         if (!state.autoSave) {
-          clearTimeout(autoSaveTimer);
-          clearInterval(autoSaveTimer);
-          autoSaveTimer = null;
+          clearAutoSaveTimer(); // [Fix] 統一された関数を使う
         } else {
           scheduleAutoSave();
         }
@@ -1571,7 +1615,10 @@
       });
 
       var upd = debounce(function() {
-        if (!edit.readOnly) { ActionHandlers.updateText(edit.value); scheduleAutoSave(); render(); }
+        // [Fix] readOnly チェックを削除（検索中も編集できる）
+        ActionHandlers.updateText(edit.value);
+        scheduleAutoSave();
+        render();
       }, 150);
       edit.oninput  = upd;
       edit.onclick  = function() { hideContextMenu(); upd(); };
@@ -1604,8 +1651,10 @@
       };
 
       document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && (state.isOptionsOpen || state.isModalOpen)) { ActionHandlers.closeOverlays(); render(); }
-        if (e.key === 'Escape') { hideDevMessage(); }
+        if (e.key === 'Escape') {
+          if (state.isOptionsOpen || state.isModalOpen) { ActionHandlers.closeOverlays(); render(); }
+          hideDevMessage();
+        }
         if ((e.ctrlKey || e.metaKey) && e.key === 'f') { e.preventDefault(); ActionHandlers.toggleSearch(); render(); }
       });
 
@@ -1623,7 +1672,6 @@
         }, 20);
       });
 
-      
       function handleOutsideClick(e) {
         if (contextMenu && !contextMenu.contains(e.target) && e.target !== edit) hideContextMenu();
 
@@ -1656,7 +1704,7 @@
       window.addEventListener('online', function() { hasShownOfflineToast = false; });
     })();
 
-    
+    /* ── Diff（ファイル比較）── */
     function computeDiff(aLines, bLines) {
       var n = aLines.length, m = bLines.length, max = n + m;
       if (max === 0) return [];
