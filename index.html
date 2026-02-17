@@ -787,9 +787,9 @@
       </button>
     </div>
     <div class="options-version">
-      <span>Build 2602161926</span>
-      <span>Version 26.0.2</span>
-      <span>↓Creator↓<br>Claude<br>Chat GPT<br>Gemini<br>Copilot<br>Cursor<br>Tikuwa</span>
+      <span>Build 2602172257</span>
+      <span>Version 26.0.3</span>
+      <span><strong>↓Creator↓</strong><br>Claude<br>Chat GPT<br>Gemini<br>Copilot<br>Cursor<br>Tikuwa</span>
     </div>
   </div>
 
@@ -832,7 +832,7 @@
       <div class="tp-src" id="tpSrc"></div>
       <div class="tp-result" id="tpResult"></div>
     </div>
-    <div class="tp-powered" id="tpPowered">Powered by Google Translate</div>
+    <div class="tp-powered" id="tpPowered">Powered by Google translation</div>
   </div>
 
   <div id="searchWebPanel" class="glass">
@@ -840,16 +840,15 @@
       <button class="swp-dot" onclick="closePanel('searchWebPanel')" aria-label="閉じる"></button>
       <span class="swp-engine" id="swpEngine">Wikipedia</span>
       <span class="swp-query-label" id="swpQueryLabel"></span>
-      <button class="swp-wiki-btn" id="swpWikiBtn">開く ↗</button>
+      <button class="swp-wiki-btn" id="swpWikiBtn">開く</button>
     </div>
     <div class="swp-body" id="swpBody">
       <div class="swp-loading">検索中…</div>
     </div>
   </div>
 
-  <!-- [Fix] dev-title を正しく構造化。重複した dev-body を削除 -->
   <div id="devMessageModal" class="glass">
-    <div class="dev-title">Information</div>
+    <div class="dev-title-main" style="text-align: center; font-weight: bold; font-size: 1.1em; margin-bottom: 8px;">Information</div>
     <div class="dev-body">アプリを使っている人へ
 私は最近開発にハマっており、このアプリもその一環として制作しました。
 しかし進学に伴い学業が忙しくなるため、今後は大規模な更新は難しくなる可能性があります。
@@ -1169,8 +1168,8 @@
     var swpCurrentPageUrl = '';
 
     var DICT_CONFIG = {
-      wikipedia:  { label: 'Wikipedia',  btnText: 'Wikiで開く ↗' },
-      wiktionary: { label: 'Wiktionary', btnText: 'Wiktで開く ↗' }
+      wikipedia:  { label: 'Wikipedia',  btnText: 'Wikiで開く' },
+      wiktionary: { label: 'Wiktionary', btnText: 'Wiktで開く' }
     };
 
     function getCurrentDict() {
@@ -1341,7 +1340,7 @@
       var doFetch = function() {
         // [Fix] 毎回 localStorage から最新のエンジン設定を取得する
         var currentEngine = localStorage.getItem('translateEngine') || 'google';
-        if (tpPowered) tpPowered.textContent = currentEngine === 'bing' ? 'Powered by Bing Translate' : 'Powered by Google Translate';
+        if (tpPowered) tpPowered.textContent = currentEngine === 'bing' ? 'Powered by Bing translation' : 'Powered by Google translation';
 
         var url = 'https://translate.googleapis.com/translate_a/single?client=gtx'
           + '&sl=' + $('tpSrcLang').value + '&tl=' + $('tpTgtLang').value
@@ -1542,7 +1541,7 @@
         localStorage.setItem('translateEngine', translateSel.value);
         var tpPowered = $('tpPowered');
         if (tpPowered) tpPowered.textContent = translateSel.value === 'bing'
-          ? 'Powered by Bing Translate' : 'Powered by Google Translate';
+          ? 'Powered by Bing translation' : 'Powered by Google translation';
       };
 
       var dictSel = $('dictSel');
@@ -1807,4 +1806,3 @@
   </script>
 </body>
 </html>
-
