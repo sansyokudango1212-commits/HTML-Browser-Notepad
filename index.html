@@ -55,13 +55,8 @@
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      z-index: 10;
-    }
-
-    /* ── 共通トランジション ── */
-    header, #options, footer, .modal, .toast {
       border-radius: var(--radius);
-      transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 10;
     }
 
     /* ── ヘッダー ── */
@@ -77,6 +72,7 @@
       max-width: 95vw;
       justify-content: center;
       z-index: 160;
+      border-radius: var(--radius);
       transition: opacity 0.32s cubic-bezier(0.4, 0, 0.2, 1),
                   transform 0.32s cubic-bezier(0.4, 0, 0.2, 1),
                   border-radius 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -89,11 +85,16 @@
       font-size: 13px;
       color: inherit;
       border-radius: 20px;
-      transition: 0.2s;
+      transition: background 0.18s cubic-bezier(0.4,0,0.2,1),
+                  transform 0.12s cubic-bezier(0.34,1.56,0.64,1),
+                  color 0.18s;
       font-family: inherit;
       white-space: nowrap;
+      -webkit-user-select: none;
+      user-select: none;
     }
     header button:hover { background: var(--hover); }
+    header button:active { transform: scale(0.88); background: rgba(255,255,255,0.13); }
     @media (max-width: 480px) {
       header { gap: 2px; padding: 4px 6px; }
       header button { padding: 6px 10px; font-size: 11px; }
@@ -110,17 +111,25 @@
       padding: 12px;
       padding-top: 36px;
       border-radius: 18px;
-      transform: translate(-50%, -50%) scale(0.9);
+      /* 閉じている状態（＝ closing の終着点と同じ） */
+      transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
       opacity: 0;
       pointer-events: none;
       will-change: opacity, transform;
       transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                  transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                  transform 0.38s cubic-bezier(0.34, 1.3, 0.64, 1);
     }
     #options.show {
       opacity: 1;
       transform: translate(-50%, -50%) scale(1);
       pointer-events: auto;
+    }
+    #options.closing {
+      opacity: 0;
+      transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
+      pointer-events: none;
+      transition: opacity 0.25s cubic-bezier(0.4, 0, 1, 1),
+                  transform 0.28s cubic-bezier(0.4, 0, 1, 1);
     }
     #options div { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .label { width: 60px; color: var(--dim); font-size: 11px; }
@@ -136,7 +145,9 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      transition: background 0.18s, transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
     }
+    #clearAutoSaveBtn:active { transform: scale(0.92); background: rgba(229,57,53,0.22); }
     .options-version {
       font-size: 10px;
       color: var(--dim);
@@ -174,6 +185,7 @@
       transition: transform 0.15s;
     }
     .info-dot:hover { transform: scale(1.1); }
+    .info-dot:active { transform: scale(0.9); }
     .info-dot:focus { outline: none; }
 
     /* ── 開発者メッセージモーダル ── */
@@ -181,7 +193,7 @@
       position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%) scale(0.9);
+      transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
       width: min(320px, 88vw);
       padding: 28px 24px 22px;
       border-radius: 20px;
@@ -190,13 +202,21 @@
       pointer-events: none;
       box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
       transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                  transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                  transform 0.38s cubic-bezier(0.34, 1.3, 0.64, 1);
     }
     #devMessageModal.show {
       opacity: 1;
       transform: translate(-50%, -50%) scale(1);
       pointer-events: auto;
     }
+    #devMessageModal.closing {
+      opacity: 0;
+      transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
+      pointer-events: none;
+      transition: opacity 0.25s cubic-bezier(0.4, 0, 1, 1),
+                  transform 0.28s cubic-bezier(0.4, 0, 1, 1);
+    }
+    .dev-title-main { text-align: center; font-weight: bold; font-size: 1.1em; margin-bottom: 8px; }
     #devMessageModal .dev-title {
       font-size: 13px;
       font-weight: bold;
@@ -228,9 +248,10 @@
       font-family: inherit;
       font-size: 13px;
       cursor: pointer;
-      transition: 0.2s;
+      transition: filter 0.18s, transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
     }
     #devMessageModal .dev-close:hover { filter: brightness(1.15); }
+    #devMessageModal .dev-close:active { transform: scale(0.95); filter: brightness(0.9); }
 
     /* ── 閉じるドット（赤丸）── */
     .close-dot {
@@ -246,7 +267,10 @@
       cursor: pointer;
       padding: 0;
       display: inline-block;
+      transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), filter 0.15s;
     }
+    .close-dot:hover  { transform: scale(1.2); filter: brightness(1.1); }
+    .close-dot:active { transform: scale(0.88); }
     .close-dot:focus { outline: none; }
 
     /* ── 確認モーダル ── */
@@ -254,7 +278,7 @@
       position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%) scale(0.9);
+      transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
       width: fit-content;
       min-width: 280px;
       padding: 24px 30px;
@@ -263,12 +287,20 @@
       pointer-events: none;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       z-index: 180;
-      transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.38s cubic-bezier(0.34, 1.3, 0.64, 1);
     }
     .modal.show {
       opacity: 1;
       transform: translate(-50%, -50%) scale(1);
       pointer-events: auto;
+    }
+    .modal.closing {
+      opacity: 0;
+      transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
+      pointer-events: none;
+      transition: opacity 0.25s cubic-bezier(0.4, 0, 1, 1),
+                  transform 0.28s cubic-bezier(0.4, 0, 1, 1);
     }
     .modal p { margin: 0 0 15px 0; font-size: 14px; white-space: nowrap; font-weight: bold; }
     #fileNameInput {
@@ -292,8 +324,9 @@
       cursor: pointer;
       font-size: 14px;
       font-family: inherit;
-      transition: 0.2s;
+      transition: filter 0.18s, transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
     }
+    .modal-btns button:active { transform: scale(0.93); filter: brightness(0.9); }
     .btn-main { background: var(--accent); color: white; }
     .btn-sub  { background: var(--hover); color: var(--text); }
 
@@ -332,6 +365,7 @@
       max-width: 90vw;
       justify-content: center;
       white-space: nowrap;
+      border-radius: var(--radius);
     }
     footer.hidden { transform: translate(-50%, 50px); opacity: 0; pointer-events: none; }
 
@@ -342,6 +376,7 @@
       background: rgba(0, 0, 0, 0.15);
       z-index: 9;
       display: none;
+      pointer-events: none; /* textareaへの入力を妨げない */
     }
     #backdrop.show { display: block; }
 
@@ -356,8 +391,8 @@
       color: var(--text);
       z-index: 200;
       overflow: hidden;
-      transform: translateX(120%);
-      transition: transform 0.36s cubic-bezier(0.2, 0, 0.2, 1), opacity 0.2s;
+      transform: translateX(120%) scale(0.96);
+      transition: transform 0.4s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.25s;
       opacity: 0;
       display: flex;
       align-items: center;
@@ -365,7 +400,7 @@
       gap: 10px;
       font-size: 13px;
     }
-    .toast.show { transform: translateX(0); opacity: 1; }
+    .toast.show { transform: translateX(0) scale(1); opacity: 1; }
     .toast .count { position: absolute; left: 0; top: 0; height: 4px; background: var(--accent); width: 100%; transition: width linear; }
     .toast .msg   { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     @media (max-width: 480px) {
@@ -380,11 +415,10 @@
       .toast.show { transform: translate(-50%, 0); }
     }
 
-    /* ── コンテキストメニュー ── */
     @keyframes contextMenuIn {
       from {
         opacity: 0;
-        transform: scale(0.5);
+        transform: scale(0.72);
       }
       to {
         opacity: 1;
@@ -396,14 +430,14 @@
       z-index: 1000;
       display: none;
       min-width: 120px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.22);
       border-radius: 20px;
       overflow: hidden;
       padding: 4px;
       transform-origin: top left;
     }
     #contextMenu.animating {
-      animation: contextMenuIn 0.18s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+      animation: contextMenuIn 0.22s cubic-bezier(0.34, 1.45, 0.64, 1) forwards;
     }
     #contextMenu button {
       width: 100%;
@@ -415,10 +449,11 @@
       font-size: 14px;
       color: var(--text);
       font-family: inherit;
-      transition: 0.2s;
+      transition: background 0.15s, transform 0.1s cubic-bezier(0.34,1.56,0.64,1);
       border-radius: 16px;
     }
     #contextMenu button:hover { background: var(--hover); }
+    #contextMenu button:active { transform: scale(0.95); background: rgba(255,255,255,0.12); }
     .ctx-divider {
       height: 1px;
       background: rgba(128, 128, 128, 0.18);
@@ -459,16 +494,16 @@
       z-index: 150;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-                  transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+      transition: opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.38s cubic-bezier(0.34, 1.2, 0.64, 1),
                   top 0.3s ease;
-      transform: translateX(-50%) translateY(-6px);
+      transform: translateX(-50%) translateY(-10px) scale(0.96);
       border-radius: var(--radius);
     }
     #searchBar.show {
       opacity: 1;
       pointer-events: auto;
-      transform: translateX(-50%) translateY(0);
+      transform: translateX(-50%) translateY(0) scale(1);
     }
     #searchBar input {
       border: none;
@@ -491,16 +526,17 @@
       padding: 2px 6px;
       border-radius: 8px;
       font-family: inherit;
-      transition: 0.15s;
+      transition: background 0.15s, color 0.15s, transform 0.1s cubic-bezier(0.34,1.56,0.64,1);
     }
     #searchBar button:hover { background: var(--hover); color: var(--text); }
+    #searchBar button:active { transform: scale(0.88); }
 
     /* ── 翻訳パネル ── */
     #translatePanel {
       position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%) scale(0.92);
+      transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
       width: min(480px, 92vw);
       max-height: 70vh;
       z-index: 1100;
@@ -510,8 +546,8 @@
       flex-direction: column;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-                  transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.38s cubic-bezier(0.34, 1.3, 0.64, 1);
       overflow: hidden;
     }
     #translatePanel.show {
@@ -519,6 +555,70 @@
       pointer-events: auto;
       transform: translate(-50%, -50%) scale(1);
     }
+    #translatePanel.closing {
+      opacity: 0;
+      transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
+      pointer-events: none;
+      transition: opacity 0.25s cubic-bezier(0.4, 0, 1, 1),
+                  transform 0.28s cubic-bezier(0.4, 0, 1, 1);
+    }
+    /* ── ドラッグハンドル ── */
+    .drag-handle {
+      cursor: grab;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .drag-handle:active { cursor: grabbing; }
+
+    /* 掴んだとき：スプリング縮小アニメーション */
+    .panel-grabbing {
+      transition: transform 0.2s cubic-bezier(0.34, 1.1, 0.64, 1),
+                  box-shadow 0.2s cubic-bezier(0.34, 1.1, 0.64, 1),
+                  opacity 0.15s !important;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.42) !important;
+      opacity: 0.92 !important;
+    }
+    /* ドロップしたとき：スプリングで元のサイズに戻る */
+    .panel-dropping {
+      transition: transform 0.38s cubic-bezier(0.34, 1.35, 0.64, 1),
+                  box-shadow 0.3s cubic-bezier(0.34, 1.35, 0.64, 1),
+                  opacity 0.2s !important;
+    }
+
+    /* 設定パネル上部ハンドルのインジケーター（ホバー時のみ表示） */
+    #optionsDragHandle::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 32px;
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(255,255,255,0.45);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s cubic-bezier(0.4,0,0.2,1);
+    }
+    #optionsDragHandle:hover::after { opacity: 1; }
+
+    /* Web検索パネルのヘッダー中央インジケーター（ホバー時のみ表示） */
+    .swp-header::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 32px;
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(255,255,255,0.38);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s cubic-bezier(0.4,0,0.2,1);
+    }
+    .swp-header:hover::after { opacity: 1; }
+
     #translatePanel .tp-header {
       display: flex;
       align-items: center;
@@ -593,7 +693,7 @@
       position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%) scale(0.92);
+      transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
       width: min(520px, 94vw);
       max-height: min(600px, 82vh);
       z-index: 1100;
@@ -603,14 +703,21 @@
       flex-direction: column;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-                  transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.38s cubic-bezier(0.34, 1.3, 0.64, 1);
       overflow: hidden;
     }
     #searchWebPanel.show {
       opacity: 1;
       pointer-events: auto;
       transform: translate(-50%, -50%) scale(1);
+    }
+    #searchWebPanel.closing {
+      opacity: 0;
+      transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
+      pointer-events: none;
+      transition: opacity 0.25s cubic-bezier(0.4, 0, 1, 1),
+                  transform 0.28s cubic-bezier(0.4, 0, 1, 1);
     }
     #searchWebPanel .swp-header {
       display: flex;
@@ -619,6 +726,7 @@
       border-bottom: 1px solid rgba(128, 128, 128, 0.15);
       flex-shrink: 0;
       gap: 8px;
+      position: relative;
     }
     #searchWebPanel .swp-dot {
       width: 14px;
@@ -631,8 +739,6 @@
       cursor: pointer;
       transition: 0.15s;
     }
-    #searchWebPanel .swp-engine      { font-size: 11px; color: var(--dim); flex-shrink: 0; }
-    #searchWebPanel .swp-query-label { font-size: 12px; color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     #searchWebPanel .swp-wiki-btn {
       background: transparent;
       border: none;
@@ -655,7 +761,7 @@
     }
     #searchWebPanel .swp-body::-webkit-scrollbar { display: none; }
 
-    .swp-loading, .swp-empty { text-align: center; padding: 32px 0; font-size: 13px; color: var(--dim); }
+    .swp-empty { text-align: center; padding: 32px 0; font-size: 13px; color: var(--dim); }
     .swp-abstract { background: rgba(128,128,128,0.07); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; }
     .swp-abstract-heading { font-size: 14px; font-weight: bold; margin-bottom: 6px; color: var(--text); }
     .swp-abstract-desc    { font-size: 12px; color: var(--accent); margin-bottom: 6px; font-weight: bold; }
@@ -700,7 +806,7 @@
       inset: 0;
       background: rgba(120, 120, 128, 0.32);
       border-radius: 13px;
-      transition: background 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .ios-toggle-slider::before {
       content: '';
@@ -712,7 +818,7 @@
       border-radius: 50%;
       background: #fff;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.32s cubic-bezier(0.34, 1.3, 0.64, 1);
     }
     .ios-toggle input:checked + .ios-toggle-slider {
       background: #34c759;
@@ -721,18 +827,17 @@
       transform: translateX(18px);
     }
 
-    /* ── カラースウォッチ ── */
-    .color-swatches { display: flex; gap: 6px; flex-wrap: wrap; }
     .swatch {
       width: 20px;
       height: 20px;
       border-radius: 50%;
       cursor: pointer;
       border: 2px solid transparent;
-      transition: 0.15s;
+      transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), border-color 0.18s;
       flex-shrink: 0;
     }
-    .swatch:hover  { transform: scale(1.15); }
+    .swatch:hover  { transform: scale(1.2); }
+    .swatch:active { transform: scale(0.9); }
     .swatch.active { border-color: var(--text); }
 
     /* ── Diffオーバーレイ ── */
@@ -813,6 +918,7 @@
   </div>
 
   <div id="options" class="glass">
+    <div id="optionsDragHandle" class="drag-handle" style="position:absolute;top:0;left:0;right:0;height:36px;border-radius:18px 18px 0 0;"></div>
     <button class="close-dot" onclick="act('toggle')" aria-label="閉じる" title="閉じる"></button>
     <button class="info-dot" onclick="showDevMessage()" aria-label="開発者メッセージ" title="開発者メッセージ">i</button>
     <div><span class="label">フォント</span><select id="fSel"></select></div>
@@ -846,8 +952,9 @@
         </svg>
       </button>
     </div>
+
     <div class="options-version">
-      <span>Build 2602181603</span>
+      <span>Build 2602190115</span>
       <span>Version 26.0.4</span>
       <span><strong>↓Creator↓</strong><br>Claude<br>Chat GPT<br>Gemini<br>Copilot<br>Cursor<br>Tikuwa</span>
     </div>
@@ -863,7 +970,7 @@
   </div>
 
   <div id="translatePanel" class="glass">
-    <div class="tp-header">
+    <div class="tp-header drag-handle" id="translateDragHandle">
       <button class="tp-dot" onclick="closePanel('translatePanel')" aria-label="閉じる"></button>
       <div class="tp-lang">
         <select id="tpSrcLang">
@@ -896,19 +1003,15 @@
   </div>
 
   <div id="searchWebPanel" class="glass">
-    <div class="swp-header">
+    <div class="swp-header drag-handle" id="searchWebDragHandle">
       <button class="swp-dot" onclick="closePanel('searchWebPanel')" aria-label="閉じる"></button>
-      <span class="swp-engine" id="swpEngine">Wikipedia</span>
-      <span class="swp-query-label" id="swpQueryLabel"></span>
       <button class="swp-wiki-btn" id="swpWikiBtn">開く</button>
     </div>
-    <div class="swp-body" id="swpBody">
-      <div class="swp-loading">検索中…</div>
-    </div>
+    <div class="swp-body" id="swpBody"></div>
   </div>
 
   <div id="devMessageModal" class="glass">
-    <div class="dev-title-main" style="text-align: center; font-weight: bold; font-size: 1.1em; margin-bottom: 8px;">Information</div>
+    <div class="dev-title-main">Information</div>
     <div class="dev-body">アプリを使っている人へ
 私は最近開発にハマっており、このアプリもその一環として制作しました。
 しかし進学に伴い学業が忙しくなるため、今後は大規模な更新は難しくなる可能性があります。
@@ -962,14 +1065,8 @@
     var $ = function(id) { return document.getElementById(id); };
 
     /* ── 開発者メッセージ ── */
-    function showDevMessage() {
-      var modal = $('devMessageModal');
-      if (modal) modal.classList.add('show');
-    }
-    function hideDevMessage() {
-      var modal = $('devMessageModal');
-      if (modal) modal.classList.remove('show');
-    }
+    function showDevMessage() { openPanel('devMessageModal'); }
+    function hideDevMessage() { closePanel('devMessageModal'); }
 
     /* ── デバイス・ブラウザ判定 ── */
     var getDevice = function() {
@@ -1001,7 +1098,7 @@
       modalType:      'new',
       isFooterHidden: false,
       hideTimer:      null,
-      accentColor:    localStorage.getItem('accentColor') || '#c9a181',  // [Fix] デフォルト値をCSS変数と一致させる
+      accentColor:    localStorage.getItem('accentColor') || '#c9a181',
       autoSave:       localStorage.getItem('autoSave') === 'true'
     };
 
@@ -1053,8 +1150,9 @@
     /* ── アクションハンドラ ── */
     var ActionHandlers = {
       new: function() {
-        state.modalType  = 'new';
+        state.modalType   = 'new';
         state.isModalOpen = true;
+        openPanel('confirmModal');
       },
       open: function() {
         state.isModalOpen   = false;
@@ -1077,11 +1175,15 @@
         } catch(e) { queueToast('保存に失敗しました。'); }
       },
       toggle: function() {
-        state.isOptionsOpen = !state.isOptionsOpen;
         if (state.isOptionsOpen) {
-          state.isModalOpen = false;
+          state.isOptionsOpen = false;
+          closePanel('options');
+        } else {
+          state.isOptionsOpen = true;
+          state.isModalOpen   = false;
           hideContextMenu();
           closePanel('translatePanel');
+          openPanel('options');
         }
       },
       toggleSearch: function() {
@@ -1098,8 +1200,8 @@
       searchNext: function() { doSearch(1);  },
       searchPrev: function() { doSearch(-1); },
       closeOverlays: function() {
-        state.isOptionsOpen = false;
-        state.isModalOpen   = false;
+        if (state.isOptionsOpen) { state.isOptionsOpen = false; closePanel('options'); }
+        if (state.isModalOpen)   { state.isModalOpen   = false; closePanel('confirmModal'); }
         closePanel('translatePanel');
         closePanel('searchWebPanel');
       },
@@ -1143,14 +1245,6 @@
       }
     };
 
-    /* ── パネル閉じる ── */
-    function closePanel(id) {
-      var el = $(id);
-      if (el) el.classList.remove('show');
-      // バックドロップを非表示にするのは render() に委ねる
-      render();
-    }
-
     /* ── 検索バー表示時のパディング調整 ── */
     function updateTextareaPadding() {
       var edit      = $('edit');
@@ -1161,10 +1255,13 @@
         var totalPadding = barTop + (searchBar.offsetHeight || 44) + 20;
         edit.style.paddingTop   = totalPadding + 'px';
         mirror.style.paddingTop = totalPadding + 'px';
-        // [Fix] 検索中も編集可能にする（readOnly を設定しない）
+        edit.readOnly = true;
+        edit.style.caretColor = 'transparent';
       } else {
         edit.style.paddingTop   = '80px';
         mirror.style.paddingTop = '80px';
+        edit.readOnly = false;
+        edit.style.caretColor = '';
       }
     }
 
@@ -1220,11 +1317,21 @@
     }
     function showContextMenu(x, y, hasSelection) {
       if (!contextMenu) contextMenu = $('contextMenu');
+      var isMobile = state.device === 'Mobile';
       /* ボタン・区切り線の表示切り替え */
       var selButtons = [$('ctxCopy'), $('ctxCut'), $('ctxDivider'), $('ctxSearch'), $('ctxTrans'), $('ctxCompare')];
-      selButtons.forEach(function(el) { if (el) el.style.display = hasSelection ? '' : 'none'; });
+      selButtons.forEach(function(el) {
+        if (!el) return;
+        /* コピー・切り取りはモバイルでは非表示 */
+        if (el === $('ctxCopy') || el === $('ctxCut')) {
+          el.style.display = (!isMobile && hasSelection) ? '' : 'none';
+        } else {
+          el.style.display = hasSelection ? '' : 'none';
+        }
+      });
       var pasteBtn = $('ctxPaste');
-      pasteBtn.style.display = hasSelection ? 'none' : '';
+      /* 貼り付けはモバイルでは非表示 */
+      pasteBtn.style.display = (!isMobile && !hasSelection) ? '' : 'none';
       /* クリップボードが空なら貼り付けボタンを灰色に */
       var hasClip = getInternalClipboard().length > 0;
       pasteBtn.style.color         = hasClip ? '' : 'var(--dim)';
@@ -1319,12 +1426,9 @@
       var body  = $('swpBody');
       var cfg   = DICT_CONFIG[dict] || DICT_CONFIG.wikipedia;
 
-      $('swpEngine').textContent     = cfg.label;
-      $('swpWikiBtn').textContent    = cfg.btnText;
-      $('swpQueryLabel').textContent = '「' + query + '」';
-      body.innerHTML = '<div class="swp-loading">検索中…</div>';
+      $('swpWikiBtn').textContent = cfg.btnText;
+      body.innerHTML = '';
       $('searchWebPanel').classList.add('show');
-      $('backdrop').classList.add('show');
 
       if      (dict === 'wikipedia')  searchWikipedia(query);
       else if (dict === 'wiktionary') searchWiktionary(query);
@@ -1469,12 +1573,10 @@
       $('tpSrc').textContent = src.length > 120 ? src.slice(0, 120) + '…' : src;
       tpResult.innerHTML = '<div class="tp-loading">翻訳中…</div>';
       $('translatePanel').classList.add('show');
-      $('backdrop').classList.add('show');
 
       var doFetch = function() {
-        // [Fix] 毎回 localStorage から最新のエンジン設定を取得する
-        var currentEngine = localStorage.getItem('translateEngine') || 'google';
-        if (tpPowered) tpPowered.textContent = currentEngine === 'bing' ? 'Powered by Bing translation' : 'Powered by Google translation';
+        var engine = localStorage.getItem('translateEngine') || 'google';
+        if (tpPowered) tpPowered.textContent = engine === 'bing' ? 'Powered by Bing translation' : 'Powered by Google translation';
 
         var url = 'https://translate.googleapis.com/translate_a/single?client=gtx'
           + '&sl=' + $('tpSrcLang').value + '&tl=' + $('tpTgtLang').value
@@ -1498,8 +1600,6 @@
 
     /* ── グローバル公開 ── */
     window.act = function(type) { ActionHandlers[type](); render(); };
-
-    // [Fix] キャンセル時は isModalOpen だけ閉じる。全パネル閉じない
     window.closeConfirm = function(yes) {
       if (yes && state.modalType === 'new') {
         $('edit').value = '';
@@ -1507,29 +1607,170 @@
         state.curFile = 'memo.txt';
       }
       state.isModalOpen = false;
+      closePanel('confirmModal');
       render();
     };
     window.closePanel = closePanel;
+    window.openPanel  = openPanel;
 
     /* ── レンダリング ── */
     function render() {
       var edit      = $('edit');
       var isAnyOpen = state.isOptionsOpen || state.isModalOpen;
-      var isPanelOpen = $('translatePanel').classList.contains('show')
-                     || $('searchWebPanel').classList.contains('show');
-
-      $('f-info').textContent      = state.curFile + ' · ' + edit.value.length + ' 文字';
-      $('b-info').textContent      = state.browser + '_' + state.device;
-      edit.placeholder             = state.browser + '_' + state.device + ' >';
-      $('options').className       = 'glass' + (state.isOptionsOpen ? ' show' : '');
-      $('confirmModal').className  = 'glass modal' + (state.isModalOpen ? ' show' : '');
-      // [Fix] バックドロップはパネル表示も含めて制御
-      $('backdrop').className      = (isAnyOpen || isPanelOpen) ? 'show' : '';
-      $('ft').className            = 'glass' + (state.isFooterHidden ? ' hidden' : '');
-      $('searchBar').className     = 'glass' + (state.isSearchOpen ? ' show' : '');
+      $('f-info').textContent  = state.curFile + ' · ' + edit.value.length + ' 文字';
+      $('b-info').textContent  = state.browser + '_' + state.device;
+      edit.placeholder         = state.browser + '_' + state.device + ' >';
+      $('backdrop').className  = isAnyOpen ? 'show' : '';
+      $('ft').className        = 'glass' + (state.isFooterHidden ? ' hidden' : '');
+      $('searchBar').className = 'glass' + (state.isSearchOpen ? ' show' : '');
     }
 
-    /* ── テーマカラー ── */
+    /* ── パネル開閉の共通関数（show / closing を管理） ── */
+    function openPanel(id) {
+      var el = $(id);
+      if (!el) return;
+      el.classList.remove('closing');
+      el.classList.add('show');
+    }
+    function closePanel(id) {
+      var el = $(id);
+      if (!el || !el.classList.contains('show')) return;
+      el.classList.add('closing');
+      el.classList.remove('show');
+      setTimeout(function() { el.classList.remove('closing'); }, 350);
+    }
+    /* ── ドラッグ移動機能 ── */
+    (function() {
+      function makeDraggable(panelId, handleId) {
+        var panel  = $(panelId);
+        var handle = $(handleId);
+        if (!panel || !handle) return;
+
+        var isDragging = false;
+        var hasMoved   = false;
+        var startX, startY, startLeft, startTop;
+        var dropTimer  = null;
+
+        function snapToPos() {
+          // show クラスがある間は CSS の translate(-50%,-50%) が transform に含まれる。
+          // getBoundingClientRect() は最終的な画面座標を返すので、
+          // それを left/top にセットしつつ transform を scale(1) のみにすれば
+          // CSS の translate は打ち消される。
+          var rect = panel.getBoundingClientRect();
+          // transition を一時停止してワープを防ぐ
+          panel.style.transition = 'none';
+          panel.style.left       = rect.left + 'px';
+          panel.style.top        = rect.top  + 'px';
+          panel.style.transform  = 'scale(1)';
+          void panel.offsetWidth; // 強制リフロー
+        }
+
+        function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+        function onStart(clientX, clientY) {
+          if (dropTimer) { clearTimeout(dropTimer); dropTimer = null; }
+
+          // 初回ドラッグ：CSS の translate(-50%,-50%) を left/top の絶対座標に変換
+          if (!panel.dataset.dragged) {
+            snapToPos();
+            panel.dataset.dragged = '1';
+          }
+
+          isDragging = true;
+          hasMoved   = false;
+          startX     = clientX;
+          startY     = clientY;
+          startLeft  = parseFloat(panel.style.left)  || 0;
+          startTop   = parseFloat(panel.style.top)   || 0;
+
+          // transition を有効化してスプリング縮小アニメーション
+          panel.style.transition = '';
+          panel.classList.remove('panel-dropping');
+          // rAF × 2 でリフロー後に transition が確実に有効になった後に scale 変更
+          requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+              panel.classList.add('panel-grabbing');
+              panel.style.transform = 'scale(0.95)';
+            });
+          });
+        }
+
+        function onMove(clientX, clientY) {
+          if (!isDragging) return;
+          var dx = clientX - startX;
+          var dy = clientY - startY;
+
+          if (!hasMoved && Math.abs(dx) + Math.abs(dy) > 3) {
+            hasMoved = true;
+            // 動き始めたら transition なしで追従
+            panel.classList.remove('panel-grabbing');
+            panel.style.transition = 'none';
+            panel.style.transform  = 'scale(0.95)';
+          }
+          if (!hasMoved) return;
+
+          var maxL = window.innerWidth  - panel.offsetWidth  - 8;
+          var maxT = window.innerHeight - panel.offsetHeight - 8;
+          panel.style.left = clamp(startLeft + dx, 8, maxL) + 'px';
+          panel.style.top  = clamp(startTop  + dy, 8, maxT) + 'px';
+        }
+
+        function onEnd() {
+          if (!isDragging) return;
+          isDragging = false;
+          panel.classList.remove('panel-grabbing');
+          panel.style.transition = '';
+          // ドロップ：スプリングで scale(1) に戻す
+          panel.classList.add('panel-dropping');
+          panel.style.transform = 'scale(1)';
+          dropTimer = setTimeout(function() {
+            panel.classList.remove('panel-dropping');
+            dropTimer = null;
+          }, 420);
+        }
+
+        // パネルが閉じたらドラッグ状態をリセット
+        new MutationObserver(function() {
+          if (!panel.classList.contains('show') && !panel.classList.contains('closing')) {
+            setTimeout(function() {
+              if (!panel.classList.contains('show')) {
+                delete panel.dataset.dragged;
+                panel.style.left       = '';
+                panel.style.top        = '';
+                panel.style.transform  = '';
+                panel.style.transition = '';
+                panel.classList.remove('panel-grabbing', 'panel-dropping');
+              }
+            }, 420);
+          }
+        }).observe(panel, { attributes: true, attributeFilter: ['class'] });
+
+        handle.addEventListener('mousedown', function(e) {
+          if (e.button !== 0) return;
+          if (['BUTTON','SELECT','INPUT','LABEL'].indexOf(e.target.tagName) !== -1) return;
+          e.preventDefault();
+          onStart(e.clientX, e.clientY);
+        });
+        document.addEventListener('mousemove', function(e) { onMove(e.clientX, e.clientY); });
+        document.addEventListener('mouseup',   onEnd);
+
+        handle.addEventListener('touchstart', function(e) {
+          if (['BUTTON','SELECT','INPUT','LABEL'].indexOf(e.target.tagName) !== -1) return;
+          onStart(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: true });
+        document.addEventListener('touchmove', function(e) {
+          if (!isDragging) return;
+          e.preventDefault();
+          onMove(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: false });
+        document.addEventListener('touchend', onEnd);
+      }
+
+      makeDraggable('options',        'optionsDragHandle');
+      makeDraggable('translatePanel', 'translateDragHandle');
+      makeDraggable('searchWebPanel', 'searchWebDragHandle');
+    })();
+
     var themeColors = [
       { color: '#c9a181', label: 'チタニウムデザート' },
       { color: '#c4bcad', label: 'チタニウムナチュラル' },
@@ -1622,7 +1863,6 @@
     }
 
     /* ── 自動保存 ── */
-    // [Fix] autoSaveTimer は setTimeout / setInterval を切り替えるため
     //       clearTimeout / clearInterval を統一して管理する
     var autoSaveTimer   = null;
     var autoSaveIsInterval = false;
@@ -1748,7 +1988,6 @@
       });
 
       var upd = debounce(function() {
-        // [Fix] readOnly チェックを削除（検索中も編集できる）
         ActionHandlers.updateText(edit.value);
         scheduleAutoSave();
         render();
@@ -1817,6 +2056,23 @@
           if (!contextMenu.contains(e.target)) hideContextMenu();
           return;
         }
+
+        // 設定パネルが開いているとき：パネル外クリックで閉じる（backdropがpointer-events:noneのため）
+        // ただし devMessageModal が開いている場合は何もしない
+        if (state.isOptionsOpen) {
+          var devModal = $('devMessageModal');
+          if (devModal && devModal.classList.contains('show')) return;
+          var optEl = $('options');
+          if (optEl && !optEl.contains(e.target)) {
+            ActionHandlers.closeOverlays();
+            render();
+          }
+          return;
+        }
+
+        // textareaやedit上のクリック/タッチはパネルを閉じない（編集を許可）
+        var editEl = $('edit');
+        if (editEl && (editEl === e.target || editEl.contains(e.target))) return;
 
         var tp = $('translatePanel');
         if (tp && tp.classList.contains('show') && !tp.contains(e.target)) closePanel('translatePanel');
