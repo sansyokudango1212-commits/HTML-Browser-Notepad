@@ -381,6 +381,16 @@
     }
 
     /* ── コンテキストメニュー ── */
+    @keyframes contextMenuIn {
+      from {
+        opacity: 0;
+        transform: scale(0.5);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
     #contextMenu {
       position: fixed;
       z-index: 1000;
@@ -390,6 +400,10 @@
       border-radius: 20px;
       overflow: hidden;
       padding: 4px;
+      transform-origin: top left;
+    }
+    #contextMenu.animating {
+      animation: contextMenuIn 0.18s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
     }
     #contextMenu button {
       width: 100%;
@@ -405,6 +419,11 @@
       border-radius: 16px;
     }
     #contextMenu button:hover { background: var(--hover); }
+    .ctx-divider {
+      height: 1px;
+      background: rgba(128, 128, 128, 0.18);
+      margin: 3px 8px;
+    }
 
     /* ── 検索ハイライトミラー ── */
     #searchHighlightMirror {
@@ -661,6 +680,47 @@
     .swp-result-desc  { font-size: 12px; color: var(--text); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .swp-result-url   { font-size: 11px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+    /* ── iOSトグルスイッチ ── */
+    .ios-toggle {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+    .ios-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+    .ios-toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: rgba(120, 120, 128, 0.32);
+      border-radius: 13px;
+      transition: background 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .ios-toggle-slider::before {
+      content: '';
+      position: absolute;
+      height: 22px;
+      width: 22px;
+      left: 2px;
+      top: 2px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .ios-toggle input:checked + .ios-toggle-slider {
+      background: #34c759;
+    }
+    .ios-toggle input:checked + .ios-toggle-slider::before {
+      transform: translateX(18px);
+    }
+
     /* ── カラースウォッチ ── */
     .color-swatches { display: flex; gap: 6px; flex-wrap: wrap; }
     .swatch {
@@ -773,10 +833,10 @@
       <div class="color-swatches" id="colorSwatches"></div>
     </div>
     <div><span class="label">自動保存</span>
-      <select id="autoSaveToggle">
-        <option value="off">OFF</option>
-        <option value="on">ON</option>
-      </select>
+      <label class="ios-toggle">
+        <input type="checkbox" id="autoSaveToggle">
+        <span class="ios-toggle-slider"></span>
+      </label>
       <button id="clearAutoSaveBtn" title="保存済みデータを消去">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#e53935;display:block;">
           <polyline points="3 6 5 6 21 6"/>
@@ -787,8 +847,8 @@
       </button>
     </div>
     <div class="options-version">
-      <span>Build 2602172257</span>
-      <span>Version 26.0.3</span>
+      <span>Build 2602181603</span>
+      <span>Version 26.0.4</span>
       <span><strong>↓Creator↓</strong><br>Claude<br>Chat GPT<br>Gemini<br>Copilot<br>Cursor<br>Tikuwa</span>
     </div>
   </div>
@@ -864,9 +924,13 @@
   <div id="backdrop" onclick="act('closeOverlays')"></div>
 
   <div id="contextMenu" class="glass">
-    <button onclick="searchWiki()">検索</button>
-    <button onclick="translateText()">翻訳</button>
-    <button onclick="openCompareFromContextMenu()">比較</button>
+    <button id="ctxCopy"    onclick="ctxCopyText()">コピー</button>
+    <button id="ctxCut"     onclick="ctxCutText()">切り取り</button>
+    <button id="ctxPaste"   onclick="ctxPasteText()">貼り付け</button>
+    <div id="ctxDivider" class="ctx-divider"></div>
+    <button id="ctxSearch"  onclick="searchWiki()">検索</button>
+    <button id="ctxTrans"   onclick="translateText()">翻訳</button>
+    <button id="ctxCompare" onclick="openCompareFromContextMenu()">比較</button>
   </div>
 
   <div id="searchHighlightMirror"></div>
@@ -1152,17 +1216,87 @@
     var contextMenu  = null;
 
     function hideContextMenu() {
-      if (contextMenu) contextMenu.style.display = 'none';
+      if (contextMenu) { contextMenu.style.display = 'none'; contextMenu.classList.remove('animating'); }
     }
-    function showContextMenu(x, y) {
+    function showContextMenu(x, y, hasSelection) {
       if (!contextMenu) contextMenu = $('contextMenu');
+      /* ボタン・区切り線の表示切り替え */
+      var selButtons = [$('ctxCopy'), $('ctxCut'), $('ctxDivider'), $('ctxSearch'), $('ctxTrans'), $('ctxCompare')];
+      selButtons.forEach(function(el) { if (el) el.style.display = hasSelection ? '' : 'none'; });
+      var pasteBtn = $('ctxPaste');
+      pasteBtn.style.display = hasSelection ? 'none' : '';
+      /* クリップボードが空なら貼り付けボタンを灰色に */
+      var hasClip = getInternalClipboard().length > 0;
+      pasteBtn.style.color         = hasClip ? '' : 'var(--dim)';
+      pasteBtn.style.cursor        = hasClip ? '' : 'default';
+      pasteBtn.style.pointerEvents = hasClip ? '' : 'none';
+      contextMenu.classList.remove('animating');
       contextMenu.style.left    = x + 'px';
       contextMenu.style.top     = y + 'px';
       contextMenu.style.display = 'block';
       var rect = contextMenu.getBoundingClientRect();
-      if (rect.right  > window.innerWidth  - 8) contextMenu.style.left = (x - rect.width  - 4) + 'px';
-      if (rect.bottom > window.innerHeight - 8) contextMenu.style.top  = (y - rect.height - 4) + 'px';
+      var finalX = x, finalY = y;
+      if (rect.right  > window.innerWidth  - 8) finalX = x - rect.width  - 4;
+      if (rect.bottom > window.innerHeight - 8) finalY = y - rect.height - 4;
+      contextMenu.style.left = finalX + 'px';
+      contextMenu.style.top  = finalY + 'px';
+      /* transform-originをマウス位置に合わせる */
+      var originX = (finalX !== x) ? 'right' : 'left';
+      var originY = (finalY !== y) ? 'bottom' : 'top';
+      contextMenu.style.transformOrigin = originY + ' ' + originX;
+      /* アニメーション再トリガー */
+      void contextMenu.offsetWidth;
+      contextMenu.classList.add('animating');
     }
+
+    /* テキストエリアの選択範囲を使ってクリップボードにコピーする共通関数 */
+    var CLIP_KEY = 'notepad26_clipboard';
+
+    function copyToClipboard(text, onDone) {
+      localStorage.setItem(CLIP_KEY, text);
+      if (onDone) onDone();
+    }
+
+    function getInternalClipboard() {
+      return localStorage.getItem(CLIP_KEY) || '';
+    }
+
+    window.ctxCopyText = function() {
+      if (!selectedText) { hideContextMenu(); return; }
+      var text = selectedText;
+      hideContextMenu();
+      copyToClipboard(text, function() {
+        queueToast('コピーしました', 1000);
+      });
+    };
+
+    window.ctxCutText = function() {
+      if (!selectedText) { hideContextMenu(); return; }
+      var edit  = $('edit');
+      var start = edit.selectionStart, end = edit.selectionEnd;
+      var text  = selectedText;
+      hideContextMenu();
+      copyToClipboard(text, function() {
+        edit.setRangeText('', start, end, 'start');
+        ActionHandlers.updateText(edit.value);
+        scheduleAutoSave();
+        render();
+        selectedText = '';
+        queueToast('切り取りました', 1000);
+      });
+    };
+
+    window.ctxPasteText = function() {
+      var text = getInternalClipboard();
+      if (!text) { hideContextMenu(); return; }
+      var edit  = $('edit');
+      var start = edit.selectionStart, end = edit.selectionEnd;
+      edit.setRangeText(text, start, end, 'end');
+      ActionHandlers.updateText(edit.value);
+      scheduleAutoSave();
+      render();
+      hideContextMenu();
+    };
 
     /* ── Web検索（Wikipedia / Wiktionary）── */
     var swpCurrentPageUrl = '';
@@ -1563,7 +1697,7 @@
       applyAccentColor(state.accentColor);
 
       var autoSaveToggle = $('autoSaveToggle');
-      autoSaveToggle.value = state.autoSave ? 'on' : 'off';
+      autoSaveToggle.checked = state.autoSave;
       if (state.autoSave) {
         var saved     = localStorage.getItem('autosave_text');
         var savedFile = localStorage.getItem('autosave_file');
@@ -1575,7 +1709,7 @@
         }
       }
       autoSaveToggle.onchange = function() {
-        state.autoSave = autoSaveToggle.value === 'on';
+        state.autoSave = autoSaveToggle.checked;
         localStorage.setItem('autoSave', state.autoSave);
         if (!state.autoSave) {
           clearAutoSaveTimer(); // [Fix] 統一された関数を使う
@@ -1657,22 +1791,32 @@
         if ((e.ctrlKey || e.metaKey) && e.key === 'f') { e.preventDefault(); ActionHandlers.toggleSearch(); render(); }
       });
 
+      var contextMenuJustOpened = false;
+
       edit.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
         var text = window.getSelection().toString().trim();
-        if (text.length > 0) { e.preventDefault(); selectedText = text; showContextMenu(e.clientX, e.clientY); }
-        else { hideContextMenu(); }
+        selectedText = text;
+        contextMenuJustOpened = true;
+        showContextMenu(e.clientX, e.clientY, text.length > 0);
+        setTimeout(function() { contextMenuJustOpened = false; }, 100);
       });
 
       edit.addEventListener('mouseup', function(e) {
+        if (e.button === 2) return; // 右クリックは無視
         setTimeout(function() {
           var text = window.getSelection().toString().trim();
-          if (text.length > 0) { selectedText = text; showContextMenu(e.clientX, e.clientY); }
+          if (text.length > 0) { selectedText = text; showContextMenu(e.clientX, e.clientY, true); }
           else if (contextMenu && !contextMenu.contains(e.target)) { hideContextMenu(); }
         }, 20);
       });
 
       function handleOutsideClick(e) {
-        if (contextMenu && !contextMenu.contains(e.target) && e.target !== edit) hideContextMenu();
+        if (contextMenuJustOpened) return;
+        if (contextMenu && contextMenu.style.display !== 'none') {
+          if (!contextMenu.contains(e.target)) hideContextMenu();
+          return;
+        }
 
         var tp = $('translatePanel');
         if (tp && tp.classList.contains('show') && !tp.contains(e.target)) closePanel('translatePanel');
@@ -1689,7 +1833,7 @@
           if (text.length > 0) {
             selectedText = text;
             var touch = e.changedTouches[0];
-            showContextMenu(touch.clientX, touch.clientY);
+            showContextMenu(touch.clientX, touch.clientY, true);
           }
         }, 50);
       });
