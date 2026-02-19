@@ -95,6 +95,27 @@
     }
     header button:hover { background: var(--hover); }
     header button:active { transform: scale(0.88); background: rgba(255,255,255,0.13); }
+    /* ページボタン表示/非表示アニメーション */
+    #headerPageBtn {
+      max-width: 0;
+      opacity: 0;
+      padding-left: 0;
+      padding-right: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    #headerPageBtn.animated {
+      transition: max-width 0.38s cubic-bezier(0.34, 1.1, 0.64, 1),
+                  opacity    0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                  padding    0.38s cubic-bezier(0.34, 1.1, 0.64, 1);
+    }
+    #headerPageBtn.visible {
+      max-width: 120px;
+      opacity: 1;
+      padding-left: 16px;
+      padding-right: 16px;
+      pointer-events: auto;
+    }
     @media (max-width: 480px) {
       header { gap: 2px; padding: 4px 6px; }
       header button { padding: 6px 10px; font-size: 11px; }
@@ -115,7 +136,6 @@
       transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
       opacity: 0;
       pointer-events: none;
-      will-change: opacity, transform;
       transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
                   transform 0.38s cubic-bezier(0.34, 1.3, 0.64, 1);
     }
@@ -351,6 +371,38 @@
     }
     textarea::-webkit-scrollbar { display: none; }
 
+    /* ── ページ切り替えアニメーション ── */
+    @keyframes pageSlideInFromRight {
+      from { opacity: 0; transform: translateX(48px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes pageSlideInFromLeft {
+      from { opacity: 0; transform: translateX(-48px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes pageSlideOutToLeft {
+      from { opacity: 1; transform: translateX(0); }
+      to   { opacity: 0; transform: translateX(-48px); }
+    }
+    @keyframes pageSlideOutToRight {
+      from { opacity: 1; transform: translateX(0); }
+      to   { opacity: 0; transform: translateX(48px); }
+    }
+    textarea.page-slide-in-right {
+      animation: pageSlideInFromRight 0.32s cubic-bezier(0.34, 1.1, 0.64, 1) forwards;
+    }
+    textarea.page-slide-in-left {
+      animation: pageSlideInFromLeft 0.32s cubic-bezier(0.34, 1.1, 0.64, 1) forwards;
+    }
+    textarea.page-slide-out-left {
+      animation: pageSlideOutToLeft 0.18s cubic-bezier(0.4, 0, 1, 1) forwards;
+      pointer-events: none;
+    }
+    textarea.page-slide-out-right {
+      animation: pageSlideOutToRight 0.18s cubic-bezier(0.4, 0, 1, 1) forwards;
+      pointer-events: none;
+    }
+
     /* ── フッター ── */
     footer {
       position: fixed;
@@ -366,6 +418,8 @@
       justify-content: center;
       white-space: nowrap;
       border-radius: var(--radius);
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1),
+                  opacity    0.3s cubic-bezier(0.4,0,0.2,1);
     }
     footer.hidden { transform: translate(-50%, 50px); opacity: 0; pointer-events: none; }
 
@@ -389,7 +443,7 @@
       max-width: 420px;
       background: var(--ui-bg);
       color: var(--text);
-      z-index: 200;
+      z-index: 400;
       overflow: hidden;
       transform: translateX(120%) scale(0.96);
       transition: transform 0.4s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.25s;
@@ -401,19 +455,19 @@
       font-size: 13px;
     }
     .toast.show { transform: translateX(0) scale(1); opacity: 1; }
+    .toast.toast-left {
+      right: auto;
+      left: 16px;
+      transform: translateX(-120%) scale(0.96);
+    }
+    .toast.toast-left.show { transform: translateX(0) scale(1); }
     .toast .count { position: absolute; left: 0; top: 0; height: 4px; background: var(--accent); width: 100%; transition: width linear; }
     .toast .msg   { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     @media (max-width: 480px) {
       textarea, #searchHighlightMirror { padding: 72px 16px 90px; font-size: 16px; }
       #contextMenu { max-width: calc(100vw - 24px); }
-      .toast {
-        left: 50%; right: auto;
-        transform: translate(-50%, -100%);
-        width: 95vw; max-width: 95vw;
-        justify-content: center;
-      }
-      .toast.show { transform: translate(-50%, 0); }
     }
+
 
     @keyframes contextMenuIn {
       from {
@@ -570,20 +624,8 @@
     }
     .drag-handle:active { cursor: grabbing; }
 
-    /* 掴んだとき：スプリング縮小アニメーション */
-    .panel-grabbing {
-      transition: transform 0.2s cubic-bezier(0.34, 1.1, 0.64, 1),
-                  box-shadow 0.2s cubic-bezier(0.34, 1.1, 0.64, 1),
-                  opacity 0.15s !important;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.42) !important;
-      opacity: 0.92 !important;
-    }
-    /* ドロップしたとき：スプリングで元のサイズに戻る */
-    .panel-dropping {
-      transition: transform 0.38s cubic-bezier(0.34, 1.35, 0.64, 1),
-                  box-shadow 0.3s cubic-bezier(0.34, 1.35, 0.64, 1),
-                  opacity 0.2s !important;
-    }
+    /* ドラッグ中・ドロップ時のスタイルは JS でインライン直書き
+       （transition !important があるだけで合成レイヤーが生まれ backdrop-filter が壊れるため CSS クラスは使わない） */
 
     /* 設定パネル上部ハンドルのインジケーター（ホバー時のみ表示） */
     #optionsDragHandle::after {
@@ -677,6 +719,7 @@
       word-break: break-all;
     }
     #translatePanel .tp-result  { font-size: 17px; line-height: 1.75; word-break: break-all; color: var(--text); }
+    #translatePanel .tp-result-text { font-size: 17px; line-height: 1.75; word-break: break-all; color: var(--text); margin: 0; }
     #translatePanel .tp-loading { text-align: center; padding: 24px 0; color: var(--dim); font-size: 13px; }
     #translatePanel .tp-error   { color: #e53935; font-size: 13px; padding: 16px 0; }
     #translatePanel .tp-powered {
@@ -761,7 +804,30 @@
     }
     #searchWebPanel .swp-body::-webkit-scrollbar { display: none; }
 
-    .swp-empty { text-align: center; padding: 32px 0; font-size: 13px; color: var(--dim); }
+    /* 検索・翻訳結果アニメーション共通 */
+    .result-anim-wrap {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 0.62s cubic-bezier(0.76, 0, 0.24, 1),
+                  opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .result-anim-wrap.open {
+      opacity: 1;
+    }
+    .result-anim-item {
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: opacity 0.26s cubic-bezier(0.4,0,0.2,1),
+                  transform 0.26s cubic-bezier(0.34,1.2,0.64,1);
+    }
+    .result-anim-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .swp-empty   { text-align: center; padding: 32px 0; font-size: 13px; color: var(--dim); }
+    .swp-loading { text-align: center; padding: 32px 0; font-size: 13px; color: var(--dim); }
     .swp-abstract { background: rgba(128,128,128,0.07); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; }
     .swp-abstract-heading { font-size: 14px; font-weight: bold; margin-bottom: 6px; color: var(--text); }
     .swp-abstract-desc    { font-size: 12px; color: var(--accent); margin-bottom: 6px; font-weight: bold; }
@@ -895,6 +961,305 @@
 
     header.diff-exit    { opacity: 0; transform: translateX(-50%) scale(0.82); pointer-events: none; }
     header.diff-restore { opacity: 1; transform: translateX(-50%) scale(1);    pointer-events: auto; }
+
+    /* ── 低スペック環境：アニメーション全カット ── */
+    body.no-anim *,
+    body.no-anim *::before,
+    body.no-anim *::after {
+      transition: none !important;
+      animation: none !important;
+    }
+    body.no-anim .glass,
+    body.no-anim .toast,
+    body.no-anim #options,
+    body.no-anim #translatePanel,
+    body.no-anim #searchWebPanel,
+    body.no-anim #devMessageModal,
+    body.no-anim .modal {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      background: rgba(30, 30, 30, 0.97) !important;
+    }
+
+    /* ── ページ管理サイドパネル（右スワイプで出現）── */
+
+    /* スワイプトリガーゾーン（右端 24px） */
+    #pageSwipeTrigger {
+      position: fixed;
+      right: 0;
+      top: 0;
+      width: 24px;
+      height: 100%;
+      z-index: 300;
+    }
+
+    /* オーバーレイ背景 */
+    #pageOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0);
+      z-index: 310;
+      pointer-events: none;
+      transition: background 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+    #pageOverlay.open {
+      background: rgba(0,0,0,0.38);
+      pointer-events: auto;
+    }
+
+    /* サイドパネル本体 */
+    #pagePanel {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      bottom: 16px;
+      width: min(300px, 82vw);
+      height: auto;
+      z-index: 320;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(calc(100% + 20px));
+      transition: transform 0.42s cubic-bezier(0.34,1.1,0.64,1);
+      overflow: hidden;
+      /* .glass と同じ値 */
+      background: var(--ui-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 18px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    }
+    #pagePanel.open {
+      transform: translateX(0);
+    }
+
+    /* ヘッダー */
+    #pagePanelHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 20px 12px;
+      flex-shrink: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    #pagePanelHeader .pph-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: var(--text);
+    }
+    #pagePanelHeader .pph-add {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), filter 0.15s;
+      flex-shrink: 0;
+    }
+    #pagePanelHeader .pph-add:hover  { filter: brightness(1.15); }
+    #pagePanelHeader .pph-add:active { transform: scale(0.88); }
+    #pagePanelHeader .pph-btns {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    #pagePanelHeader .pph-edit {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.10);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), background 0.15s;
+      flex-shrink: 0;
+    }
+    #pagePanelHeader .pph-edit:hover  { background: rgba(255,255,255,0.18); }
+    #pagePanelHeader .pph-edit:active { transform: scale(0.88); }
+
+    /* ページリスト */
+    #pageList {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 12px 24px;
+      scrollbar-width: none;
+    }
+    #pageList::-webkit-scrollbar { display: none; }
+
+    /* ページカード */
+    .page-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 12px;
+      border-radius: 14px;
+      cursor: pointer;
+      position: relative;
+      margin-bottom: 3px;
+      -webkit-user-select: none;
+      user-select: none;
+      height: 61px;
+      box-sizing: border-box;
+      z-index: 1;
+    }
+    .page-card:hover  { background: rgba(255,255,255,0.07); }
+    .page-card:active { background: rgba(255,255,255,0.12); }
+    .page-card.active {
+      background: transparent; /* インジケーターが担当 */
+    }
+
+    /* 番号バッジ */
+    .page-num {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.09);
+      border: 1px solid rgba(255,255,255,0.10);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--dim);
+      flex-shrink: 0;
+
+    }
+    .page-card.active .page-num {
+      background: var(--accent);
+      border-color: transparent;
+      color: #fff;
+    }
+    /* スライドするアクティブカードインジケーター */
+    #pageNumIndicator {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 61px;
+      border-radius: 14px;
+      background: rgba(var(--accent-rgb), 0.15);
+      pointer-events: none;
+      z-index: 0;
+      transition: top 0.42s cubic-bezier(0.34, 1.1, 0.64, 1),
+                  opacity 0.22s cubic-bezier(0.4,0,0.2,1);
+      opacity: 1;
+    }
+
+    /* ページ情報 */
+    .page-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .page-title-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
+      cursor: text;
+    }
+
+    .page-preview {
+      font-size: 11px;
+      color: var(--dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+      line-height: 1.3;
+    }
+
+    /* 削除ボタン */
+    .page-del {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(229,57,53,0.15);
+      color: #e53935;
+      font-size: 14px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      opacity: 0;
+      transition: transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
+      pointer-events: none;
+    }
+    .page-card:hover .page-del {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .page-del:active { transform: scale(0.88); }
+
+    /* 最大ページ数メッセージ */
+    #pageMaxMsg {
+      font-size: 11px;
+      color: var(--dim);
+      text-align: center;
+      padding: 8px 0 4px;
+    }
+
+    /* カード内要素のフェード */
+    .page-card .page-info,
+    .page-card .page-del {
+      transition: opacity 0.22s cubic-bezier(0.4,0,0.2,1);
+    }
+    #pageList.editing .page-info,
+    #pageList.editing .page-del {
+      opacity: 0;
+      pointer-events: none;
+    }
+    /* カード内タイトル入力欄 */
+    .page-title-edit-input {
+      position: absolute;
+      left: 54px; /* num幅30px + gap12px + padding12px */
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(var(--accent-rgb),0.5);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      font-family: inherit;
+      outline: none;
+      box-sizing: border-box;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s cubic-bezier(0.4,0,0.2,1);
+    }
+    #pageList.editing .page-title-edit-input {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* スワイプ中のドラッグ追従 */
+    #pagePanel.dragging {
+      transition: none;
+    }
+    #pageOverlay.dragging {
+      transition: none;
+    }
+
   </style>
 </head>
 <body>
@@ -904,6 +1269,7 @@
     <button onclick="act('open')">開く</button>
     <button onclick="act('save')">保存</button>
     <button onclick="act('toggleSearch')">検索</button>
+    <button id="headerPageBtn" onclick="act('togglePagePanel')">ページ</button>
     <button onclick="act('toggle')">設定</button>
   </header>
 
@@ -953,9 +1319,16 @@
       </button>
     </div>
 
+    <div id="pageToggleRow" style="display:none"><span class="label">ページ</span>
+      <label class="ios-toggle">
+        <input type="checkbox" id="pageBarToggle">
+        <span class="ios-toggle-slider"></span>
+      </label>
+    </div>
+
     <div class="options-version">
-      <span>Build 2602190115</span>
-      <span>Version 26.0.4</span>
+      <span>Build 2602200033</span>
+      <span>Version 26.1</span>
       <span><strong>↓Creator↓</strong><br>Claude<br>Chat GPT<br>Gemini<br>Copilot<br>Cursor<br>Tikuwa</span>
     </div>
   </div>
@@ -1061,8 +1434,56 @@
 
   <div id="toastContainer"></div>
 
+  <!-- ── ページ管理パネル ── -->
+  <div id="pageSwipeTrigger"></div>
+  <div id="pageOverlay" onclick="closePagePanel()"></div>
+  <div id="pagePanel">
+    <div id="pagePanelHeader">
+      <span class="pph-title">ページ</span>
+      <div class="pph-btns">
+        <button class="pph-edit" onclick="editCurrentPageTitle()" title="名前を変更" style="transform: scaleX(-1);">✎</button>
+        <button class="pph-add" onclick="addPage()" title="新しいページ">＋</button>
+      </div>
+    </div>
+    <div id="pageList"><div id="pageNumIndicator"></div></div>
+    <div id="pageMaxMsg"></div>
+  </div>
+
+
   <script>
     var $ = function(id) { return document.getElementById(id); };
+
+    /* ── 低スペック検出（ページ安定後に5秒計測） ── */
+    (function() {
+      var WARMUP_MS      = 2000; // 起動直後の初期化ノイズを除外するための待機時間
+      var MEASURE_MS     = 5000; // 計測時間
+      var DROP_THRESHOLD = 33;   // 33ms超え＝ドロップ（≒30fps 相当。高スペックでも起動直後はこれを余裕で超える）
+      var DROP_LIMIT     = 25;   // 計測期間中にこの回数超えたら低スペック判定
+
+      setTimeout(function() {
+        var drops    = 0;
+        var last     = performance.now();
+        var elapsed  = 0;
+        var prevTime = last;
+
+        function checkFrame(now) {
+          var delta = now - last;
+          elapsed  += now - prevTime;
+          prevTime  = now;
+          if (delta > DROP_THRESHOLD) drops++;
+          last = now;
+
+          if (elapsed < MEASURE_MS) {
+            requestAnimationFrame(checkFrame);
+          } else {
+            if (drops > DROP_LIMIT) {
+              document.body.classList.add('no-anim');
+            }
+          }
+        }
+        requestAnimationFrame(checkFrame);
+      }, WARMUP_MS);
+    })();
 
     /* ── 開発者メッセージ ── */
     function showDevMessage() { openPanel('devMessageModal'); }
@@ -1110,19 +1531,19 @@
     var sizeToastTimer     = null;
     var hasShownOfflineToast = false;
 
-    function queueToast(message, duration) {
-      toastQueue.push({ message: message, duration: duration || 4000 });
+    function queueToast(message, duration, side) {
+      toastQueue.push({ message: message, duration: duration || 4000, side: side || 'right' });
       processToastQueue();
     }
     function processToastQueue() {
       if (isToastShowing || toastQueue.length === 0) return;
       isToastShowing = true;
       var item = toastQueue.shift();
-      showToastUI(item.message, item.duration);
+      showToastUI(item.message, item.duration, item.side);
     }
-    function showToastUI(message, duration) {
-      var el    = document.createElement('div');
-      el.className = 'glass toast';
+    function showToastUI(message, duration, side) {
+      var el = document.createElement('div');
+      el.className = 'glass toast' + (side === 'left' ? ' toast-left' : '');
       var count = document.createElement('div'); count.className = 'count';
       var msg   = document.createElement('div'); msg.className   = 'msg'; msg.textContent = message;
       el.appendChild(count);
@@ -1132,9 +1553,17 @@
       var header = document.querySelector('header');
       if (header) {
         var rect = header.getBoundingClientRect();
-        el.style.top          = rect.top + 'px';
-        el.style.height       = rect.height + 'px';
-        el.style.borderRadius = getComputedStyle(header).borderRadius;
+        if (state.device === 'Mobile' || window.innerWidth <= 480) {
+          // モバイル・狭い画面：上部バーの下端から16px離す
+          el.style.top          = (rect.bottom + 16) + 'px';
+          el.style.height       = rect.height + 'px';
+          el.style.borderRadius = getComputedStyle(header).borderRadius;
+        } else {
+          // PC：ヘッダーに重ねる
+          el.style.top          = rect.top + 'px';
+          el.style.height       = rect.height + 'px';
+          el.style.borderRadius = getComputedStyle(header).borderRadius;
+        }
       }
       setTimeout(function() {
         el.classList.add('show');
@@ -1173,6 +1602,10 @@
           URL.revokeObjectURL(url);
           queueToast('保存を開始しました：' + state.curFile, 2500);
         } catch(e) { queueToast('保存に失敗しました。'); }
+      },
+      togglePagePanel: function() {
+        if (pagePanelOpen) { closePagePanel(); }
+        else               { openPagePanel(); }
       },
       toggle: function() {
         if (state.isOptionsOpen) {
@@ -1427,12 +1860,87 @@
       var cfg   = DICT_CONFIG[dict] || DICT_CONFIG.wikipedia;
 
       $('swpWikiBtn').textContent = cfg.btnText;
-      body.innerHTML = '';
+      // 前回のアニメ状態をリセットしてから検索中表示
+      body.style.opacity    = '';
+      body.style.maxHeight  = '';
+      body.style.overflow   = '';
+      body.style.transition = '';
+      body.innerHTML = '<div class="swp-loading">検索中...</div>';
       $('searchWebPanel').classList.add('show');
 
       if      (dict === 'wikipedia')  searchWikipedia(query);
       else if (dict === 'wiktionary') searchWiktionary(query);
     };
+
+    /* 検索・翻訳結果の共通アニメーション
+       containerEl: ローディング表示を含む親要素
+       html: 表示するHTML文字列
+       ラッパーdivで max-height アニメ → flex親には一切触れない
+    */
+    // expandHeight=true: 高さアニメあり（検索ウィンドウ）
+    // expandHeight=false: フェードインのみ（翻訳ウィンドウ、高さ固定）
+    function animateResults(containerEl, html, expandHeight) {
+      containerEl.style.transition = 'opacity 0.16s ease';
+      containerEl.style.opacity = '0';
+
+      setTimeout(function() {
+        var wrap = document.createElement('div');
+        wrap.className = 'result-anim-wrap';
+        wrap.innerHTML = html;
+
+        var items = wrap.children;
+        for (var i = 0; i < items.length; i++) {
+          items[i].classList.add('result-anim-item');
+        }
+
+        containerEl.innerHTML = '';
+        containerEl.appendChild(wrap);
+        containerEl.style.opacity = '1';
+        containerEl.style.transition = '';
+
+        if (expandHeight === false) {
+          // ── フェードインのみ（翻訳）──
+          // max-height 制約なし、即 open にして各アイテムをフェードイン
+          wrap.style.maxHeight = 'none';
+          wrap.style.overflow  = 'visible';
+          requestAnimationFrame(function() {
+            wrap.classList.add('open');
+            var nodeItems = wrap.querySelectorAll('.result-anim-item');
+            nodeItems.forEach(function(el, idx) {
+              setTimeout(function() { el.classList.add('visible'); }, 30 + idx * 40);
+            });
+          });
+        } else {
+          // ── 高さ+フェードイン（検索）──
+          requestAnimationFrame(function() {
+            wrap.style.maxHeight = 'none';
+            var targetH = wrap.scrollHeight;
+            wrap.style.maxHeight = '0px';
+
+            requestAnimationFrame(function() {
+              wrap.classList.add('open');
+              wrap.style.maxHeight = targetH + 'px';
+
+              var nodeItems = wrap.querySelectorAll('.result-anim-item');
+              nodeItems.forEach(function(el, idx) {
+                setTimeout(function() { el.classList.add('visible'); }, 60 + idx * 50);
+              });
+
+              setTimeout(function() {
+                wrap.style.transition = 'none';
+                wrap.style.maxHeight  = 'none';
+                wrap.style.overflow   = 'visible';
+              }, 680);
+            });
+          });
+        }
+
+      }, 175);
+    }
+
+    function animateSearchResults(html) {
+      animateResults($('swpBody'), html, true);
+    }
 
     function searchWikipedia(query) {
       var body    = $('swpBody');
@@ -1446,7 +1954,7 @@
         .then(function(data) {
           var results = data.query && data.query.search;
           if (!results || results.length === 0) {
-            body.innerHTML = '<div class="swp-empty">「' + escapeHtml(query) + '」はWikipediaに見つかりませんでした。</div>';
+            animateSearchResults('<div class="swp-empty">「' + escapeHtml(query) + '」はWikipediaに見つかりませんでした。</div>');
             return;
           }
           var topTitle = results[0].title;
@@ -1457,7 +1965,7 @@
             .then(function(summary) { renderWikiResults(summary, results, query); });
         })
         .catch(function() {
-          body.innerHTML = '<div class="swp-empty">取得に失敗しました。<br>ネットワーク接続を確認してください。</div>';
+          animateSearchResults('<div class="swp-empty">取得に失敗しました。<br>ネットワーク接続を確認してください。</div>');
         });
     }
 
@@ -1490,7 +1998,7 @@
           html += '<div class="swp-result-url">' + escapeHtml(url) + '</div></a>';
         });
       }
-      $('swpBody').innerHTML = html || '<div class="swp-empty">「' + escapeHtml(query) + '」はWikipediaに見つかりませんでした。</div>';
+      animateSearchResults(html || '<div class="swp-empty">「' + escapeHtml(query) + '」はWikipediaに見つかりませんでした。</div>');
     }
 
     function searchWiktionary(query) {
@@ -1531,7 +2039,7 @@
                   html += '</a>';
                 });
               }
-              body.innerHTML = html;
+              animateSearchResults(html);
             });
         })
         .catch(function() {
@@ -1542,7 +2050,7 @@
             .then(function(d) {
               var results = d.query && d.query.search;
               if (!results || results.length === 0) {
-                body.innerHTML = '<div class="swp-empty">「' + escapeHtml(query) + '」はWiktionaryに見つかりませんでした。</div>';
+                animateSearchResults('<div class="swp-empty">「' + escapeHtml(query) + '」はWiktionaryに見つかりませんでした。</div>');
                 return;
               }
               var html = '<div class="swp-results-label">検索結果</div>';
@@ -1554,10 +2062,10 @@
                 if (snippet) html += '<div class="swp-result-desc">' + escapeHtml(snippet) + '</div>';
                 html += '<div class="swp-result-url">' + escapeHtml(url) + '</div></a>';
               });
-              body.innerHTML = html;
+              animateSearchResults(html);
             })
             .catch(function() {
-              body.innerHTML = '<div class="swp-empty">取得に失敗しました。<br>ネットワーク接続を確認してください。</div>';
+              animateSearchResults('<div class="swp-empty">取得に失敗しました。<br>ネットワーク接続を確認してください。</div>');
             });
         });
     }
@@ -1571,7 +2079,6 @@
       var tpResult  = $('tpResult');
       var tpPowered = $('tpPowered');
       $('tpSrc').textContent = src.length > 120 ? src.slice(0, 120) + '…' : src;
-      tpResult.innerHTML = '<div class="tp-loading">翻訳中…</div>';
       $('translatePanel').classList.add('show');
 
       var doFetch = function() {
@@ -1581,16 +2088,21 @@
         var url = 'https://translate.googleapis.com/translate_a/single?client=gtx'
           + '&sl=' + $('tpSrcLang').value + '&tl=' + $('tpTgtLang').value
           + '&dt=t&q=' + encodeURIComponent(src);
+        tpResult.style.transition = '';
+        tpResult.style.opacity = '1';
         tpResult.innerHTML = '<div class="tp-loading">翻訳中…</div>';
         fetch(url)
           .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
           .then(function(data) {
             var result = '';
             if (data && data[0]) data[0].forEach(function(seg) { if (seg && seg[0]) result += seg[0]; });
-            tpResult.textContent = result || '翻訳結果が取得できませんでした';
+            animateResults(tpResult,
+              '<p class="tp-result-text">' + escapeHtml(result || '翻訳結果が取得できませんでした') + '</p>',
+              false
+            );
           })
           .catch(function() {
-            tpResult.innerHTML = '<div class="tp-error">翻訳に失敗しました。<br>ネットワーク接続を確認してください。</div>';
+            animateResults(tpResult, '<div class="tp-error">翻訳に失敗しました。<br>ネットワーク接続を確認してください。</div>', false);
           });
       };
       $('tpSrcLang').onchange = doFetch;
@@ -1614,6 +2126,459 @@
     window.openPanel  = openPanel;
 
     /* ── レンダリング ── */
+
+    /* ── ページ管理システム ── */
+    var PAGES_KEY    = 'np26_pages';
+    var PAGES_CUR    = 'np26_cur_page';
+    var MAX_PAGES    = 10;
+
+    function genPageId() {
+      return 'p' + Date.now() + Math.random().toString(36).slice(2,6);
+    }
+
+    function loadPages() {
+      try {
+        var raw = localStorage.getItem(PAGES_KEY);
+        if (raw) {
+          var arr = JSON.parse(raw);
+          if (Array.isArray(arr) && arr.length > 0) return arr;
+        }
+      } catch(e) {}
+      // 初回：現在の内容で1ページ目を作成
+      return [{ id: genPageId(), title: 'ページ 1', text: '', font: 'Arial', size: 18 }];
+    }
+
+    function savePages() {
+      try { localStorage.setItem(PAGES_KEY, JSON.stringify(pages)); } catch(e) {}
+    }
+
+    function getCurrentPageIdx() {
+      var savedId = localStorage.getItem(PAGES_CUR);
+      if (savedId) {
+        var idx = pages.findIndex(function(p) { return p.id === savedId; });
+        if (idx !== -1) return idx;
+      }
+      return 0;
+    }
+
+    var pages      = loadPages();
+    var curPageIdx = getCurrentPageIdx();
+
+    /* 現在の編集内容をページデータに保存 */
+    function saveCurrentPage() {
+      if (!pages[curPageIdx]) return;
+      var edit = $('edit');
+      var fSel = $('fSel');
+      var sSel = $('sSel');
+      pages[curPageIdx].text  = edit ? edit.value : '';
+      pages[curPageIdx].font  = fSel ? fSel.value : 'Arial';
+      pages[curPageIdx].size  = sSel ? parseInt(sSel.value) : 18;
+      // タイトル：テキストの最初の行（空なら「ページ N」）
+      var firstLine = pages[curPageIdx].text.split('\n')[0].trim().slice(0, 20);
+      if (firstLine) pages[curPageIdx].title = firstLine;
+      savePages();
+    }
+
+    /* ページを切り替える */
+    function switchPage(idx) {
+      if (titleEditMode) commitTitleEdit();
+      if (idx === curPageIdx) return;
+
+      var edit      = $('edit');
+      var direction = idx > curPageIdx ? 'right' : 'left'; // 新ページが右か左か
+
+      // ① 現在ページをスライドアウト
+      var outClass = direction === 'right' ? 'page-slide-out-left' : 'page-slide-out-right';
+      edit.classList.remove('page-slide-in-right','page-slide-in-left','page-slide-out-left','page-slide-out-right');
+      edit.classList.add(outClass);
+
+      // ② アウトアニメ完了後にページ切り替え＆スライドイン
+      setTimeout(function() {
+        saveCurrentPage();
+        curPageIdx = idx;
+        localStorage.setItem(PAGES_CUR, pages[curPageIdx].id);
+        var p    = pages[curPageIdx];
+        var fSel = $('fSel');
+        var sSel = $('sSel');
+        edit.value = p.text || '';
+        for (var i = 0; i < fSel.options.length; i++) {
+          if (fSel.options[i].value === p.font) { fSel.selectedIndex = i; break; }
+        }
+        sSel.value = String(p.size || 18);
+        applyStyles();
+        ActionHandlers.updateText(edit.value);
+        render();
+        renderPageList();
+        // インジケーターをアニメ付きで移動
+        requestAnimationFrame(function() { updatePageIndicator(true); });
+
+        // スライドイン
+        var inClass = direction === 'right' ? 'page-slide-in-right' : 'page-slide-in-left';
+        edit.classList.remove('page-slide-out-left','page-slide-out-right');
+        edit.classList.add(inClass);
+
+        // アニメ完了後クラスを片付ける
+        setTimeout(function() {
+          edit.classList.remove('page-slide-in-right','page-slide-in-left');
+        }, 350);
+      }, 180);
+    }
+
+    /* 新規ページ追加 */
+    window.addPage = function() {
+      if (pages.length >= MAX_PAGES) {
+        queueToast('ページは最大' + MAX_PAGES + '枚までです', 2000);
+        return;
+      }
+      var edit = $('edit');
+
+      // スライドアウト（左へ）
+      edit.classList.remove('page-slide-in-right','page-slide-in-left','page-slide-out-left','page-slide-out-right');
+      edit.classList.add('page-slide-out-left');
+
+      setTimeout(function() {
+        saveCurrentPage();
+        var newPage = {
+          id:    genPageId(),
+          title: 'ページ ' + (pages.length + 1),
+          text:  '',
+          font:  $('fSel').value || 'Arial',
+          size:  parseInt($('sSel').value) || 18
+        };
+        pages.push(newPage);
+        curPageIdx = pages.length - 1;
+        localStorage.setItem(PAGES_CUR, newPage.id);
+        edit.value = '';
+        ActionHandlers.updateText('');
+        savePages();
+        render();
+        renderPageList();
+        requestAnimationFrame(function() { updatePageIndicator(true); });
+
+        // スライドイン（右から）
+        edit.classList.remove('page-slide-out-left');
+        edit.classList.add('page-slide-in-right');
+        setTimeout(function() {
+          edit.classList.remove('page-slide-in-right');
+        }, 350);
+      }, 180);
+    };
+
+    /* ページ削除 */
+    window.deletePage = function(idx, e) {
+      e.stopPropagation();
+      if (pages.length <= 1) {
+        queueToast('最後のページは削除できません', 2000, 'left');
+        return;
+      }
+      pages.splice(idx, 1);
+      if (curPageIdx >= pages.length) curPageIdx = pages.length - 1;
+      localStorage.setItem(PAGES_CUR, pages[curPageIdx].id);
+      var p    = pages[curPageIdx];
+      var edit = $('edit');
+      edit.value = p.text || '';
+      $('fSel').value = p.font || 'Arial';
+      $('sSel').value = String(p.size || 18);
+      applyStyles();
+      ActionHandlers.updateText(edit.value);
+      savePages();
+      render();
+      renderPageList();
+      requestAnimationFrame(function() { updatePageIndicator(true); });
+    };
+
+    /* ページリストの描画 */
+    var titleEditMode = false;
+
+    function openTitleEdit() {
+      if (titleEditMode) { closeTitleEdit(false); return; }
+      titleEditMode = true;
+      var list = $('pageList');
+      var inputs = list.querySelectorAll('.page-title-edit-input');
+      inputs.forEach(function(inp, i) {
+        inp.value = pages[i].title || ('ページ ' + (i + 1));
+      });
+      list.classList.add('editing');
+      // ペンボタン→バツボタン
+      var editBtn = document.querySelector('.pph-edit');
+      if (editBtn) {
+        editBtn.textContent = '✕';
+        editBtn.style.transform = '';
+        editBtn.style.background = 'rgba(229,57,53,0.18)';
+        editBtn.style.color = '#e57373';
+      }
+      setTimeout(function() {
+        if (inputs[curPageIdx]) { inputs[curPageIdx].focus(); inputs[curPageIdx].select(); }
+      }, 50);
+    }
+
+    function resetEditBtn() {
+      var editBtn = document.querySelector('.pph-edit');
+      if (editBtn) {
+        editBtn.textContent = '✎';
+        editBtn.style.transform = 'scaleX(-1)';
+        editBtn.style.background = '';
+        editBtn.style.color = '';
+      }
+    }
+
+    function commitTitleEdit() {
+      if (!titleEditMode) return;
+      var list   = $('pageList');
+      var inputs = list.querySelectorAll('.page-title-edit-input');
+      inputs.forEach(function(inp, i) {
+        var val = inp.value.trim().slice(0, 20);
+        pages[i].title = val || ('ページ ' + (i + 1));
+      });
+      savePages();
+      titleEditMode = false;
+      list.classList.remove('editing');
+      resetEditBtn();
+      setTimeout(function() { renderPageList(); }, 240);
+    }
+
+    function cancelTitleEdit() {
+      if (!titleEditMode) return;
+      titleEditMode = false;
+      $('pageList').classList.remove('editing');
+      resetEditBtn();
+      setTimeout(function() { renderPageList(); }, 240);
+    }
+
+    function closeTitleEdit(save) {
+      if (save) commitTitleEdit(); else cancelTitleEdit();
+    }
+
+    window.editCurrentPageTitle = function() { openTitleEdit(); };
+
+    function renderPageList() {
+      var list = $('pageList');
+      if (!list) return;
+      list.innerHTML = '';
+      pages.forEach(function(p, i) {
+        var card = document.createElement('div');
+        card.className = 'page-card' + (i === curPageIdx ? ' active' : '');
+        card.onclick   = function() { switchPage(i); };
+
+        var num  = document.createElement('div');
+        num.className   = 'page-num';
+        num.textContent = String(i + 1);
+
+        var info  = document.createElement('div');
+        info.className  = 'page-info';
+
+        var titleEl = document.createElement('div');
+        titleEl.className   = 'page-title-text';
+        titleEl.textContent = p.title || ('ページ ' + (i + 1));
+
+        var preview = document.createElement('div');
+        preview.className   = 'page-preview';
+        var previewText = (p.text || '').replace(/\n/g, ' ').trim().slice(0, 40);
+        preview.textContent = previewText || '空のページ';
+
+        info.appendChild(titleEl);
+        info.appendChild(preview);
+
+        var del = document.createElement('button');
+        del.className   = 'page-del';
+        del.textContent = '✕';
+        del.title       = '削除';
+        del.onclick     = function(e) { deletePage(i, e); };
+
+        // カード内タイトル入力欄（編集モード時に表示）
+        var inp = document.createElement('input');
+        inp.type        = 'text';
+        inp.className   = 'page-title-edit-input';
+        inp.maxLength   = 20;
+        inp.value       = p.title || ('ページ ' + (i + 1));
+        inp.placeholder = 'ページ名...';
+        inp.onclick     = function(e) { e.stopPropagation(); };
+        (function(pageIdx, inputEl) {
+          inputEl.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter')  { e.preventDefault(); commitTitleEdit(); }
+            if (e.key === 'Escape') { cancelTitleEdit(); }
+            e.stopPropagation();
+          });
+        })(i, inp);
+
+        card.appendChild(num);
+        card.appendChild(info);
+        card.appendChild(del);
+        card.appendChild(inp);
+        list.appendChild(card);
+      });
+
+      var msg = $('pageMaxMsg');
+      if (msg) msg.textContent = pages.length >= MAX_PAGES ? '最大' + MAX_PAGES + 'ページに達しました' : '';
+
+      // インジケーターを初期位置へ（アニメなしで即座に）
+      updatePageIndicator(false);
+    }
+
+    function updatePageIndicator(animate) {
+      var indicator = $('pageNumIndicator');
+      var list      = $('pageList');
+      if (!indicator || !list) return;
+      var cards = list.querySelectorAll('.page-card');
+      if (!cards[curPageIdx]) return;
+
+      // カードの offsetTop を使う（getBoundingClientRect はスクロール・パネル未開時にズレる）
+      var top = cards[curPageIdx].offsetTop;
+
+      if (!animate) {
+        indicator.style.transition = 'none';
+        indicator.style.top = top + 'px';
+        indicator.style.opacity = '1';
+        requestAnimationFrame(function() {
+          indicator.style.transition = '';
+        });
+      } else {
+        indicator.style.top = top + 'px';
+        indicator.style.opacity = '1';
+      }
+    }
+
+    /* ── パネル開閉 ── */
+    var pagePanelOpen = false;
+
+    function openPagePanel() {
+      if (pagePanelOpen) return;
+      pagePanelOpen = true;
+      saveCurrentPage();
+      renderPageList();
+      $('pagePanel').classList.add('open');
+      $('pageOverlay').classList.add('open');
+    }
+
+    window.closePagePanel = function() {
+      if (!pagePanelOpen) return;
+      pagePanelOpen = false;
+      $('pagePanel').classList.remove('open');
+      $('pageOverlay').classList.remove('open');
+    };
+
+    // マウスがパネルから離れたら閉じる（PCのみ）
+    $('pagePanel').addEventListener('mouseleave', function() {
+      if (state.device !== 'PC') return;
+      closePagePanel();
+    });
+
+    /* ── スワイプ検出（右端から左スワイプ） ── */
+    (function() {
+      var panel    = $('pagePanel');
+      var overlay  = $('pageOverlay');
+      var EDGE     = 32;   // 右端何pxからスワイプ開始を受け付けるか
+      var THRESH   = 60;   // 何px動いたら開くか
+      var touching = false;
+      var startX   = 0;
+      var startY   = 0;
+      var startedFromEdge = false;
+      var currentX = 0;
+      var panelW   = 0;
+
+      function getTranslate(dx) {
+        // dx: 右→左の移動量（正値）。0でパネル全開、正でパネル幅分閉じている
+        return Math.max(0, panelW - dx);
+      }
+
+      document.addEventListener('touchstart', function(e) {
+        var t = e.touches[0];
+        startX = t.clientX;
+        startY = t.clientY;
+        panelW = panel.offsetWidth;
+        startedFromEdge = false;
+        touching = false;
+
+        if (!pagePanelOpen && window.innerWidth - startX < EDGE) {
+          startedFromEdge = true;
+          touching = true;
+        } else if (pagePanelOpen) {
+          touching = true;
+        }
+      }, { passive: true });
+
+      document.addEventListener('touchmove', function(e) {
+        if (!touching) return;
+        var t  = e.touches[0];
+        var dx = startX - t.clientX; // 右→左が正
+        var dy = Math.abs(t.clientY - startY);
+
+        // 縦スクロールが優勢なら無視
+        if (!startedFromEdge && dy > Math.abs(dx) * 1.5) { touching = false; return; }
+
+        if (!pagePanelOpen && startedFromEdge) {
+          // 開くドラッグ（right:12px の分だけ全閉時のオフセットを加算）
+          var GAP  = 20;
+          var open = Math.min(dx > 0 ? 0 : Math.abs(dx), panelW);
+          var tx   = Math.max(0, panelW + GAP - open);
+          panel.classList.add('dragging');
+          overlay.classList.add('dragging');
+          panel.style.transform  = 'translateX(' + tx + 'px)';
+          overlay.style.background = 'rgba(0,0,0,' + (0.38 * open / panelW) + ')';
+          overlay.style.pointerEvents = 'auto';
+        } else if (pagePanelOpen && dx > 0) {
+          // 閉じるドラッグ
+          var tx2 = Math.min(dx, panelW + 20);
+          panel.classList.add('dragging');
+          overlay.classList.add('dragging');
+          panel.style.transform  = 'translateX(' + tx2 + 'px)';
+          overlay.style.background = 'rgba(0,0,0,' + (0.38 * Math.max(0, 1 - tx2/panelW)) + ')';
+        }
+      }, { passive: true });
+
+      document.addEventListener('touchend', function(e) {
+        if (!touching) return;
+        touching = false;
+        panel.classList.remove('dragging');
+        overlay.classList.remove('dragging');
+        panel.style.transform  = '';
+        overlay.style.background = '';
+        overlay.style.pointerEvents = '';
+
+        var t  = e.changedTouches[0];
+        var dx = startX - t.clientX;
+
+        if (!pagePanelOpen && startedFromEdge && dx > THRESH) {
+          openPagePanel();
+        } else if (pagePanelOpen && dx > THRESH) {
+          closePagePanel();
+        } else if (!pagePanelOpen && startedFromEdge) {
+          // 戻す（何もしない、transformリセット済み）
+        }
+        startedFromEdge = false;
+      }, { passive: true });
+
+      // PCはスワイプトリガーゾーンにマウス入ったら開く（hover tab的に）
+      var trigger = $('pageSwipeTrigger');
+      if (trigger) {
+        trigger.addEventListener('mouseenter', function() {
+          if (!pagePanelOpen) openPagePanel();
+        });
+      }
+    })();
+
+    /* ── 初期化時にページデータをエディタに反映 ── */
+    // init() より後に実行されるよう window.addEventListener('load') で
+    window.addEventListener('load', function() {
+      var p = pages[curPageIdx];
+      if (p) {
+        var edit = $('edit');
+        var fSel = $('fSel');
+        var sSel = $('sSel');
+        // autoSave の復元が走っていない場合だけページデータを使う
+        if (!edit.value && p.text) {
+          edit.value = p.text;
+          for (var i = 0; i < fSel.options.length; i++) {
+            if (fSel.options[i].value === p.font) { fSel.selectedIndex = i; break; }
+          }
+          sSel.value = String(p.size || 18);
+          applyStyles();
+          ActionHandlers.updateText(edit.value);
+          render();
+        }
+      }
+    });
+
     function render() {
       var edit      = $('edit');
       var isAnyOpen = state.isOptionsOpen || state.isModalOpen;
@@ -1635,9 +2600,32 @@
     function closePanel(id) {
       var el = $(id);
       if (!el || !el.classList.contains('show')) return;
-      el.classList.add('closing');
-      el.classList.remove('show');
-      setTimeout(function() { el.classList.remove('closing'); }, 350);
+
+      if (el.dataset.dragged) {
+        // ドラッグ済み：show クラスを外すと CSS のデフォルト位置（中央）に戻ってしまうため
+        // show クラスは外さず pointer-events だけ切り、opacity だけでフェードアウトする
+        el.style.pointerEvents = 'none';
+        el.style.transition    = 'opacity 0.25s cubic-bezier(0.4, 0, 1, 1)';
+        // rAF を挟んで transition を確実に認識させてから opacity を変える
+        requestAnimationFrame(function() {
+          el.style.opacity = '0';
+          setTimeout(function() {
+            el.classList.remove('show');
+            el.style.pointerEvents = '';
+            el.style.transition    = '';
+            el.style.opacity       = '';
+            el.style.left          = '';
+            el.style.top           = '';
+            el.style.transform     = '';
+            delete el.dataset.dragged;
+          }, 280);
+        });
+      } else {
+        // 通常：CSS の closing アニメ（translate + scale + opacity）
+        el.classList.add('closing');
+        el.classList.remove('show');
+        setTimeout(function() { el.classList.remove('closing'); }, 350);
+      }
     }
     /* ── ドラッグ移動機能 ── */
     (function() {
@@ -1654,15 +2642,16 @@
         function snapToPos() {
           // show クラスがある間は CSS の translate(-50%,-50%) が transform に含まれる。
           // getBoundingClientRect() は最終的な画面座標を返すので、
-          // それを left/top にセットしつつ transform を scale(1) のみにすれば
-          // CSS の translate は打ち消される。
+          // それを left/top にセットしつつ transform を none にすれば
+          // CSS の translate も scale も打ち消され、closing アニメーションも正しく動く。
           var rect = panel.getBoundingClientRect();
-          // transition を一時停止してワープを防ぐ
           panel.style.transition = 'none';
           panel.style.left       = rect.left + 'px';
           panel.style.top        = rect.top  + 'px';
-          panel.style.transform  = 'scale(1)';
+          panel.style.transform  = 'none';
           void panel.offsetWidth; // 強制リフロー
+          // transition を即座に戻す（closing / opening の CSS アニメが効くように）
+          panel.style.transition = '';
         }
 
         function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
@@ -1683,32 +2672,19 @@
           startLeft  = parseFloat(panel.style.left)  || 0;
           startTop   = parseFloat(panel.style.top)   || 0;
 
-          // transition を有効化してスプリング縮小アニメーション
-          panel.style.transition = '';
-          panel.classList.remove('panel-dropping');
-          // rAF × 2 でリフロー後に transition が確実に有効になった後に scale 変更
-          requestAnimationFrame(function() {
-            requestAnimationFrame(function() {
-              panel.classList.add('panel-grabbing');
-              panel.style.transform = 'scale(0.95)';
-            });
-          });
+          // backdrop-filter を壊さないための鉄則:
+          // ・transition / transform / opacity / will-change を一切インラインで変更しない
+          // ・CSS クラスの付け外しも !important な transition があれば同じ問題を起こす
+          // → ドラッグ中は left/top の変更のみ。cursor のみ変える。
+          handle.style.cursor = 'grabbing';
         }
 
         function onMove(clientX, clientY) {
           if (!isDragging) return;
           var dx = clientX - startX;
           var dy = clientY - startY;
-
-          if (!hasMoved && Math.abs(dx) + Math.abs(dy) > 3) {
-            hasMoved = true;
-            // 動き始めたら transition なしで追従
-            panel.classList.remove('panel-grabbing');
-            panel.style.transition = 'none';
-            panel.style.transform  = 'scale(0.95)';
-          }
+          if (!hasMoved && Math.abs(dx) + Math.abs(dy) > 3) hasMoved = true;
           if (!hasMoved) return;
-
           var maxL = window.innerWidth  - panel.offsetWidth  - 8;
           var maxT = window.innerHeight - panel.offsetHeight - 8;
           panel.style.left = clamp(startLeft + dx, 8, maxL) + 'px';
@@ -1718,30 +2694,17 @@
         function onEnd() {
           if (!isDragging) return;
           isDragging = false;
-          panel.classList.remove('panel-grabbing');
-          panel.style.transition = '';
-          // ドロップ：スプリングで scale(1) に戻す
-          panel.classList.add('panel-dropping');
-          panel.style.transform = 'scale(1)';
-          dropTimer = setTimeout(function() {
-            panel.classList.remove('panel-dropping');
-            dropTimer = null;
-          }, 420);
+          handle.style.cursor = '';
+          dropTimer = setTimeout(function() { dropTimer = null; }, 420);
         }
 
-        // パネルが閉じたらドラッグ状態をリセット
+        // 通常 close（非ドラッグ）後の最終クリーンアップ
         new MutationObserver(function() {
           if (!panel.classList.contains('show') && !panel.classList.contains('closing')) {
-            setTimeout(function() {
-              if (!panel.classList.contains('show')) {
-                delete panel.dataset.dragged;
-                panel.style.left       = '';
-                panel.style.top        = '';
-                panel.style.transform  = '';
-                panel.style.transition = '';
-                panel.classList.remove('panel-grabbing', 'panel-dropping');
-              }
-            }, 420);
+            panel.style.left      = '';
+            panel.style.top       = '';
+            panel.style.transform = '';
+            delete panel.dataset.dragged;
           }
         }).observe(panel, { attributes: true, attributeFilter: ['class'] });
 
@@ -1964,6 +2927,55 @@
         queueToast('自動保存データを消去しました', 2000);
       };
 
+      // ── ページバー設定（PC: 設定トグル / Mobile: 常に表示） ──
+      var isMobileDevice = state.device === 'Mobile';
+      var headerPageBtn  = $('headerPageBtn');
+      var pageBarToggle  = $('pageBarToggle');
+      var pageToggleRow  = $('pageToggleRow');
+
+      function applyPageBarSetting(show) {
+        if (!headerPageBtn) return;
+        // トグル操作時は animated クラスを付けてアニメあり
+        headerPageBtn.classList.add('animated');
+        if (show) {
+          requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+              headerPageBtn.classList.add('visible');
+            });
+          });
+        } else {
+          headerPageBtn.classList.remove('visible');
+        }
+      }
+
+      if (isMobileDevice) {
+        // スマホ：常にヘッダーに表示（初回はアニメなし）
+        if (headerPageBtn) {
+          headerPageBtn.classList.add('animated', 'visible');
+        }
+        if (pageToggleRow) pageToggleRow.style.display = 'none';
+      } else {
+        // PC：設定のトグルで制御
+        if (pageToggleRow) pageToggleRow.style.display = '';
+        var pageBarOn = localStorage.getItem('pageBarVisible') === 'true';
+        if (pageBarToggle) {
+          pageBarToggle.checked = pageBarOn;
+          pageBarToggle.onchange = function() {
+            localStorage.setItem('pageBarVisible', pageBarToggle.checked);
+            applyPageBarSetting(pageBarToggle.checked);
+          };
+        }
+        // 初回は即時（アニメなし）：先に visible を付けてから animated を付ける
+        if (pageBarOn && headerPageBtn) {
+          headerPageBtn.classList.add('visible');
+          requestAnimationFrame(function() {
+            headerPageBtn.classList.add('animated');
+          });
+        } else if (headerPageBtn) {
+          headerPageBtn.classList.add('animated');
+        }
+      }
+
       function positionSearchBar() {
         var header = document.querySelector('header');
         var bar    = $('searchBar');
@@ -1990,6 +3002,7 @@
       var upd = debounce(function() {
         ActionHandlers.updateText(edit.value);
         scheduleAutoSave();
+        saveCurrentPage();
         render();
       }, 150);
       edit.oninput  = upd;
@@ -2024,6 +3037,7 @@
 
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
+          if (pagePanelOpen) { closePagePanel(); return; }
           if (state.isOptionsOpen || state.isModalOpen) { ActionHandlers.closeOverlays(); render(); }
           hideDevMessage();
         }
@@ -2062,6 +3076,11 @@
         if (state.isOptionsOpen) {
           var devModal = $('devMessageModal');
           if (devModal && devModal.classList.contains('show')) return;
+          // 設定ボタン自身のクリックは toggle の onclick に任せる
+          var headerBtns = document.querySelectorAll('header button');
+          for (var bi = 0; bi < headerBtns.length; bi++) {
+            if (headerBtns[bi] === e.target || headerBtns[bi].contains(e.target)) return;
+          }
           var optEl = $('options');
           if (optEl && !optEl.contains(e.target)) {
             ActionHandlers.closeOverlays();
