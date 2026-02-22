@@ -60,7 +60,6 @@
     #lockScreen.unlocking { opacity: 0; pointer-events: none; }
     #lockScreen.hidden    { display: none; }
 
-    /* ロック画面内のグラスカード */
     #lockCard {
       position: relative;
       display: flex; align-items: center; gap: 28px;
@@ -113,25 +112,7 @@
     .lock-submit-btn:active { transform: scale(0.95); }
     .lock-error-msg { font-size: 11px; color: #e57373; text-align: center; min-height: 16px; }
 
-    #pwUnlockModal {
-      position: fixed; top: 50%; left: 50%;
-      transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
-      width: min(320px, 88vw);
-      padding: 32px 28px 24px;
-      z-index: 230; opacity: 0; pointer-events: none;
-      box-shadow: 0 16px 50px rgba(0,0,0,0.3);
-      transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1),
-                  transform 0.38s cubic-bezier(0.34,1.3,0.64,1);
-    }
-    #pwUnlockModal.show {
-      opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto;
-    }
-    #pwUnlockModal.closing {
-      opacity: 0; transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
-      pointer-events: none;
-      transition: opacity 0.25s cubic-bezier(0.4,0,1,1),
-                  transform 0.28s cubic-bezier(0.4,0,1,1);
-    }
+    #pwUnlockModal { width: min(320px,88vw); padding: 32px 28px 24px; z-index: 230; }
     #pwUnlockModal .pwunlock-title {
       font-size: 15px; font-weight: 200; text-align: center;
       margin-bottom: 10px; color: var(--text);
@@ -153,7 +134,6 @@
       border: 1px solid rgba(229,57,53,0.3);
     }
     #pwUnlockModal .btn-danger:hover { background: rgba(229,57,53,0.28); }
-
 
     header {
       position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
@@ -177,7 +157,6 @@
                   border-radius 0.26s cubic-bezier(0.34,1.3,0.64,1),
                   padding-top 0.26s cubic-bezier(0.34,1.2,0.64,1) !important;
     }
-    /* headerTopBar: padding-topで上に伸ばしたエリアに絶対配置 */
     #headerTopBar {
       position: absolute; left: 0; right: 0;
       top: 0; height: 38px;
@@ -198,7 +177,6 @@
     header.no-move:hover #headerTopBar {
       opacity: 0 !important; pointer-events: none !important;
     }
-    /* ステム */
     #headerTopBar::after {
       content: ''; position: absolute;
       top: 50%; left: 50%;
@@ -207,7 +185,6 @@
       background: rgba(255,255,255,0.55);
       pointer-events: none;
     }
-    /* 黄色ボタン */
     #headerYellowBtn {
       position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
       width: 14px; height: 14px; border-radius: 50%;
@@ -247,7 +224,8 @@
     #options {
       position: fixed; top: 50%; left: 50%; z-index: 170;
       box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-      min-width: 220px; padding: 12px; padding-top: 36px; border-radius: 18px;
+      width: max-content; min-width: 240px; max-width: min(340px, calc(100vw - 32px));
+      padding: 12px; padding-top: 36px; border-radius: 18px;
       transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
       opacity: 0; pointer-events: none;
       transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1),
@@ -258,8 +236,8 @@
       opacity: 0; transform: translate(-50%, calc(-50% + 16px)) scale(0.9); pointer-events: none;
       transition: opacity 0.25s cubic-bezier(0.4,0,1,1), transform 0.28s cubic-bezier(0.4,0,1,1);
     }
-    #options div { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-    .label { width: 60px; color: var(--dim); font-size: 11px; }
+    #options div { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: nowrap; }
+    .label { width: 60px; color: var(--dim); font-size: 11px; white-space: nowrap; flex-shrink: 0; }
     #clearAutoSaveBtn {
       background: rgba(229,57,53,0.12); border: 1px solid rgba(229,57,53,0.4);
       border-radius: 8px; cursor: pointer; padding: 0 7px; height: 26px;
@@ -300,20 +278,22 @@
     .info-dot:active { transform: scale(0.9); }
     .info-dot:focus  { outline: none; }
 
-    .modal {
+    /* 共通モーダルパネル */
+    .panel-modal {
       position: fixed; top: 50%; left: 50%;
       transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
-      width: fit-content; min-width: 280px; padding: 24px 30px; text-align: center;
       opacity: 0; pointer-events: none;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 180;
+      box-shadow: 0 16px 50px rgba(0,0,0,0.3);
       transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1),
                   transform 0.38s cubic-bezier(0.34,1.3,0.64,1);
     }
-    .modal.show    { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
-    .modal.closing {
+    .panel-modal.show    { opacity: 1; transform: translate(-50%,-50%) scale(1); pointer-events: auto; }
+    .panel-modal.closing {
       opacity: 0; transform: translate(-50%, calc(-50% + 16px)) scale(0.9); pointer-events: none;
       transition: opacity 0.25s cubic-bezier(0.4,0,1,1), transform 0.28s cubic-bezier(0.4,0,1,1);
     }
+
+    .modal { width: fit-content; min-width: 280px; padding: 24px 30px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 180; }
     .modal p { margin: 0 0 15px; font-size: 14px; white-space: nowrap; font-weight: bold; }
     #fileNameInput {
       width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
@@ -330,21 +310,13 @@
     .btn-main { background: var(--accent); color: white; }
     .btn-sub  { background: var(--hover); color: var(--text); }
 
+    .save-meta-modal { width: min(320px,92vw); padding: 26px 24px 20px; border-radius: 22px; z-index: 200; box-shadow: 0 16px 50px rgba(0,0,0,0.35); }
+    .save-meta-modal p { font-size: 15px; white-space: nowrap; font-weight: 200; }
+    .save-meta-desc { font-size: 12px; color: var(--dim); text-align: center; line-height: 1.65; margin-bottom: 18px; }
+    .save-meta-desc span { font-size: 10px; }
+    .save-meta-remember { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 18px; font-size: 11px; color: var(--dim); }
 
-    #pwSetModal {
-      position: fixed; top: 50%; left: 50%;
-      transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
-      width: min(340px, 92vw); padding: 28px 26px 22px; border-radius: 22px;
-      z-index: 220; opacity: 0; pointer-events: none;
-      box-shadow: 0 16px 50px rgba(0,0,0,0.25);
-      transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1),
-                  transform 0.38s cubic-bezier(0.34,1.3,0.64,1);
-    }
-    #pwSetModal.show    { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
-    #pwSetModal.closing {
-      opacity: 0; transform: translate(-50%, calc(-50% + 16px)) scale(0.9); pointer-events: none;
-      transition: opacity 0.25s cubic-bezier(0.4,0,1,1), transform 0.28s cubic-bezier(0.4,0,1,1);
-    }
+    #pwSetModal { width: min(340px,92vw); padding: 28px 26px 22px; border-radius: 22px; z-index: 220; box-shadow: 0 16px 50px rgba(0,0,0,0.25); }
     #pwSetModal .pwset-title { font-size: 15px; font-weight: 200; margin-bottom: 18px; text-align: center; }
     .pwset-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
     .pwset-field label { font-size: 11px; color: var(--dim); }
@@ -375,21 +347,7 @@
     #pwSetCancelBtn { background: rgba(255,255,255,0.08); color: var(--text); }
     #pwSetSaveBtn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-
-    #devMessageModal {
-      position: fixed; top: 50%; left: 50%;
-      transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
-      width: min(320px, 88vw); padding: 28px 24px 22px; border-radius: 20px;
-      z-index: 210; opacity: 0; pointer-events: none;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.18);
-      transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1),
-                  transform 0.38s cubic-bezier(0.34,1.3,0.64,1);
-    }
-    #devMessageModal.show    { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
-    #devMessageModal.closing {
-      opacity: 0; transform: translate(-50%, calc(-50% + 16px)) scale(0.9); pointer-events: none;
-      transition: opacity 0.25s cubic-bezier(0.4,0,1,1), transform 0.28s cubic-bezier(0.4,0,1,1);
-    }
+    #devMessageModal { width: min(320px,88vw); padding: 28px 24px 22px; border-radius: 20px; z-index: 210; box-shadow: 0 12px 40px rgba(0,0,0,0.18); }
     .dev-title-main { text-align: center; font-weight: bold; font-size: 1.1em; margin-bottom: 8px; }
     #devMessageModal .dev-body { font-size: 13px; line-height: 1.85; white-space: pre-wrap; }
     #devMessageModal .dev-close {
@@ -401,7 +359,6 @@
     #devMessageModal .dev-close:hover  { filter: brightness(1.15); }
     #devMessageModal .dev-close:active { transform: scale(0.95); filter: brightness(0.9); }
 
-
     textarea {
       position: absolute; inset: 0; border: none; outline: none;
       padding: 80px 30px 100px; background: transparent;
@@ -412,7 +369,6 @@
     }
     textarea::-webkit-scrollbar { display: none; }
 
-    /* ページ切り替えアニメーション */
     @keyframes slideInRight  { from { opacity:0; transform:translateX(48px);  } to { opacity:1; transform:translateX(0); } }
     @keyframes slideInLeft   { from { opacity:0; transform:translateX(-48px); } to { opacity:1; transform:translateX(0); } }
     @keyframes slideOutLeft  { from { opacity:1; transform:translateX(0); } to { opacity:0; transform:translateX(-48px); } }
@@ -421,15 +377,163 @@
     textarea.page-slide-in-left   { animation: slideInLeft   0.32s cubic-bezier(0.34,1.1,0.64,1) forwards; }
     textarea.page-slide-out-left  { animation: slideOutLeft  0.18s cubic-bezier(0.4,0,1,1) forwards; pointer-events:none; }
     textarea.page-slide-out-right { animation: slideOutRight 0.18s cubic-bezier(0.4,0,1,1) forwards; pointer-events:none; }
+    #penCanvas.page-slide-in-right  { animation: slideInRight  0.32s cubic-bezier(0.34,1.1,0.64,1) forwards; }
+    #penCanvas.page-slide-in-left   { animation: slideInLeft   0.32s cubic-bezier(0.34,1.1,0.64,1) forwards; }
+    #penCanvas.page-slide-out-left  { animation: slideOutLeft  0.18s cubic-bezier(0.4,0,1,1) forwards; pointer-events:none; }
+    #penCanvas.page-slide-out-right { animation: slideOutRight 0.18s cubic-bezier(0.4,0,1,1) forwards; pointer-events:none; }
 
     footer {
       position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
       padding: 5px 14px; font-size: 11px; color: var(--dim);
       display: flex; gap: 8px; max-width: 90vw; justify-content: center;
       white-space: nowrap; border-radius: var(--radius);
+      z-index: 150;
       transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s cubic-bezier(0.4,0,0.2,1);
     }
     footer.hidden { transform: translate(-50%, 50px); opacity: 0; pointer-events: none; }
+
+    .ft-slot {
+      position: relative; overflow: hidden;
+      display: inline-block; vertical-align: middle; line-height: 1.4;
+    }
+    .ft-slot-inner { display: block; }
+    @keyframes ftSlotOut {
+      from { transform: translateY(0);     opacity: 1; filter: blur(0px); }
+      to   { transform: translateY(-110%); opacity: 0; filter: blur(4px); }
+    }
+    @keyframes ftSlotIn {
+      from { transform: translateY(110%);  opacity: 0; filter: blur(4px); }
+      to   { transform: translateY(0);     opacity: 1; filter: blur(0px); }
+    }
+    .ft-slot-inner.slot-out { animation: ftSlotOut 0.18s cubic-bezier(0.4,0,1,1)       forwards; }
+    .ft-slot-inner.slot-in  { animation: ftSlotIn  0.26s cubic-bezier(0.34,1.2,0.64,1) forwards; }
+
+    #penToggleBtn {
+      position: fixed; bottom: 15px; right: 16px;
+      width: 38px; height: 38px; border-radius: 50%; border: none;
+      background: var(--ui-bg);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--dim); font-size: 17px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 120;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+      transition: background 0.2s, color 0.2s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1),
+                  box-shadow 0.2s, border-color 0.2s;
+      -webkit-user-select: none; user-select: none;
+    }
+    #penToggleBtn:hover  { background: var(--hover); }
+    #penToggleBtn:active { transform: scale(0.88); }
+    #penToggleBtn.pen-active {
+      background: rgba(220,50,50,0.18);
+      border-color: rgba(220,50,50,0.5);
+      color: #e05050;
+      box-shadow: 0 4px 18px rgba(220,50,50,0.22);
+    }
+
+    #penToolbar {
+      position: fixed; bottom: 15px; right: 16px;
+      display: flex; flex-direction: column-reverse; align-items: center; gap: 8px;
+      z-index: 121; pointer-events: none;
+      padding-bottom: 46px; /* penToggleBtn(38px) + gap */
+    }
+
+    .pen-toolbar-item {
+      opacity: 0;
+      transform: translateY(0) scale(0.6);
+      pointer-events: none;
+      transition:
+        opacity    0.18s cubic-bezier(0.4,0,1,1),
+        transform  0.18s cubic-bezier(0.4,0,1,1);
+    }
+
+    #penToolbar.show .pen-toolbar-item {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    #penToolbar.show .pen-toolbar-item:nth-child(1) {
+      transition: opacity 0.32s cubic-bezier(0.34,1.5,0.64,1)  0.03s,
+                  transform 0.38s cubic-bezier(0.34,1.5,0.64,1) 0.03s;
+    }
+    #penToolbar.show .pen-toolbar-item:nth-child(2) {
+      transition: opacity 0.32s cubic-bezier(0.34,1.5,0.64,1)  0.08s,
+                  transform 0.38s cubic-bezier(0.34,1.5,0.64,1) 0.08s;
+    }
+    #penToolbar.show .pen-toolbar-item:nth-child(3) {
+      transition: opacity 0.32s cubic-bezier(0.34,1.5,0.64,1)  0.13s,
+                  transform 0.38s cubic-bezier(0.34,1.5,0.64,1) 0.13s;
+    }
+    #penToolbar.show .pen-toolbar-item:nth-child(4) {
+      transition: opacity 0.32s cubic-bezier(0.34,1.5,0.64,1)  0.18s,
+                  transform 0.38s cubic-bezier(0.34,1.5,0.64,1) 0.18s;
+    }
+
+    .pen-tool-btn {
+      width: 36px; height: 36px; border-radius: 50%; border: none;
+      background: var(--ui-bg);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.2);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: var(--dim);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.18);
+      transition: background 0.15s, color 0.15s, border-color 0.15s,
+                  transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+      -webkit-user-select: none; user-select: none;
+    }
+    .pen-tool-btn:hover  { background: var(--hover); }
+    .pen-tool-btn:active { transform: scale(0.88); }
+    .pen-tool-btn.active {
+      background: rgba(220,50,50,0.18);
+      border-color: rgba(220,50,50,0.5);
+      color: #e05050;
+    }
+
+    #penSizeWrap {
+      background: var(--ui-bg);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 18px; padding: 6px 8px;
+      display: flex; flex-direction: column; gap: 5px; align-items: center;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.18);
+    }
+    .pen-size-dot {
+      border-radius: 50%; background: #e05050; cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), opacity 0.15s;
+      opacity: 0.45;
+    }
+    .pen-size-dot:hover   { transform: scale(1.2); opacity: 0.8; }
+    .pen-size-dot.active  { opacity: 1; transform: scale(1.15); }
+
+    #penCanvas {
+      position: fixed; inset: 0; z-index: 110;
+      pointer-events: none; touch-action: none;
+      cursor: crosshair;
+    }
+    #penCanvas.pen-mode { pointer-events: auto; }
+
+    #penUndoBtn  { font-size: 15px; }
+    #penClearBtn { font-size: 13px; }
+
+    #penEraserBtn.eraser-active {
+      background: rgba(255,255,255,0.18);
+      border-color: rgba(255,255,255,0.55);
+      color: var(--text);
+    }
+
+    #penCanvas.eraser-mode { cursor: none; }
+
+    #eraserCursor {
+      position: fixed; pointer-events: none; z-index: 112;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.12);
+      display: none;
+      transform: translate(-50%, -50%);
+      transition: width 0.08s, height 0.08s;
+    }
+    #eraserCursor.visible { display: block; }
     #backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.15); z-index: 9; display: none; pointer-events: none; }
     #backdrop.show { display: block; }
 
@@ -437,11 +541,17 @@
       position: fixed; right: 16px; bottom: 62px;
       min-width: 200px; max-width: 420px;
       background: var(--ui-bg); color: var(--text); z-index: 400;
-      overflow: hidden; transform: translateY(120%) scale(0.96);
-      transition: transform 0.4s cubic-bezier(0.34,1.2,0.64,1), opacity 0.25s;
-      opacity: 0; display: flex; align-items: center; padding: 10px 14px; gap: 10px; font-size: 13px;
+      overflow: hidden;
+      opacity: 0; filter: blur(6px);
+      transform: translateY(120%) scale(0.96);
+      transition: transform 0.38s cubic-bezier(0.34,1.1,0.64,1),
+                  opacity   0.35s cubic-bezier(0.34,1.1,0.64,1),
+                  filter    0.35s cubic-bezier(0.34,1.1,0.64,1);
+      display: flex; align-items: center; padding: 10px 14px; gap: 10px; font-size: 13px;
     }
-    .toast.show { transform: translateY(0) scale(1); opacity: 1; }
+    .toast.show {
+      transform: translateY(0) scale(1); opacity: 1; filter: blur(0px);
+    }
     .toast .count { position: absolute; left: 0; bottom: 0; height: 3px; background: var(--accent); width: 100%; transition: width linear; }
     .toast .msg   { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     @media (max-width: 480px) {
@@ -599,7 +709,6 @@
     .ios-toggle-slider::before { content: ''; position: absolute; height: 22px; width: 22px; left: 2px; top: 2px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: transform 0.32s cubic-bezier(0.34,1.3,0.64,1); }
     .ios-toggle input:checked + .ios-toggle-slider { background: #34c759; }
     .ios-toggle input:checked + .ios-toggle-slider::before { transform: translateX(18px); }
-    /* 小サイズトグル (11px相当) */
     .ios-toggle-sm { width: 28px; height: 17px; }
     .ios-toggle-sm .ios-toggle-slider { border-radius: 9px; }
     .ios-toggle-sm .ios-toggle-slider::before { height: 13px; width: 13px; left: 2px; top: 2px; }
@@ -701,7 +810,7 @@
     </div>
   </div>
 
-  <div id="pwUnlockModal" class="glass">
+  <div id="pwUnlockModal" class="glass panel-modal">
     <button class="close-dot" onclick="closePwUnlockModal()" aria-label="閉じる"></button>
     <div class="pwunlock-title">パスワードロック解除</div>
     <div class="pwunlock-desc">ロックを解除すると、データは暗号化されずlocalStorageに保存されます。</div>
@@ -711,7 +820,7 @@
     </div>
   </div>
 
-  <div id="pwSetModal" class="glass">
+  <div id="pwSetModal" class="glass panel-modal">
     <button class="close-dot" onclick="closePwSetModal()" aria-label="閉じる"></button>
     <div class="pwset-title">パスワードロック設定</div>
     <div class="pwset-field">
@@ -731,7 +840,6 @@
       <button id="pwSetSaveBtn" onclick="savePassword()" disabled>設定する</button>
     </div>
   </div>
-
 
   <header class="glass">
     <div id="headerTopBar">
@@ -790,7 +898,7 @@
     <div>
       <span class="label">保存</span>
       <label class="ios-toggle"><input type="checkbox" id="saveMetaToggle"><span class="ios-toggle-slider"></span></label>
-      <span style="font-size:10px; color:var(--dim); margin-left:4px;">文章情報を含める</span>
+      <span style="font-size:10px; color:var(--dim); margin-left:4px; white-space:nowrap;">文章情報を含める</span>
     </div>
     <div id="pageToggleRow" style="display:none">
       <span class="label">ページ</span>
@@ -800,18 +908,28 @@
       <span class="label">バーの移動</span>
       <label class="ios-toggle"><input type="checkbox" id="headerMoveToggle"><span class="ios-toggle-slider"></span></label>
     </div>
+    <div>
+      <span class="label">下部バー</span>
+      <label class="ios-toggle"><input type="checkbox" id="footerAlwaysToggle"><span class="ios-toggle-slider"></span></label>
+      <span style="font-size:10px; color:var(--dim); margin-left:4px; white-space:nowrap;">常時表示</span>
+    </div>
+    <div id="paintSaveRow">
+      <span class="label">ペイント</span>
+      <label class="ios-toggle"><input type="checkbox" id="paintSaveToggle"><span class="ios-toggle-slider"></span></label>
+      <span style="font-size:10px; color:var(--dim); margin-left:4px; white-space:nowrap;">描画を保存</span>
+    </div>
     <div id="pwLockRow">
       <span class="label">パスワードロック</span>
       <label class="ios-toggle"><input type="checkbox" id="pwLockToggle"><span class="ios-toggle-slider"></span></label>
     </div>
     <div class="options-version">
-      <span>😺Build 2602221940😺</span>
-      <span>Version 26.2.2</span>
+      <span>Build 2602230322</span>
+      <span>Version 26.2.3</span>
       <span><strong>↓Creator↓</strong><br>Claude<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Chat GPT<br>Gemini<br>Cursor<br>Tikuwa</span>
     </div>
   </div>
 
-  <div id="confirmModal" class="glass modal" role="dialog" aria-modal="true">
+  <div id="confirmModal" class="glass modal panel-modal" role="dialog" aria-modal="true">
     <p id="modalMsg">内容をすべて消去しますか？</p>
     <input type="text" id="fileNameInput" placeholder="ファイル名を入力..." style="display:none">
     <div class="modal-btns">
@@ -820,41 +938,19 @@
     </div>
   </div>
 
-  <!-- 保存時メタデータ確認モーダル -->
-  <div id="saveMetaModal" class="glass" style="
-    position:fixed; top:50%; left:50%;
-    transform:translate(-50%, calc(-50% + 16px)) scale(0.9);
-    width:min(320px, 92vw); padding:26px 24px 20px; border-radius:22px;
-    z-index:200; opacity:0; pointer-events:none;
-    box-shadow:0 16px 50px rgba(0,0,0,0.35);
-    transition:opacity 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.38s cubic-bezier(0.34,1.3,0.64,1);
-  ">
+  <div id="saveMetaModal" class="glass modal panel-modal save-meta-modal">
     <button class="close-dot" id="saveMetaCloseBtn" style="left:13px;" aria-label="閉じる"></button>
-    <div style="font-size:15px; text-align:center; margin-bottom:6px; color:var(--text);">ファイルを保存</div>
-    <div style="font-size:12px; color:var(--dim); text-align:center; line-height:1.65; margin-bottom:18px;">
-      フォント・サイズ情報をファイルに含めますか？<br>
-      <span style="font-size:10px;">含めると次回読み込み時に設定が復元されます</span>
-    </div>
-    <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:18px;">
+    <p>ファイルを保存</p>
+    <div class="save-meta-desc">フォント・サイズ情報をファイルに含めますか？<br><span>含めると次回読み込み時に設定が復元されます</span></div>
+    <div class="save-meta-remember">
       <label class="ios-toggle ios-toggle-sm"><input type="checkbox" id="saveMetaRememberToggle"><span class="ios-toggle-slider"></span></label>
-      <span style="font-size:11px; color:var(--dim);">この選択を記憶する</span>
+      <span>この選択を記憶する</span>
     </div>
-    <div style="display:flex; gap:10px;">
-      <button id="saveMetaNoBtn" style="
-        flex:1; padding:10px 0; border-radius:14px; border:none; cursor:pointer;
-        font-size:13px; font-family:inherit; font-weight:200;
-        background:rgba(255,255,255,0.08); color:var(--text);
-        transition:filter 0.18s, transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
-      ">情報なしで保存</button>
-      <button id="saveMetaYesBtn" style="
-        flex:1; padding:10px 0; border-radius:14px; border:none; cursor:pointer;
-        font-size:13px; font-family:inherit; font-weight:200;
-        background:var(--accent); color:#fff;
-        transition:filter 0.18s, transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
-      ">情報ありで保存</button>
+    <div class="modal-btns">
+      <button id="saveMetaNoBtn" class="btn-sub">情報なしで保存</button>
+      <button id="saveMetaYesBtn" class="btn-main">情報ありで保存</button>
     </div>
   </div>
-
 
   <div id="translatePanel" class="glass">
     <div class="tp-header drag-handle" id="translateDragHandle">
@@ -891,13 +987,14 @@
     <div class="swp-body" id="swpBody"></div>
   </div>
 
-  <div id="devMessageModal" class="glass">
+  <div id="devMessageModal" class="glass panel-modal">
     <div class="dev-title-main">Information</div>
     <div class="dev-body">アプリを使っている人へ
 私は最近開発にハマっており、このアプリもその一環として制作しました。
 しかし進学に伴い学業が忙しくなるため、今後は大規模な更新は難しくなる可能性があります。
 現在は主に細かな機能追加やバグ修正が中心になる予定ですが、可能な限り改善は続けていきます。
 まとまった時間が確保でき次第、改めて本格的なメンテナンスや機能強化を行う予定です。
+できるだけお休みがある日や放課後は作業に時間を当てていますのでできるだけ機能追加を増やすつもりです。
 
 ご了承の上今後ともよろしくお願いします。
 
@@ -918,7 +1015,41 @@
   </div>
   <div id="searchHighlightMirror"></div>
   <textarea id="edit" spellcheck="false"></textarea>
-  <footer id="ft" class="glass"><span id="b-info"></span><span id="f-info"></span></footer>
+  <footer id="ft" class="glass">
+    <span id="b-info"></span>
+    <span id="f-info-label"></span><span id="f-info-wrap" class="ft-slot"><span id="f-info-num" class="ft-slot-inner"></span></span><span id="f-info-unit"></span>
+  </footer>
+
+  <!-- 赤ペン機能 -->
+  <canvas id="penCanvas"></canvas>
+  <button id="penToggleBtn" title="赤ペン" aria-label="赤ペンモード切替">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+      <path d="m15 5 4 4"/>
+    </svg>
+  </button>
+  <div id="penToolbar">
+    <!-- 太さ（item 1・一番下から最初に出る） -->
+    <div id="penSizeWrap" class="pen-toolbar-item">
+      <div class="pen-size-dot" data-size="3"  style="width:6px;height:6px;"  title="細い"></div>
+      <div class="pen-size-dot" data-size="6"  style="width:10px;height:10px;" title="中"></div>
+      <div class="pen-size-dot" data-size="12" style="width:16px;height:16px;" title="太い"></div>
+    </div>
+    <!-- Undo（item 2） -->
+    <button class="pen-tool-btn pen-toolbar-item" id="penUndoBtn" title="一つ戻す">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+    </button>
+    <!-- 消しゴム（item 3） -->
+    <button class="pen-tool-btn pen-toolbar-item" id="penEraserBtn" title="消しゴム">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H7L3 16l10-10 7 7-2.5 2.5"/><path d="M6.0 11.0 2.5 14.5"/></svg>
+    </button>
+    <!-- Clear（item 4） -->
+    <button class="pen-tool-btn pen-toolbar-item" id="penClearBtn" title="全消去">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+    </button>
+  </div>
+  <!-- 消しゴムカーソル -->
+  <div id="eraserCursor"></div>
   <input type="file" id="fileInput"        hidden accept=".txt">
   <input type="file" id="compareFileInput" hidden accept=".txt">
   <div id="diffOverlay" style="display:none;position:fixed;inset:0;z-index:300;overflow:hidden;background:var(--bg);">
@@ -939,7 +1070,7 @@
     <div id="pagePanelHeader">
       <span class="pph-title">ページ</span>
       <div class="pph-btns">
-        <button class="pph-edit" onclick="editCurrentPageTitle()" style="transform:scaleX(-1);">✎</button>
+        <button class="pph-edit" onclick="openTitleEdit()" style="transform:scaleX(-1);">✎</button>
         <button class="pph-add" onclick="addPage()">＋</button>
       </div>
     </div>
@@ -1158,7 +1289,6 @@
     }
   };
 
-
   async function loadEncryptedPages(pw) {
     if (!localStorage.getItem('np26_pages_enc')) return;
     var data = await CryptoEngine.decryptPages(pw);
@@ -1192,7 +1322,6 @@
     return name.toLowerCase().endsWith('.txt') ? name : name + '.txt';
   }
 
-  /* ---- 保存ヘルパー ---- */
   function doFileSave(withMeta) {
     try {
       var text = $('edit').value;
@@ -1208,21 +1337,10 @@
   }
 
   function openSaveMetaModal() {
-    var modal = $('saveMetaModal');
-    var rememberToggle = $('saveMetaRememberToggle');
-    if (!modal) return;
-    rememberToggle.checked = false;
-    modal.style.opacity = '1';
-    modal.style.transform = 'translate(-50%, -50%) scale(1)';
-    modal.style.pointerEvents = 'auto';
+    $('saveMetaRememberToggle').checked = false;
+    openPanel('saveMetaModal');
   }
-  function closeSaveMetaModal() {
-    var modal = $('saveMetaModal');
-    if (!modal) return;
-    modal.style.opacity = '0';
-    modal.style.transform = 'translate(-50%, calc(-50% + 16px)) scale(0.9)';
-    modal.style.pointerEvents = 'none';
-  }
+  function closeSaveMetaModal() { closePanel('saveMetaModal'); }
   function debounce(fn, wait) {
     var t;
     return function() { var ctx = this, args = arguments; clearTimeout(t); t = setTimeout(function() { fn.apply(ctx, args); }, wait); };
@@ -1265,7 +1383,8 @@
     modalType: 'new', isFooterHidden: false, hideTimer: null,
     accentColor: localStorage.getItem('accentColor') || '#c9a181',
     autoSave: localStorage.getItem('autoSave') === 'true',
-    saveMeta: localStorage.getItem('saveMeta') !== 'false'
+    saveMeta: localStorage.getItem('saveMeta') !== 'false',
+    footerAlways: localStorage.getItem('footerAlways') === 'true'
   };
   var supportedFonts = ['Arial','Noto Sans JP','Noto Serif JP','Zen Maru Gothic','Dela Gothic One','Kosugi Maru'];
 
@@ -1302,7 +1421,6 @@
     },
     save: function() {
       state.text = $('edit').value;
-      /* 設定で記憶済みなら確認なしで即保存 */
       if (localStorage.getItem('saveMetaRemembered') === 'true') {
         doFileSave(state.saveMeta);
       } else {
@@ -1356,7 +1474,6 @@
 
   function updateTextareaPadding() {
     var edit = $('edit'), mirror = $('searchHighlightMirror');
-    /* 検索パネルはフローティングなのでテキストエリアのパディングは変えない */
     edit.style.paddingTop = '80px'; mirror.style.paddingTop = '80px';
     if (!state.isSearchOpen) {
       edit.readOnly = false; edit.style.caretColor = '';
@@ -1630,7 +1747,6 @@
     makeDraggable('searchWebPanel', 'searchWebDragHandle');
     makeDraggable('searchPanel', 'searchPanelDragHandle');
 
-    /* searchPanel ボタン */
     $('searchPanelCloseBtn').onclick = function() {
       state.isSearchOpen = false;
       closePanel('searchPanel');
@@ -1641,7 +1757,6 @@
     $('spPrevBtn').onclick = function() { doSearch(-1); };
     $('spNextBtn').onclick = function() { doSearch(1); };
 
-    /* バーの移動トグル */
     var headerMoveToggle = $('headerMoveToggle');
     headerMoveToggle.checked = localStorage.getItem('headerMoveEnabled') === 'true';
     state.headerMoveEnabled = headerMoveToggle.checked;
@@ -1654,7 +1769,16 @@
       if (h) h.classList.toggle('no-move', !state.headerMoveEnabled);
     };
 
-    /* 左右ボタン */
+    var footerAlwaysToggle = $('footerAlwaysToggle');
+    if (footerAlwaysToggle) {
+      footerAlwaysToggle.checked = state.footerAlways;
+      footerAlwaysToggle.onchange = function() {
+        state.footerAlways = footerAlwaysToggle.checked;
+        localStorage.setItem('footerAlways', state.footerAlways);
+        render();
+      };
+    }
+
     (function() {
       var leftBtn = $('headerLeftBtn'), rightBtn = $('headerRightBtn');
       var hdr = document.querySelector('header');
@@ -1681,7 +1805,6 @@
       rightBtn.onclick = function(e) { e.stopPropagation(); moveHeader(+40); };
     })();
 
-    /* ---- header ドラッグ ---- */
     (function() {
       var hdr = document.querySelector('header');
       var topBar = $('headerTopBar');
@@ -1742,7 +1865,6 @@
       }, { passive: false });
       document.addEventListener('touchend', onEnd);
 
-      /* 黄色ボタン：定位置へ戻る */
       if (yellowBtn) {
         yellowBtn.onclick = function() {
           if (!hdr.dataset.dragged) return;
@@ -1767,7 +1889,6 @@
       }
     })();
 
-    /* saveMetaModal 閉じるボタン */
     $('saveMetaCloseBtn').onclick = closeSaveMetaModal;
   })();
 
@@ -1869,6 +1990,11 @@
     return 0;
   }
   var pages = loadPages(), curPageIdx = getCurrentPageIdx();
+  setTimeout(function() {
+    if (window.penSetInitialPage && pages[curPageIdx]) {
+      window.penSetInitialPage(pages[curPageIdx].id);
+    }
+  }, 0);
 
   function saveCurrentPage() {
     if (!pages[curPageIdx]) return;
@@ -1876,16 +2002,20 @@
     pages[curPageIdx].text = edit ? edit.value : '';
     pages[curPageIdx].font = fSel ? fSel.value : 'Arial';
     pages[curPageIdx].size = sSel ? parseInt(sSel.value) : 18;
-    var firstLine = pages[curPageIdx].text.split('\n')[0].trim().slice(0, 20);
-    if (firstLine) pages[curPageIdx].title = firstLine;
+    if (!pages[curPageIdx].titleLocked) {
+      var firstLine = pages[curPageIdx].text.split('\n')[0].trim().slice(0, 20);
+      if (firstLine) pages[curPageIdx].title = firstLine;
+    }
     savePages();
   }
   function switchPage(idx) {
     if (titleEditMode) commitTitleEdit();
     if (idx === curPageIdx) return;
     var edit = $('edit'), dir = idx > curPageIdx ? 'right' : 'left';
+    var fromId = pages[curPageIdx] ? pages[curPageIdx].id : null;
     edit.classList.remove('page-slide-in-right','page-slide-in-left','page-slide-out-left','page-slide-out-right');
     edit.classList.add(dir === 'right' ? 'page-slide-out-left' : 'page-slide-out-right');
+    var penSlideIn = window.penPageSwitch ? window.penPageSwitch(fromId, pages[idx].id, dir) : null;
     setTimeout(function() {
       saveCurrentPage(); curPageIdx = idx; localStorage.setItem(PAGES_CUR, pages[curPageIdx].id);
       var p = pages[curPageIdx], fSel = $('fSel'), sSel = $('sSel');
@@ -1896,33 +2026,46 @@
       edit.classList.remove('page-slide-out-left','page-slide-out-right');
       edit.classList.add(dir === 'right' ? 'page-slide-in-right' : 'page-slide-in-left');
       setTimeout(function() { edit.classList.remove('page-slide-in-right','page-slide-in-left'); }, 350);
+      if (penSlideIn) penSlideIn();
     }, 180);
   }
   window.addPage = function() {
     if (pages.length >= MAX_PAGES) { queueToast('ページは最大' + MAX_PAGES + '枚までです', 2000); return; }
     var edit = $('edit');
+    var fromId = pages[curPageIdx] ? pages[curPageIdx].id : null;
+    var newId  = genPageId();
     edit.classList.remove('page-slide-in-right','page-slide-in-left','page-slide-out-left','page-slide-out-right');
     edit.classList.add('page-slide-out-left');
+    var penSlideIn = window.penPageSwitch ? window.penPageSwitch(fromId, newId, 'right') : null;
     setTimeout(function() {
       saveCurrentPage();
-      var np = { id: genPageId(), title: 'ページ ' + (pages.length + 1), text: '', font: $('fSel').value || 'Arial', size: parseInt($('sSel').value) || 18 };
+      var np = { id: newId, title: 'ページ ' + (pages.length + 1), text: '', font: $('fSel').value || 'Arial', size: parseInt($('sSel').value) || 18 };
       pages.push(np); curPageIdx = pages.length - 1; localStorage.setItem(PAGES_CUR, np.id);
       edit.value = ''; ActionHandlers.updateText(''); savePages(); render(); renderPageList();
       requestAnimationFrame(function() { updatePageIndicator(true); });
       edit.classList.remove('page-slide-out-left'); edit.classList.add('page-slide-in-right');
       setTimeout(function() { edit.classList.remove('page-slide-in-right'); }, 350);
+      if (penSlideIn) penSlideIn();
     }, 180);
   };
   window.deletePage = function(idx, e) {
     e.stopPropagation();
     if (pages.length <= 1) { queueToast('最後のページは削除できません', 2000); return; }
+    var deletedId      = pages[idx].id;
+    var wasCurrentPage = (idx === curPageIdx);
+    var fromId         = wasCurrentPage ? deletedId : null;
     pages.splice(idx, 1);
     if (curPageIdx >= pages.length) curPageIdx = pages.length - 1;
     localStorage.setItem(PAGES_CUR, pages[curPageIdx].id);
     var p = pages[curPageIdx], edit = $('edit');
+    if (window.penPageDelete) window.penPageDelete(deletedId);
+    var penSlideIn = (wasCurrentPage && window.penPageSwitch)
+      ? window.penPageSwitch(fromId, pages[curPageIdx].id, 'left')
+      : null;
     edit.value = p.text || ''; $('fSel').value = p.font || 'Arial'; $('sSel').value = String(p.size || 18);
     applyStyles(); ActionHandlers.updateText(edit.value); savePages(); render(); renderPageList();
     requestAnimationFrame(function() { updatePageIndicator(true); });
+    if (penSlideIn) penSlideIn();
   };
 
   var titleEditMode = false;
@@ -1943,7 +2086,11 @@
   function commitTitleEdit() {
     if (!titleEditMode) return;
     var list = $('pageList'), inputs = list.querySelectorAll('.page-title-edit-input');
-    inputs.forEach(function(inp, i) { pages[i].title = inp.value.trim().slice(0,20) || ('ページ ' + (i+1)); });
+    inputs.forEach(function(inp, i) {
+      var edited = inp.value.trim().slice(0, 20);
+      pages[i].title       = edited || ('ページ ' + (i + 1));
+      pages[i].titleLocked = edited.length > 0; /* 入力があればロック */
+    });
     savePages(); titleEditMode = false; list.classList.remove('editing'); resetEditBtn();
     setTimeout(function() { renderPageList(); }, 240);
   }
@@ -1953,8 +2100,7 @@
     setTimeout(function() { renderPageList(); }, 240);
   }
   function closeTitleEdit(save) { if (save) commitTitleEdit(); else cancelTitleEdit(); }
-  window.editCurrentPageTitle = function() { openTitleEdit(); };
-
+  
   function renderPageList() {
     var list = $('pageList'); if (!list) return;
     list.innerHTML = '';
@@ -2048,13 +2194,54 @@
     if (trigger) trigger.addEventListener('mouseenter', function() { if (!pagePanelOpen) openPagePanel(); });
   })();
 
+  var ftNumTimer = null;
+  var ftLastNum  = null;
+
+  function updateFtNum(newNum) {
+    var wrap  = $('f-info-wrap');
+    var inner = $('f-info-num');
+    if (!wrap || !inner) return;
+    var numStr = String(newNum);
+    if (numStr === ftLastNum) return;
+    ftLastNum = numStr;
+
+    if (!state.footerAlways) {
+      inner.textContent = numStr;
+      return;
+    }
+    clearTimeout(ftNumTimer);
+    wrap.style.width = wrap.offsetWidth + 'px';
+    inner.classList.remove('slot-in');
+    inner.classList.add('slot-out');
+    ftNumTimer = setTimeout(function() {
+      inner.textContent = numStr;
+      inner.classList.remove('slot-out');
+      wrap.style.width  = '';
+      inner.classList.add('slot-in');
+      setTimeout(function() { inner.classList.remove('slot-in'); }, 300);
+    }, 160);
+  }
+
   function render() {
     var edit = $('edit'), isAnyOpen = state.isOptionsOpen || state.isModalOpen;
-    $('f-info').textContent  = state.curFile + ' · ' + edit.value.length + ' 文字';
-    $('b-info').textContent  = state.browser + '_' + state.device;
-    edit.placeholder         = state.browser + '_' + state.device + ' >';
-    $('backdrop').className  = isAnyOpen ? 'show' : '';
-    $('ft').className        = 'glass' + (state.isFooterHidden ? ' hidden' : '');
+    var pageTitle = (pages && pages[curPageIdx]) ? pages[curPageIdx].title.slice(0, 20) : state.curFile.slice(0, 20);
+    var charCount = edit.value.length;
+
+    $('b-info').textContent = state.browser + '_' + state.device;
+
+    var labelEl = $('f-info-label');
+    var unitEl  = $('f-info-unit');
+    if (labelEl) labelEl.textContent = pageTitle + ' · ';
+    if (unitEl)  unitEl.textContent  = ' 文字';
+    updateFtNum(charCount);
+
+    edit.placeholder        = state.browser + '_' + state.device + ' >';
+    $('backdrop').className = isAnyOpen ? 'show' : '';
+    if (state.footerAlways) {
+      $('ft').className = 'glass';
+    } else {
+      $('ft').className = 'glass' + (state.isFooterHidden ? ' hidden' : '');
+    }
   }
 
   /* 低スペック検出 */
@@ -2079,12 +2266,10 @@
   (function init() {
     var fSel = $('fSel'), sSel = $('sSel'), edit = $('edit');
 
-    /* フォント・サイズ選択肢 */
     supportedFonts.forEach(function(f) { fSel.add(new Option(f, f)); });
     for (var j = 12; j <= 80; j += 2) sSel.add(new Option(j + 'px', j));
     sSel.value = 18;
 
-    /* 翻訳エンジン */
     var translateSel = $('translateSel');
     translateSel.value = localStorage.getItem('translateEngine') || 'google';
     translateSel.onchange = function() {
@@ -2092,12 +2277,10 @@
       $('tpPowered').textContent = translateSel.value === 'bing' ? 'Powered by Bing translation' : 'Powered by Google translation';
     };
 
-    /* 辞書エンジン */
     var dictSel = $('dictSel');
     dictSel.value = localStorage.getItem('dictEngine') || 'wikipedia';
     dictSel.onchange = function() { localStorage.setItem('dictEngine', dictSel.value); };
 
-    /* テーマスウォッチ */
     var swatchContainer = $('colorSwatches');
     themeColors.forEach(function(t) {
       var s = document.createElement('button'); s.className = 'swatch'; s.dataset.color = t.color;
@@ -2107,7 +2290,6 @@
     });
     applyAccentColor(state.accentColor);
 
-    /* 自動保存 */
     var autoSaveToggle = $('autoSaveToggle');
     autoSaveToggle.checked = state.autoSave;
     if (state.autoSave) {
@@ -2130,17 +2312,14 @@
       queueToast('自動保存データを消去しました', 2000);
     };
 
-    /* 保存メタトグル（設定内） */
     var saveMetaToggle = $('saveMetaToggle');
     saveMetaToggle.checked = state.saveMeta;
     saveMetaToggle.onchange = function() {
       state.saveMeta = saveMetaToggle.checked;
       localStorage.setItem('saveMeta', state.saveMeta);
-      /* 手動変更時は記憶をリセット（次回保存時また確認） */
       localStorage.removeItem('saveMetaRemembered');
     };
 
-    /* 保存確認モーダルのボタン */
     $('saveMetaYesBtn').onclick = function() {
       var remember = $('saveMetaRememberToggle').checked;
       if (remember) {
@@ -2164,7 +2343,6 @@
       doFileSave(false);
     };
 
-    /* パスワードロックトグル */
     var pwLockToggle = $('pwLockToggle');
     pwLockToggle.checked = CryptoEngine.isEnabled();
     pwLockToggle.onchange = function() {
@@ -2172,7 +2350,6 @@
       else { openPwUnlockModal(); }
     };
 
-    /* ページバー設定 */
     var isMob = state.device === 'Mobile', headerPageBtn = $('headerPageBtn');
     var pageBarToggle = $('pageBarToggle'), pageToggleRow = $('pageToggleRow');
     function applyPageBarSetting(show) {
@@ -2195,8 +2372,6 @@
       else if (headerPageBtn) headerPageBtn.classList.add('animated');
     }
 
-    /* 検索バー位置 */
-    /* 検索入力 */
     var searchInput = $('searchInput');
     searchInput.oninput = function() { doSearch(0); };
     searchInput.addEventListener('keydown', function(e) {
@@ -2210,7 +2385,6 @@
       }
     });
 
-    /* テキストエリア */
     var upd = debounce(function() { ActionHandlers.updateText(edit.value); scheduleAutoSave(); saveCurrentPage(); render(); }, 150);
     edit.oninput  = upd;
     edit.onclick  = function() { hideContextMenu(); upd(); };
@@ -2226,7 +2400,6 @@
       }
     }, { passive: false });
 
-    /* ファイル読み込み */
     $('fileInput').onchange = function(e) {
       var file = e.target.files[0]; if (!file) return;
       state.curFile = file.name;
@@ -2235,7 +2408,6 @@
       reader.readAsText(file);
     };
 
-    /* キーボードショートカット */
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         if (pagePanelOpen) { closePagePanel(); return; }
@@ -2245,7 +2417,6 @@
       if ((e.ctrlKey || e.metaKey) && e.key === 'f') { e.preventDefault(); ActionHandlers.toggleSearch(); render(); }
     });
 
-    /* コンテキストメニュー */
     var ctxJustOpened = false;
     edit.addEventListener('contextmenu', function(e) {
       e.preventDefault(); var text = window.getSelection().toString().trim();
@@ -2384,6 +2555,409 @@
       mainHeader.classList.remove('diff-exit','diff-restore');
     }, 350);
   };
+
+  /* ═══════════════════════════════════════════
+     赤ペン機能
+  ═══════════════════════════════════════════ */
+  (function initPen() {
+    var canvas       = $('penCanvas');
+    var toggleBtn    = $('penToggleBtn');
+    var toolbar      = $('penToolbar');
+    var undoBtn      = $('penUndoBtn');
+    var clearBtn     = $('penClearBtn');
+    var eraserBtn    = $('penEraserBtn');
+    var eraserCursor = $('eraserCursor');
+    var paintSaveToggle = $('paintSaveToggle');
+    if (!canvas || !toggleBtn) return;
+
+    var ctx          = canvas.getContext('2d');
+    var penActive    = false;
+    var eraserMode   = false;
+    var drawing      = false;
+    var penSize      = 6;
+    var eraserSize   = 24;
+    var strokes      = [];
+    var activeStroke = null;
+
+    var DB_NAME       = 'np26_paint_db';
+    var DB_VERSION    = 1;
+    var STORE_NAME    = 'strokes';
+    var db            = null;
+    var saveEnabled   = localStorage.getItem('paintSaveEnabled') === 'true';
+    var saveDebounceTimer = null;
+    var currentPageId = 'page_default';
+
+    function openDB(callback) {
+      if (db) { callback(db); return; }
+      var req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = function(e) {
+        var d = e.target.result;
+        if (!d.objectStoreNames.contains(STORE_NAME)) {
+          d.createObjectStore(STORE_NAME, { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = function(e) { db = e.target.result; callback(db); };
+      req.onerror   = function()  { console.warn('IndexedDB open failed'); };
+    }
+
+    function dbKey(pageId) { return 'page_' + (pageId || currentPageId); }
+
+    function saveStrokesDB(pageId, strokesData) {
+      if (!saveEnabled) return;
+      var key  = 'page_' + (pageId || currentPageId);
+      var data = (strokesData !== undefined) ? strokesData : strokes.slice();
+      openDB(function(d) {
+        try {
+          var tx = d.transaction(STORE_NAME, 'readwrite');
+          tx.objectStore(STORE_NAME).put({ id: key, data: data });
+          tx.onerror = function() { console.warn('paint save failed'); };
+        } catch(e) { console.warn('paint save error', e); }
+      });
+    }
+
+    function scheduleSave() {
+      if (!saveEnabled) return;
+      clearTimeout(saveDebounceTimer);
+      var snapId = currentPageId;
+      saveDebounceTimer = setTimeout(function() {
+        saveStrokesDB(snapId, strokes);
+      }, 800);
+    }
+
+    window.addEventListener('beforeunload', function() {
+      if (saveEnabled && strokes.length) saveStrokesDB(currentPageId, strokes);
+    });
+
+    function loadStrokesDB(pageId, callback) {
+      openDB(function(d) {
+        try {
+          var tx  = d.transaction(STORE_NAME, 'readonly');
+          var req = tx.objectStore(STORE_NAME).get(dbKey(pageId));
+          req.onsuccess = function(e) {
+            var rec = e.target.result;
+            callback(rec && Array.isArray(rec.data) ? rec.data : []);
+          };
+          req.onerror = function() { callback([]); };
+        } catch(e) { callback([]); }
+      });
+    }
+
+    function clearPageDB(pageId, callback) {
+      openDB(function(d) {
+        try {
+          var tx = d.transaction(STORE_NAME, 'readwrite');
+          tx.objectStore(STORE_NAME).delete(dbKey(pageId));
+          if (callback) tx.oncomplete = callback;
+        } catch(e) { if (callback) callback(); }
+      });
+    }
+
+    function clearAllPagesDB(callback) {
+      openDB(function(d) {
+        try {
+          var tx = d.transaction(STORE_NAME, 'readwrite');
+          tx.objectStore(STORE_NAME).clear();
+          if (callback) tx.oncomplete = callback;
+        } catch(e) { if (callback) callback(); }
+      });
+    }
+
+    if (paintSaveToggle) {
+      paintSaveToggle.checked = saveEnabled;
+      paintSaveToggle.addEventListener('change', function() {
+        saveEnabled = paintSaveToggle.checked;
+        localStorage.setItem('paintSaveEnabled', saveEnabled);
+        if (saveEnabled) {
+          if (strokes.length > 0) saveStrokesDB();
+          queueToast('ペイントの自動保存を有効にしました', 2000);
+        } else {
+          clearTimeout(saveDebounceTimer);
+          clearAllPagesDB(function() {
+            queueToast('すべてのページのペイント保存データを消去しました', 2500);
+          });
+        }
+      });
+    }
+
+    function initRestoreIfNeeded(pageId) {
+      if (!saveEnabled) return;
+      loadStrokesDB(pageId, function(saved) {
+        if (!saved.length) return;
+        strokes = saved;
+        redrawAll();
+      });
+    }
+
+    window.penPageSwitch = function(fromId, toId, dir) {
+      clearTimeout(saveDebounceTimer);
+      if (saveEnabled && fromId) saveStrokesDB(fromId, strokes);
+
+      var outClass = (dir === 'right') ? 'page-slide-out-left'  : 'page-slide-out-right';
+      var inClass  = (dir === 'right') ? 'page-slide-in-right'  : 'page-slide-in-left';
+
+      canvas.style.transition = '';
+      canvas.style.opacity    = '';
+      canvas.classList.remove(
+        'page-slide-in-right','page-slide-in-left',
+        'page-slide-out-left','page-slide-out-right'
+      );
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() { canvas.classList.add(outClass); });
+      });
+
+      var nextStrokes = [];
+      var loadDone    = false;
+      var slideInCalled = false;
+
+      if (saveEnabled) {
+        loadStrokesDB(toId, function(saved) {
+          nextStrokes = saved;
+          loadDone    = true;
+          if (slideInCalled) doSlideIn();
+        });
+      } else {
+        loadDone = true;
+      }
+
+      function doSlideIn() {
+        canvas.classList.remove(outClass);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        strokes       = nextStrokes;
+        currentPageId = toId;
+        redrawAll();
+        canvas.classList.add(inClass);
+        setTimeout(function() { canvas.classList.remove(inClass); }, 350);
+      }
+
+      return function trySlideIn() {
+        if (loadDone) {
+          doSlideIn();
+        } else {
+          slideInCalled = true;
+        }
+      };
+    };
+
+    window.penPageDelete = function(deletedId) {
+      if (saveEnabled) clearPageDB(deletedId);
+    };
+
+    function resizeCanvas() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+      redrawAll();
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    function redrawAll() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      strokes.forEach(function(s) { drawStroke(s); });
+    }
+
+    function drawStroke(stroke) {
+      if (!stroke || !stroke.points.length) return;
+      ctx.save();
+      if (stroke.type === 'eraser') {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.strokeStyle = 'rgba(0,0,0,1)';
+        ctx.fillStyle   = 'rgba(0,0,0,1)';
+      } else {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.strokeStyle = stroke.color;
+        ctx.fillStyle   = stroke.color;
+      }
+      ctx.lineWidth = stroke.size;
+      ctx.lineCap   = 'round';
+      ctx.lineJoin  = 'round';
+      if (stroke.points.length === 1) {
+        ctx.beginPath();
+        ctx.arc(stroke.points[0].x, stroke.points[0].y, stroke.size / 2, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+        for (var i = 1; i < stroke.points.length; i++) {
+          var p0 = stroke.points[i - 1];
+          var p1 = stroke.points[i];
+          ctx.quadraticCurveTo(p0.x, p0.y, (p0.x + p1.x) / 2, (p0.y + p1.y) / 2);
+        }
+        ctx.lineTo(stroke.points[stroke.points.length - 1].x,
+                   stroke.points[stroke.points.length - 1].y);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function activatePen() {
+      penActive = true;
+      canvas.classList.add('pen-mode');
+      toggleBtn.classList.add('pen-active');
+      toolbar.classList.add('show');
+      resizeCanvas();
+    }
+    function deactivatePen() {
+      penActive  = false;
+      drawing    = false;
+      eraserMode = false;
+      canvas.classList.remove('pen-mode', 'eraser-mode');
+      toggleBtn.classList.remove('pen-active');
+      eraserBtn.classList.remove('eraser-active');
+      eraserCursor.classList.remove('visible');
+      /* 閉じるアニメーション：transitionはCSSデフォルト(0.18s)に戻してから show を外す */
+      toolbar.classList.remove('show');
+    }
+    toggleBtn.addEventListener('click', function() {
+      if (penActive) deactivatePen(); else activatePen();
+    });
+
+    function setEraserMode(on) {
+      eraserMode = on;
+      if (on) {
+        canvas.classList.add('eraser-mode');
+        eraserBtn.classList.add('eraser-active');
+        updateEraserCursor(null);
+      } else {
+        canvas.classList.remove('eraser-mode');
+        eraserBtn.classList.remove('eraser-active');
+        eraserCursor.classList.remove('visible');
+      }
+    }
+    eraserBtn.addEventListener('click', function() { setEraserMode(!eraserMode); });
+
+    /* 消しゴムカーソル */
+    function updateEraserCursor(pos) {
+      if (!eraserMode) { eraserCursor.classList.remove('visible'); return; }
+      var sz = eraserSize + 4;
+      eraserCursor.style.width  = sz + 'px';
+      eraserCursor.style.height = sz + 'px';
+      if (pos) {
+        eraserCursor.style.left = pos.x + 'px';
+        eraserCursor.style.top  = pos.y + 'px';
+        eraserCursor.classList.add('visible');
+      }
+    }
+
+    var sizeDots = document.querySelectorAll('.pen-size-dot');
+    sizeDots.forEach(function(dot) {
+      if (parseInt(dot.dataset.size) === penSize) dot.classList.add('active');
+      dot.addEventListener('click', function() {
+        var sz = parseInt(dot.dataset.size);
+        if (eraserMode) {
+          eraserSize = sz * 4;
+          updateEraserCursor(null);
+        } else {
+          penSize = sz;
+        }
+        sizeDots.forEach(function(d) { d.classList.remove('active'); });
+        dot.classList.add('active');
+      });
+    });
+
+    function getPos(e) {
+      if (e.touches) {
+        var t = e.touches[0] || e.changedTouches[0];
+        return { x: t.clientX, y: t.clientY };
+      }
+      return { x: e.clientX, y: e.clientY };
+    }
+
+    function startDraw(e) {
+      if (!penActive) return;
+      drawing = true;
+      var pos  = getPos(e);
+      var type = eraserMode ? 'eraser' : 'pen';
+      var size = eraserMode ? eraserSize : penSize;
+      activeStroke = { type: type, points: [pos], size: size, color: 'rgba(220,50,50,0.85)' };
+      drawStroke(activeStroke);
+    }
+
+    function moveDraw(e) {
+      if (!drawing || !activeStroke) return;
+      if (e.cancelable) e.preventDefault();
+      var pos = getPos(e);
+      updateEraserCursor(pos);
+      activeStroke.points.push(pos);
+      var pts = activeStroke.points, n = pts.length;
+      ctx.save();
+      if (activeStroke.type === 'eraser') {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.strokeStyle = 'rgba(0,0,0,1)';
+      } else {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.strokeStyle = activeStroke.color;
+      }
+      ctx.lineWidth = activeStroke.size;
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.beginPath();
+      if (n >= 3) {
+        var p0 = pts[n-3], p1 = pts[n-2], p2 = pts[n-1];
+        ctx.moveTo((p0.x+p1.x)/2, (p0.y+p1.y)/2);
+        ctx.quadraticCurveTo(p1.x, p1.y, (p1.x+p2.x)/2, (p1.y+p2.y)/2);
+      } else if (n === 2) {
+        ctx.moveTo(pts[0].x, pts[0].y);
+        ctx.lineTo(pts[1].x, pts[1].y);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function endDraw() {
+      if (!drawing || !activeStroke) return;
+      drawing = false;
+      strokes.push(activeStroke);
+      activeStroke = null;
+      scheduleSave(); /* ストローク確定後に保存スケジュール */
+    }
+
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', function(e) {
+      moveDraw(e);
+      if (eraserMode) updateEraserCursor(getPos(e));
+    });
+    canvas.addEventListener('mouseup',    endDraw);
+    canvas.addEventListener('mouseleave', function() {
+      endDraw();
+      eraserCursor.classList.remove('visible');
+    });
+    canvas.addEventListener('mouseenter', function(e) {
+      if (eraserMode) updateEraserCursor(getPos(e));
+    });
+    canvas.addEventListener('touchstart', function(e) {
+      if (e.cancelable) e.preventDefault();
+      startDraw(e);
+      if (eraserMode) updateEraserCursor(getPos(e));
+    }, { passive: false });
+    canvas.addEventListener('touchmove',  function(e) { moveDraw(e); }, { passive: false });
+    canvas.addEventListener('touchend',   function() {
+      endDraw();
+      eraserCursor.classList.remove('visible');
+    }, { passive: true });
+
+    undoBtn.addEventListener('click', function() {
+      if (!strokes.length) return;
+      strokes.pop();
+      redrawAll();
+      scheduleSave();
+    });
+
+    clearBtn.addEventListener('click', function() {
+      strokes = [];
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      clearTimeout(saveDebounceTimer);
+      if (saveEnabled) clearPageDB(currentPageId);
+    });
+
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    ctx.lineCap   = 'round';
+    ctx.lineJoin  = 'round';
+
+      window.penSetInitialPage = function(pageId) {
+      currentPageId = pageId;
+      initRestoreIfNeeded(pageId);
+    };
+  })();
+
   </script>
 </body>
 </html>
