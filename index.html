@@ -913,18 +913,14 @@
       <label class="ios-toggle"><input type="checkbox" id="footerAlwaysToggle"><span class="ios-toggle-slider"></span></label>
       <span style="font-size:10px; color:var(--dim); margin-left:4px; white-space:nowrap;">常時表示</span>
     </div>
-    <div id="paintSaveRow">
-      <span class="label">ペイント</span>
-      <label class="ios-toggle"><input type="checkbox" id="paintSaveToggle"><span class="ios-toggle-slider"></span></label>
-      <span style="font-size:10px; color:var(--dim); margin-left:4px; white-space:nowrap;">描画を保存</span>
-    </div>
+
     <div id="pwLockRow">
       <span class="label">パスワードロック</span>
       <label class="ios-toggle"><input type="checkbox" id="pwLockToggle"><span class="ios-toggle-slider"></span></label>
     </div>
     <div class="options-version">
       <span>Build 2602230322</span>
-      <span>Version 26.2.3</span>
+      <span>Version 26.2.3.1</span>
       <span><strong>↓Creator↓</strong><br>Claude<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Chat GPT<br>Gemini<br>Cursor<br>Tikuwa</span>
     </div>
   </div>
@@ -2567,7 +2563,6 @@
     var clearBtn     = $('penClearBtn');
     var eraserBtn    = $('penEraserBtn');
     var eraserCursor = $('eraserCursor');
-    var paintSaveToggle = $('paintSaveToggle');
     if (!canvas || !toggleBtn) return;
 
     var ctx          = canvas.getContext('2d');
@@ -2579,119 +2574,7 @@
     var strokes      = [];
     var activeStroke = null;
 
-    var DB_NAME       = 'np26_paint_db';
-    var DB_VERSION    = 1;
-    var STORE_NAME    = 'strokes';
-    var db            = null;
-    var saveEnabled   = localStorage.getItem('paintSaveEnabled') === 'true';
-    var saveDebounceTimer = null;
-    var currentPageId = 'page_default';
-
-    function openDB(callback) {
-      if (db) { callback(db); return; }
-      var req = indexedDB.open(DB_NAME, DB_VERSION);
-      req.onupgradeneeded = function(e) {
-        var d = e.target.result;
-        if (!d.objectStoreNames.contains(STORE_NAME)) {
-          d.createObjectStore(STORE_NAME, { keyPath: 'id' });
-        }
-      };
-      req.onsuccess = function(e) { db = e.target.result; callback(db); };
-      req.onerror   = function()  { console.warn('IndexedDB open failed'); };
-    }
-
-    function dbKey(pageId) { return 'page_' + (pageId || currentPageId); }
-
-    function saveStrokesDB(pageId, strokesData) {
-      if (!saveEnabled) return;
-      var key  = 'page_' + (pageId || currentPageId);
-      var data = (strokesData !== undefined) ? strokesData : strokes.slice();
-      openDB(function(d) {
-        try {
-          var tx = d.transaction(STORE_NAME, 'readwrite');
-          tx.objectStore(STORE_NAME).put({ id: key, data: data });
-          tx.onerror = function() { console.warn('paint save failed'); };
-        } catch(e) { console.warn('paint save error', e); }
-      });
-    }
-
-    function scheduleSave() {
-      if (!saveEnabled) return;
-      clearTimeout(saveDebounceTimer);
-      var snapId = currentPageId;
-      saveDebounceTimer = setTimeout(function() {
-        saveStrokesDB(snapId, strokes);
-      }, 800);
-    }
-
-    window.addEventListener('beforeunload', function() {
-      if (saveEnabled && strokes.length) saveStrokesDB(currentPageId, strokes);
-    });
-
-    function loadStrokesDB(pageId, callback) {
-      openDB(function(d) {
-        try {
-          var tx  = d.transaction(STORE_NAME, 'readonly');
-          var req = tx.objectStore(STORE_NAME).get(dbKey(pageId));
-          req.onsuccess = function(e) {
-            var rec = e.target.result;
-            callback(rec && Array.isArray(rec.data) ? rec.data : []);
-          };
-          req.onerror = function() { callback([]); };
-        } catch(e) { callback([]); }
-      });
-    }
-
-    function clearPageDB(pageId, callback) {
-      openDB(function(d) {
-        try {
-          var tx = d.transaction(STORE_NAME, 'readwrite');
-          tx.objectStore(STORE_NAME).delete(dbKey(pageId));
-          if (callback) tx.oncomplete = callback;
-        } catch(e) { if (callback) callback(); }
-      });
-    }
-
-    function clearAllPagesDB(callback) {
-      openDB(function(d) {
-        try {
-          var tx = d.transaction(STORE_NAME, 'readwrite');
-          tx.objectStore(STORE_NAME).clear();
-          if (callback) tx.oncomplete = callback;
-        } catch(e) { if (callback) callback(); }
-      });
-    }
-
-    if (paintSaveToggle) {
-      paintSaveToggle.checked = saveEnabled;
-      paintSaveToggle.addEventListener('change', function() {
-        saveEnabled = paintSaveToggle.checked;
-        localStorage.setItem('paintSaveEnabled', saveEnabled);
-        if (saveEnabled) {
-          if (strokes.length > 0) saveStrokesDB();
-          queueToast('ペイントの自動保存を有効にしました', 2000);
-        } else {
-          clearTimeout(saveDebounceTimer);
-          clearAllPagesDB(function() {
-            queueToast('すべてのページのペイント保存データを消去しました', 2500);
-          });
-        }
-      });
-    }
-
-    function initRestoreIfNeeded(pageId) {
-      if (!saveEnabled) return;
-      loadStrokesDB(pageId, function(saved) {
-        if (!saved.length) return;
-        strokes = saved;
-        redrawAll();
-      });
-    }
-
     window.penPageSwitch = function(fromId, toId, dir) {
-      clearTimeout(saveDebounceTimer);
-      if (saveEnabled && fromId) saveStrokesDB(fromId, strokes);
-
       var outClass = (dir === 'right') ? 'page-slide-out-left'  : 'page-slide-out-right';
       var inClass  = (dir === 'right') ? 'page-slide-in-right'  : 'page-slide-in-left';
 
@@ -2705,41 +2588,19 @@
         requestAnimationFrame(function() { canvas.classList.add(outClass); });
       });
 
-      var nextStrokes = [];
-      var loadDone    = false;
-      var slideInCalled = false;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      strokes = [];
+      redrawAll();
+      canvas.classList.add(inClass);
+      setTimeout(function() { canvas.classList.remove(inClass); }, 350);
 
-      if (saveEnabled) {
-        loadStrokesDB(toId, function(saved) {
-          nextStrokes = saved;
-          loadDone    = true;
-          if (slideInCalled) doSlideIn();
-        });
-      } else {
-        loadDone = true;
-      }
-
-      function doSlideIn() {
+      return function() {
         canvas.classList.remove(outClass);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        strokes       = nextStrokes;
-        currentPageId = toId;
-        redrawAll();
-        canvas.classList.add(inClass);
-        setTimeout(function() { canvas.classList.remove(inClass); }, 350);
-      }
-
-      return function trySlideIn() {
-        if (loadDone) {
-          doSlideIn();
-        } else {
-          slideInCalled = true;
-        }
       };
     };
 
     window.penPageDelete = function(deletedId) {
-      if (saveEnabled) clearPageDB(deletedId);
+      // 削除時は何もしない（保存機能なし）
     };
 
     function resizeCanvas() {
@@ -2906,7 +2767,6 @@
       drawing = false;
       strokes.push(activeStroke);
       activeStroke = null;
-      scheduleSave(); /* ストローク確定後に保存スケジュール */
     }
 
     canvas.addEventListener('mousedown', startDraw);
