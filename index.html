@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://translate.googleapis.com https://ja.wikipedia.org https://ja.wiktionary.org;">
   <meta name="google-site-verification" content="Z5LCrw2wiWOC0bTQynoScEQ9LTvHoEucbmQwoReCLXE" />
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
@@ -587,10 +587,10 @@
     .swp-abstract-src a   { color: var(--accent); text-decoration: none; }
     .swp-abstract-src a:hover { text-decoration: underline; }
     .swp-results-label { font-size: 11px; color: var(--dim); margin-bottom: 8px; padding-left: 2px; }
-    .swp-result-item { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; border-radius: 12px; cursor: pointer; text-decoration: none; transition: background 0.15s; margin-bottom: 4px; }
+    .swp-result-item { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; border-radius: 12px; cursor: pointer; text-decoration: none; transition: background 0.15s; margin-bottom: 4px; color: var(--text); }
     .swp-result-item:hover { background: var(--hover); }
     .swp-result-title { font-size: 13px; font-weight: bold; color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .swp-result-desc  { font-size: 12px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .swp-result-desc  { font-size: 12px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: var(--text); font-family: 'Source Han Sans JP', 'Noto Sans JP', 'ヒラギノ角ゴ ProN', sans-serif; font-weight: 200; }
     .swp-result-url   { font-size: 11px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     .ios-toggle { position: relative; display: inline-block; width: 44px; height: 26px; flex-shrink: 0; }
@@ -805,9 +805,9 @@
       <label class="ios-toggle"><input type="checkbox" id="pwLockToggle"><span class="ios-toggle-slider"></span></label>
     </div>
     <div class="options-version">
-      <span>Build 2602221923</span>
-      <span>Version 26.2.1</span>
-      <span><strong>↓Creator↓</strong><br>Claude<br>Chat GPT<br>Gemini<br>Copilot<br>Cursor<br>Tikuwa</span>
+      <span>😺Build 2602221940😺</span>
+      <span>Version 26.2.2</span>
+      <span><strong>↓Creator↓</strong><br>Claude<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Chat GPT<br>Gemini<br>Cursor<br>Tikuwa</span>
     </div>
   </div>
 
@@ -2387,4 +2387,3 @@
   </script>
 </body>
 </html>
-
