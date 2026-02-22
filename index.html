@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'none';">
   <meta name="google-site-verification" content="Z5LCrw2wiWOC0bTQynoScEQ9LTvHoEucbmQwoReCLXE" />
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
@@ -12,7 +13,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP&family=Zen+Maru+Gothic&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Kosugi+Maru&family=Noto+Sans+JP:wght@200;400;700&family=Noto+Serif+JP&family=Zen+Maru+Gothic&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #121212;
@@ -29,7 +30,8 @@
       margin: 0;
       background: var(--bg);
       color: var(--text);
-      font-family: sans-serif;
+      font-family: 'Noto Sans JP', 'Source Han Sans JP', 'ヒラギノ角ゴ ProN', sans-serif;
+      font-weight: 200;
       height: 100vh;
       overflow: hidden;
     }
@@ -72,7 +74,7 @@
       width: 72px; height: 72px; border-radius: 18px;
       object-fit: cover; box-shadow: 0 6px 20px rgba(0,0,0,0.3);
     }
-    .lock-app-name { font-size: 15px; font-weight: 700; white-space: nowrap; }
+    .lock-app-name { font-size: 15px; font-weight: 200; white-space: nowrap; }
     .lock-right {
       display: flex; flex-direction: column; gap: 10px; flex: 1; min-width: 0;
     }
@@ -103,7 +105,7 @@
     .lock-submit-btn {
       background: var(--accent); color: #fff; border: none;
       border-radius: 20px; padding: 10px 0;
-      font-size: 14px; font-family: inherit; font-weight: 700; cursor: pointer;
+      font-size: 14px; font-family: inherit; font-weight: 200; cursor: pointer;
       letter-spacing: 0.5px;
       transition: filter 0.18s, transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
     }
@@ -131,7 +133,7 @@
                   transform 0.28s cubic-bezier(0.4,0,1,1);
     }
     #pwUnlockModal .pwunlock-title {
-      font-size: 15px; font-weight: 700; text-align: center;
+      font-size: 15px; font-weight: 200; text-align: center;
       margin-bottom: 10px; color: var(--text);
     }
     #pwUnlockModal .pwunlock-desc {
@@ -155,13 +157,68 @@
 
     header {
       position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
-      padding: 4px; display: flex; gap: 4px;
+      padding: 4px; padding-top: 4px; display: flex; gap: 4px; align-items: center;
       width: fit-content; max-width: 95vw; justify-content: center;
-      z-index: 160; border-radius: var(--radius);
+      z-index: 9998; border-radius: var(--radius);
+      overflow: visible;
       transition: opacity 0.32s cubic-bezier(0.4,0,0.2,1),
                   transform 0.32s cubic-bezier(0.4,0,0.2,1),
-                  border-radius 0.3s cubic-bezier(0.4,0,0.2,1);
+                  border-radius 0.26s cubic-bezier(0.34,1.3,0.64,1),
+                  padding-top 0.26s cubic-bezier(0.34,1.2,0.64,1);
     }
+    header:hover,
+    header.header-expanded { border-radius: 20px; padding-top: 38px; }
+    header.no-move:hover   { border-radius: var(--radius); padding-top: 4px; }
+    header.returning {
+      transition: left 0.52s cubic-bezier(0.4,0,0.2,1),
+                  top  0.52s cubic-bezier(0.4,0,0.2,1),
+                  opacity 0.32s cubic-bezier(0.4,0,0.2,1),
+                  transform 0.52s cubic-bezier(0.4,0,0.2,1),
+                  border-radius 0.26s cubic-bezier(0.34,1.3,0.64,1),
+                  padding-top 0.26s cubic-bezier(0.34,1.2,0.64,1) !important;
+    }
+    /* headerTopBar: padding-topで上に伸ばしたエリアに絶対配置 */
+    #headerTopBar {
+      position: absolute; left: 0; right: 0;
+      top: 0; height: 38px;
+      cursor: grab; pointer-events: none;
+      border-radius: 20px 20px 0 0;
+      display: flex; align-items: center;
+      justify-content: center; padding: 0 12px;
+      opacity: 0;
+      transition: opacity 0.08s cubic-bezier(0.4,0,0.2,1);
+    }
+    header:hover #headerTopBar,
+    header.header-expanded #headerTopBar {
+      pointer-events: auto;
+      opacity: 1;
+      transition: opacity 0.18s cubic-bezier(0.4,0,0.2,1) 0.18s;
+    }
+    header.no-move #headerTopBar,
+    header.no-move:hover #headerTopBar {
+      opacity: 0 !important; pointer-events: none !important;
+    }
+    /* ステム */
+    #headerTopBar::after {
+      content: ''; position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 32px; height: 4px; border-radius: 2px;
+      background: rgba(255,255,255,0.55);
+      pointer-events: none;
+    }
+    /* 黄色ボタン */
+    #headerYellowBtn {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      width: 14px; height: 14px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ffd966, #f0b429);
+      border: 1px solid rgba(0,0,0,0.25); box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      cursor: pointer; padding: 0;
+      transition: filter 0.15s;
+    }
+    #headerYellowBtn:hover  { filter: brightness(1.18); }
+    #headerYellowBtn:active { filter: brightness(0.9); }
+    #headerTopBar:active { cursor: grabbing; }
     header button {
       background: transparent; border: none; cursor: pointer;
       padding: 8px 16px; font-size: 13px; color: inherit;
@@ -288,7 +345,7 @@
       opacity: 0; transform: translate(-50%, calc(-50% + 16px)) scale(0.9); pointer-events: none;
       transition: opacity 0.25s cubic-bezier(0.4,0,1,1), transform 0.28s cubic-bezier(0.4,0,1,1);
     }
-    #pwSetModal .pwset-title { font-size: 15px; font-weight: 700; margin-bottom: 18px; text-align: center; }
+    #pwSetModal .pwset-title { font-size: 15px; font-weight: 200; margin-bottom: 18px; text-align: center; }
     .pwset-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
     .pwset-field label { font-size: 11px; color: var(--dim); }
     .pwset-input {
@@ -377,17 +434,15 @@
     #backdrop.show { display: block; }
 
     .toast {
-      position: fixed; right: 16px; top: 12px;
-      min-width: 260px; max-width: 420px;
+      position: fixed; right: 16px; bottom: 62px;
+      min-width: 200px; max-width: 420px;
       background: var(--ui-bg); color: var(--text); z-index: 400;
-      overflow: hidden; transform: translateX(120%) scale(0.96);
+      overflow: hidden; transform: translateY(120%) scale(0.96);
       transition: transform 0.4s cubic-bezier(0.34,1.2,0.64,1), opacity 0.25s;
       opacity: 0; display: flex; align-items: center; padding: 10px 14px; gap: 10px; font-size: 13px;
     }
-    .toast.show { transform: translateX(0) scale(1); opacity: 1; }
-    .toast.toast-left { right:auto; left:16px; transform: translateX(-120%) scale(0.96); }
-    .toast.toast-left.show { transform: translateX(0) scale(1); }
-    .toast .count { position: absolute; left: 0; top: 0; height: 4px; background: var(--accent); width: 100%; transition: width linear; }
+    .toast.show { transform: translateY(0) scale(1); opacity: 1; }
+    .toast .count { position: absolute; left: 0; bottom: 0; height: 3px; background: var(--accent); width: 100%; transition: width linear; }
     .toast .msg   { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     @media (max-width: 480px) {
       textarea, #searchHighlightMirror { padding: 72px 16px 90px; font-size: 16px; }
@@ -418,23 +473,41 @@
     }
     #searchHighlightMirror mark { border-radius: 3px; color: transparent; background: var(--accent); opacity: 0.18; }
     #searchHighlightMirror mark.current { opacity: 0.38; }
-    #searchBar {
-      position: fixed; left: 50%; display: flex; align-items: center; gap: 6px;
-      padding: 6px 10px; z-index: 150; opacity: 0; pointer-events: none;
-      transform: translateX(-50%) translateY(-10px) scale(0.96); border-radius: var(--radius);
-      transition: opacity 0.28s cubic-bezier(0.4,0,0.2,1), transform 0.38s cubic-bezier(0.34,1.2,0.64,1), top 0.3s ease;
+    #searchPanel {
+      position: fixed; top: 50%; left: 50%; z-index: 170;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      width: 300px; padding: 12px 16px 16px; padding-top: 40px; border-radius: 18px;
+      transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1),
+                  transform 0.38s cubic-bezier(0.34,1.3,0.64,1);
     }
-    #searchBar.show { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0) scale(1); }
-    #searchBar input { border: none; outline: none; background: transparent; font-size: 14px; color: var(--text); font-family: inherit; width: 200px; padding: 2px 4px; }
-    #searchBar .s-count   { font-size: 11px; color: var(--dim); white-space: nowrap; min-width: 40px; }
-    #searchBar .s-divider { width: 1px; height: 16px; background: rgba(128,128,128,0.25); }
-    #searchBar button {
+    #searchPanel.show    { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
+    #searchPanel.closing {
+      opacity: 0; transform: translate(-50%, calc(-50% + 16px)) scale(0.9); pointer-events: none;
+      transition: opacity 0.25s cubic-bezier(0.4,0,1,1), transform 0.28s cubic-bezier(0.4,0,1,1);
+    }
+    #searchPanelDragHandle::after {
+      content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: 32px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.45);
+      pointer-events: none; opacity: 0; transition: opacity 0.2s;
+    }
+    #searchPanelDragHandle:hover::after { opacity: 1; }
+    .sp-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .sp-row:last-child { margin-bottom: 0; }
+    #searchInput {
+      flex: 1; border: none; outline: none; background: rgba(255,255,255,0.07);
+      font-size: 14px; color: var(--text); font-family: inherit;
+      padding: 7px 12px; border-radius: 10px;
+    }
+    #searchCount { font-size: 11px; color: var(--dim); white-space: nowrap; min-width: 44px; text-align: right; }
+    .sp-btn {
       background: transparent; border: none; cursor: pointer; font-size: 13px;
-      color: var(--dim); padding: 2px 6px; border-radius: 8px; font-family: inherit;
+      color: var(--dim); padding: 4px 10px; border-radius: 8px; font-family: inherit;
       transition: background 0.15s, color 0.15s, transform 0.1s cubic-bezier(0.34,1.56,0.64,1);
     }
-    #searchBar button:hover  { background: var(--hover); color: var(--text); }
-    #searchBar button:active { transform: scale(0.88); }
+    .sp-btn:hover  { background: var(--hover); color: var(--text); }
+    .sp-btn:active { transform: scale(0.88); }
 
     #translatePanel {
       position: fixed; top: 50%; left: 50%;
@@ -526,6 +599,11 @@
     .ios-toggle-slider::before { content: ''; position: absolute; height: 22px; width: 22px; left: 2px; top: 2px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: transform 0.32s cubic-bezier(0.34,1.3,0.64,1); }
     .ios-toggle input:checked + .ios-toggle-slider { background: #34c759; }
     .ios-toggle input:checked + .ios-toggle-slider::before { transform: translateX(18px); }
+    /* 小サイズトグル (11px相当) */
+    .ios-toggle-sm { width: 28px; height: 17px; }
+    .ios-toggle-sm .ios-toggle-slider { border-radius: 9px; }
+    .ios-toggle-sm .ios-toggle-slider::before { height: 13px; width: 13px; left: 2px; top: 2px; }
+    .ios-toggle-sm input:checked + .ios-toggle-slider::before { transform: translateX(11px); }
     .swatch {
       width: 20px; height: 20px; border-radius: 50%; cursor: pointer;
       border: 2px solid transparent; flex-shrink: 0;
@@ -615,8 +693,8 @@
       </div>
       <div class="lock-right">
         <div class="lock-label">暗証番号を入力してください</div>
-        <input id="lockPwInput" type="tel" class="lock-pw-input"
-               placeholder="数字" inputmode="numeric" pattern="[0-9]*" maxlength="20">
+        <input id="lockPwInput" type="password" class="lock-pw-input"
+               placeholder="パスワード" maxlength="64" autocomplete="current-password">
         <button class="lock-submit-btn" id="lockSubmitBtn">ロック解除</button>
         <div class="lock-error-msg" id="lockErrorMsg"></div>
       </div>
@@ -638,14 +716,13 @@
     <div class="pwset-title">パスワードロック設定</div>
     <div class="pwset-field">
       <label>暗証番号（数字のみ）</label>
-      <input type="tel" id="pwSetNew" class="pwset-input" placeholder="数字を入力..."
-             inputmode="numeric" pattern="[0-9]*" maxlength="20">
+      <input type="password" id="pwSetNew" class="pwset-input" placeholder="パスワードを入力..."
+             maxlength="64" autocomplete="new-password">
       <div id="pwStrength"></div>
     </div>
     <div class="pwset-field">
       <label>確認入力</label>
-      <input type="tel" id="pwSetConfirm" class="pwset-input" placeholder="もう一度入力..."
-             inputmode="numeric" pattern="[0-9]*" maxlength="20">
+      <input type="password" id="pwSetConfirm" class="pwset-input" placeholder="もう一度入力..." maxlength="64" autocomplete="new-password">
     </div>
     <div id="pwSetProgress"></div>
     <div id="pwSetError"></div>
@@ -655,23 +732,28 @@
     </div>
   </div>
 
+
   <header class="glass">
+    <div id="headerTopBar">
+      <button id="headerYellowBtn" title="メニューバーをリセット" aria-label="位置をリセット"></button>
+    </div>
     <button onclick="act('new')">新規</button>
     <button onclick="act('open')">開く</button>
     <button onclick="act('save')">保存</button>
-    <button onclick="act('toggleSearch')">検索</button>
     <button id="headerPageBtn" onclick="act('togglePagePanel')">ページ</button>
     <button onclick="act('toggle')">設定</button>
   </header>
-
-  <div id="searchBar" class="glass">
-    <button onclick="act('searchPrev')" title="前へ">↑</button>
-    <button onclick="act('searchNext')" title="次へ">↓</button>
-    <div class="s-divider"></div>
-    <input id="searchInput" type="text" placeholder="検索..." autocomplete="off">
-    <span id="searchCount" class="s-count"></span>
-    <div class="s-divider"></div>
-    <button onclick="act('toggleSearch')">✕</button>
+  <div id="searchPanel" class="glass">
+    <div id="searchPanelDragHandle" class="drag-handle" style="position:absolute;top:0;left:0;right:0;height:36px;border-radius:18px 18px 0 0;"></div>
+    <button class="close-dot" id="searchPanelCloseBtn" aria-label="閉じる"></button>
+    <span id="searchCount" class="s-count" style="position:absolute;top:0;right:0;height:36px;display:flex;align-items:center;padding-right:14px;font-size:11px;pointer-events:none;"></span>
+    <div class="sp-row">
+      <input id="searchInput" type="text" placeholder="検索..." autocomplete="off">
+    </div>
+    <div class="sp-row" style="justify-content:center; gap:6px;">
+      <button class="sp-btn" id="spPrevBtn" title="前へ">↑ 前へ</button>
+      <button class="sp-btn" id="spNextBtn" title="次へ">↓ 次へ</button>
+    </div>
   </div>
 
   <div id="options" class="glass">
@@ -705,9 +787,18 @@
         </svg>
       </button>
     </div>
+    <div>
+      <span class="label">保存</span>
+      <label class="ios-toggle"><input type="checkbox" id="saveMetaToggle"><span class="ios-toggle-slider"></span></label>
+      <span style="font-size:10px; color:var(--dim); margin-left:4px;">文章情報を含める</span>
+    </div>
     <div id="pageToggleRow" style="display:none">
       <span class="label">ページ</span>
       <label class="ios-toggle"><input type="checkbox" id="pageBarToggle"><span class="ios-toggle-slider"></span></label>
+    </div>
+    <div>
+      <span class="label">バーの移動</span>
+      <label class="ios-toggle"><input type="checkbox" id="headerMoveToggle"><span class="ios-toggle-slider"></span></label>
     </div>
     <div id="pwLockRow">
       <span class="label">パスワードロック</span>
@@ -726,6 +817,41 @@
     <div class="modal-btns">
       <button class="btn-sub" onclick="closeConfirm(false)">キャンセル</button>
       <button id="modalConfirmBtn" class="btn-main" onclick="closeConfirm(true)">確定</button>
+    </div>
+  </div>
+
+  <!-- 保存時メタデータ確認モーダル -->
+  <div id="saveMetaModal" class="glass" style="
+    position:fixed; top:50%; left:50%;
+    transform:translate(-50%, calc(-50% + 16px)) scale(0.9);
+    width:min(320px, 92vw); padding:26px 24px 20px; border-radius:22px;
+    z-index:200; opacity:0; pointer-events:none;
+    box-shadow:0 16px 50px rgba(0,0,0,0.35);
+    transition:opacity 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.38s cubic-bezier(0.34,1.3,0.64,1);
+  ">
+    <button class="close-dot" id="saveMetaCloseBtn" style="left:13px;" aria-label="閉じる"></button>
+    <div style="font-size:15px; text-align:center; margin-bottom:6px; color:var(--text);">ファイルを保存</div>
+    <div style="font-size:12px; color:var(--dim); text-align:center; line-height:1.65; margin-bottom:18px;">
+      フォント・サイズ情報をファイルに含めますか？<br>
+      <span style="font-size:10px;">含めると次回読み込み時に設定が復元されます</span>
+    </div>
+    <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:18px;">
+      <label class="ios-toggle ios-toggle-sm"><input type="checkbox" id="saveMetaRememberToggle"><span class="ios-toggle-slider"></span></label>
+      <span style="font-size:11px; color:var(--dim);">この選択を記憶する</span>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button id="saveMetaNoBtn" style="
+        flex:1; padding:10px 0; border-radius:14px; border:none; cursor:pointer;
+        font-size:13px; font-family:inherit; font-weight:200;
+        background:rgba(255,255,255,0.08); color:var(--text);
+        transition:filter 0.18s, transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
+      ">情報なしで保存</button>
+      <button id="saveMetaYesBtn" style="
+        flex:1; padding:10px 0; border-radius:14px; border:none; cursor:pointer;
+        font-size:13px; font-family:inherit; font-weight:200;
+        background:var(--accent); color:#fff;
+        transition:filter 0.18s, transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
+      ">情報ありで保存</button>
     </div>
   </div>
 
@@ -788,6 +914,7 @@
     <button id="ctxSearch"  onclick="searchWiki()">検索</button>
     <button id="ctxTrans"   onclick="translateText()">翻訳</button>
     <button id="ctxCompare" onclick="openCompareFromContextMenu()">比較</button>
+    <button id="ctxFind" onclick="ctxOpenSearch()">検索</button>
   </div>
   <div id="searchHighlightMirror"></div>
   <textarea id="edit" spellcheck="false"></textarea>
@@ -931,9 +1058,7 @@
     setTimeout(function() { lockErrorMsg.textContent = ''; }, 3000);
   }
   lockSubmitBtn.onclick = tryUnlock;
-  lockPwInput.addEventListener('input', function() {
-    lockPwInput.value = lockPwInput.value.replace(/[^0-9]/g, '');
-  });
+
   lockPwInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') tryUnlock(); });
 
   (function checkInitialLock() {
@@ -955,12 +1080,11 @@
   function getStrength(pw) {
     if (!pw) return null;
     var len = pw.length;
-    if (len < 6)  return { level: 'weak',   label: '弱い（6桁以上推奨）' };
+    if (len < 6)  return { level: 'weak',   label: '弱い（6文字以上推奨）' };
     if (len < 8)  return { level: 'medium', label: '普通' };
     return { level: 'strong', label: '強い' };
   }
   function onlyDigits(e) {
-    e.target.value = e.target.value.replace(/[^0-9]/g, '');
     updatePwSaveBtn();
   }
   function updatePwSaveBtn() {
@@ -970,7 +1094,7 @@
     else     { pwStrength.className = 'pwset-strength'; pwStrength.textContent = ''; }
     var ok = pw1.length >= 4 && pw1 === pw2;
     pwSetSaveBtn.disabled = !ok;
-    pwSetError.textContent = pw2.length > 0 && pw1 !== pw2 ? '番号が一致しません' : '';
+    pwSetError.textContent = pw2.length > 0 && pw1 !== pw2 ? 'パスワードが一致しません' : '';
   }
   pwSetNew.oninput     = onlyDigits;
   pwSetConfirm.oninput = onlyDigits;
@@ -991,7 +1115,7 @@
   };
   window.savePassword = async function() {
     var pw = pwSetNew.value;
-    if (!pw || pw.length < 4) { pwSetError.textContent = '4桁以上の数字を入力してください'; return; }
+    if (!pw || pw.length < 4) { pwSetError.textContent = '4文字以上入力してください'; return; }
     pwSetSaveBtn.disabled = true;
     pwSetProgress.textContent = '鍵を導出中... (しばらくお待ちください)';
     try {
@@ -1067,6 +1191,38 @@
     name = (name || 'memo.txt').trim().replace(/[/\\:*?"<>|]/g, '');
     return name.toLowerCase().endsWith('.txt') ? name : name + '.txt';
   }
+
+  /* ---- 保存ヘルパー ---- */
+  function doFileSave(withMeta) {
+    try {
+      var text = $('edit').value;
+      var fullText = withMeta
+        ? '##FONT:"' + $('fSel').value + '"\n##SIZE:' + $('sSel').value + '\n' + text
+        : text;
+      var a = document.createElement('a');
+      var blob = new Blob([fullText], { type: 'text/plain' });
+      var url = URL.createObjectURL(blob);
+      a.href = url; a.download = sanitizeFileName(state.curFile); a.click(); URL.revokeObjectURL(url);
+      queueToast('保存しました：' + state.curFile, 2500);
+    } catch(e) { queueToast('保存に失敗しました。'); }
+  }
+
+  function openSaveMetaModal() {
+    var modal = $('saveMetaModal');
+    var rememberToggle = $('saveMetaRememberToggle');
+    if (!modal) return;
+    rememberToggle.checked = false;
+    modal.style.opacity = '1';
+    modal.style.transform = 'translate(-50%, -50%) scale(1)';
+    modal.style.pointerEvents = 'auto';
+  }
+  function closeSaveMetaModal() {
+    var modal = $('saveMetaModal');
+    if (!modal) return;
+    modal.style.opacity = '0';
+    modal.style.transform = 'translate(-50%, calc(-50% + 16px)) scale(0.9)';
+    modal.style.pointerEvents = 'none';
+  }
   function debounce(fn, wait) {
     var t;
     return function() { var ctx = this, args = arguments; clearTimeout(t); t = setTimeout(function() { fn.apply(ctx, args); }, wait); };
@@ -1108,13 +1264,14 @@
     text: '', isOptionsOpen: false, isModalOpen: false, isSearchOpen: false,
     modalType: 'new', isFooterHidden: false, hideTimer: null,
     accentColor: localStorage.getItem('accentColor') || '#c9a181',
-    autoSave: localStorage.getItem('autoSave') === 'true'
+    autoSave: localStorage.getItem('autoSave') === 'true',
+    saveMeta: localStorage.getItem('saveMeta') !== 'false'
   };
-  var supportedFonts = ['Arial','Noto Sans JP','Noto Serif JP','Zen Maru Gothic','Dela Gothic One'];
+  var supportedFonts = ['Arial','Noto Sans JP','Noto Serif JP','Zen Maru Gothic','Dela Gothic One','Kosugi Maru'];
 
   var toastQueue = [], isToastShowing = false, sizeToastTimer = null, hasShownOfflineToast = false;
-  function queueToast(message, duration, side) {
-    toastQueue.push({ message: message, duration: duration || 4000, side: side || 'right' });
+  function queueToast(message, duration) {
+    toastQueue.push({ message: message, duration: duration || 4000 });
     processToastQueue();
   }
   function processToastQueue() {
@@ -1122,18 +1279,11 @@
     isToastShowing = true;
     var item = toastQueue.shift();
     var el = document.createElement('div');
-    el.className = 'glass toast' + (item.side === 'left' ? ' toast-left' : '');
-    var count = document.createElement('div'); count.className = 'count';
+    el.className = 'glass toast';
     var msg = document.createElement('div'); msg.className = 'msg'; msg.textContent = item.message;
-    el.appendChild(count); el.appendChild(msg);
+    var count = document.createElement('div'); count.className = 'count';
+    el.appendChild(msg); el.appendChild(count);
     $('toastContainer').appendChild(el);
-    var header = document.querySelector('header');
-    if (header) {
-      var rect = header.getBoundingClientRect();
-      el.style.top = (state.device === 'Mobile' || window.innerWidth <= 480 ? rect.bottom + 16 : rect.top) + 'px';
-      el.style.height = rect.height + 'px';
-      el.style.borderRadius = getComputedStyle(header).borderRadius;
-    }
     setTimeout(function() {
       el.classList.add('show');
       count.style.transitionDuration = item.duration + 'ms'; count.style.width = '0%';
@@ -1152,14 +1302,12 @@
     },
     save: function() {
       state.text = $('edit').value;
-      try {
-        var fullText = '##FONT:"' + $('fSel').value + '"\n##SIZE:' + $('sSel').value + '\n' + state.text;
-        var a = document.createElement('a');
-        var blob = new Blob([fullText], { type: 'text/plain' });
-        var url = URL.createObjectURL(blob);
-        a.href = url; a.download = sanitizeFileName(state.curFile); a.click(); URL.revokeObjectURL(url);
-        queueToast('保存を開始しました：' + state.curFile, 2500);
-      } catch(e) { queueToast('保存に失敗しました。'); }
+      /* 設定で記憶済みなら確認なしで即保存 */
+      if (localStorage.getItem('saveMetaRemembered') === 'true') {
+        doFileSave(state.saveMeta);
+      } else {
+        openSaveMetaModal();
+      }
     },
     togglePagePanel: function() { if (pagePanelOpen) closePagePanel(); else openPagePanel(); },
     toggle: function() {
@@ -1168,9 +1316,16 @@
     },
     toggleSearch: function() {
       state.isSearchOpen = !state.isSearchOpen;
-      if (state.isSearchOpen) { setTimeout(function() { $('searchInput').focus(); }, 50); doSearch(0); }
-      else { clearSearchHighlight(); $('searchCount').textContent = ''; }
-      updateTextareaPadding();
+      if (state.isSearchOpen) {
+        openPanel('searchPanel');
+        setTimeout(function() { $('searchInput').focus(); }, 50);
+        doSearch(0);
+      } else {
+        closePanel('searchPanel');
+        clearSearchHighlight();
+        $('searchCount').textContent = '';
+        updateTextareaPadding();
+      }
     },
     searchNext: function() { doSearch(1); },
     searchPrev: function() { doSearch(-1); },
@@ -1200,13 +1355,10 @@
   };
 
   function updateTextareaPadding() {
-    var edit = $('edit'), mirror = $('searchHighlightMirror'), bar = $('searchBar');
-    if (state.isSearchOpen) {
-      var tp = (parseInt(bar.style.top) || 68) + (bar.offsetHeight || 44) + 20;
-      edit.style.paddingTop = tp + 'px'; mirror.style.paddingTop = tp + 'px';
-      edit.readOnly = true; edit.style.caretColor = 'transparent';
-    } else {
-      edit.style.paddingTop = '80px'; mirror.style.paddingTop = '80px';
+    var edit = $('edit'), mirror = $('searchHighlightMirror');
+    /* 検索パネルはフローティングなのでテキストエリアのパディングは変えない */
+    edit.style.paddingTop = '80px'; mirror.style.paddingTop = '80px';
+    if (!state.isSearchOpen) {
       edit.readOnly = false; edit.style.caretColor = '';
     }
   }
@@ -1231,6 +1383,7 @@
     var isMob = state.device === 'Mobile';
     [$('ctxCopy'), $('ctxCut')].forEach(function(el) { if (el) el.style.display = (!isMob && hasSel) ? '' : 'none'; });
     [$('ctxDivider'), $('ctxSearch'), $('ctxTrans'), $('ctxCompare')].forEach(function(el) { if (el) el.style.display = hasSel ? '' : 'none'; });
+    var ctxFind = $('ctxFind'); if (ctxFind) ctxFind.style.display = '';
     var paste = $('ctxPaste'), hasClip = (localStorage.getItem(CLIP_KEY) || '').length > 0;
     paste.style.display = (!isMob && !hasSel) ? '' : 'none';
     paste.style.color = hasClip ? '' : 'var(--dim)'; paste.style.cursor = hasClip ? '' : 'default'; paste.style.pointerEvents = hasClip ? '' : 'none';
@@ -1245,6 +1398,11 @@
   }
   function copyToClipboard(text, onDone) { localStorage.setItem(CLIP_KEY, text); if (onDone) onDone(); }
   window.ctxCopyText  = function() { if (!selectedText) { hideContextMenu(); return; } var t = selectedText; hideContextMenu(); copyToClipboard(t, function() { queueToast('コピーしました', 1000); }); };
+  window.ctxOpenSearch = function() {
+    hideContextMenu();
+    if (!state.isSearchOpen) { state.isSearchOpen = true; openPanel('searchPanel'); doSearch(0); }
+    setTimeout(function() { $('searchInput').focus(); }, 60);
+  };
   window.ctxCutText   = function() {
     if (!selectedText) { hideContextMenu(); return; }
     var edit = $('edit'), s = edit.selectionStart, e = edit.selectionEnd, t = selectedText; hideContextMenu();
@@ -1470,6 +1628,147 @@
     makeDraggable('options', 'optionsDragHandle');
     makeDraggable('translatePanel', 'translateDragHandle');
     makeDraggable('searchWebPanel', 'searchWebDragHandle');
+    makeDraggable('searchPanel', 'searchPanelDragHandle');
+
+    /* searchPanel ボタン */
+    $('searchPanelCloseBtn').onclick = function() {
+      state.isSearchOpen = false;
+      closePanel('searchPanel');
+      clearSearchHighlight();
+      $('searchCount').textContent = '';
+      updateTextareaPadding();
+    };
+    $('spPrevBtn').onclick = function() { doSearch(-1); };
+    $('spNextBtn').onclick = function() { doSearch(1); };
+
+    /* バーの移動トグル */
+    var headerMoveToggle = $('headerMoveToggle');
+    headerMoveToggle.checked = localStorage.getItem('headerMoveEnabled') === 'true';
+    state.headerMoveEnabled = headerMoveToggle.checked;
+    var hdrEl = document.querySelector('header');
+    if (hdrEl && !headerMoveToggle.checked) hdrEl.classList.add('no-move');
+    headerMoveToggle.onchange = function() {
+      state.headerMoveEnabled = headerMoveToggle.checked;
+      localStorage.setItem('headerMoveEnabled', state.headerMoveEnabled);
+      var h = document.querySelector('header');
+      if (h) h.classList.toggle('no-move', !state.headerMoveEnabled);
+    };
+
+    /* 左右ボタン */
+    (function() {
+      var leftBtn = $('headerLeftBtn'), rightBtn = $('headerRightBtn');
+      var hdr = document.querySelector('header');
+      if (!leftBtn || !rightBtn || !hdr) return;
+      function snapIfNeeded() {
+        if (!hdr.dataset.dragged) {
+          var r = hdr.getBoundingClientRect();
+          hdr.style.transition = 'none';
+          hdr.style.left = r.left + 'px';
+          hdr.style.top  = r.top  + 'px';
+          hdr.style.transform = 'none';
+          void hdr.offsetWidth;
+          hdr.style.transition = '';
+          hdr.dataset.dragged = '1';
+        }
+      }
+      function moveHeader(dx) {
+        snapIfNeeded();
+        var cur = parseFloat(hdr.style.left) || 0;
+        var max = window.innerWidth - hdr.offsetWidth - 8;
+        hdr.style.left = Math.max(8, Math.min(max, cur + dx)) + 'px';
+      }
+      leftBtn.onclick  = function(e) { e.stopPropagation(); moveHeader(-40); };
+      rightBtn.onclick = function(e) { e.stopPropagation(); moveHeader(+40); };
+    })();
+
+    /* ---- header ドラッグ ---- */
+    (function() {
+      var hdr = document.querySelector('header');
+      var topBar = $('headerTopBar');
+      var yellowBtn = $('headerYellowBtn');
+      if (!hdr || !topBar) return;
+      var isDragging = false, hasMoved = false;
+      var startX, startY, startLeft, startTop;
+
+      function snapHeader() {
+        var r = hdr.getBoundingClientRect();
+        hdr.style.transition = 'none';
+        hdr.style.left = r.left + 'px';
+        hdr.style.top  = r.top  + 'px';
+        hdr.style.transform = 'none';
+        void hdr.offsetWidth;
+        hdr.style.transition = '';
+      }
+      function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+      function onStart(cx, cy) {
+        if (!hdr.dataset.dragged) { snapHeader(); hdr.dataset.dragged = '1'; }
+        isDragging = true; hasMoved = false;
+        startX = cx; startY = cy;
+        startLeft = parseFloat(hdr.style.left) || 0;
+        startTop  = parseFloat(hdr.style.top)  || 0;
+        hdr.classList.add('header-expanded');
+        topBar.style.cursor = 'grabbing';
+      }
+      function onMove(cx, cy) {
+        if (!isDragging) return;
+        var dx = cx - startX, dy = cy - startY;
+        if (!hasMoved && Math.abs(dx) + Math.abs(dy) > 3) hasMoved = true;
+        if (!hasMoved) return;
+        hdr.style.left = clamp(startLeft + dx, 8, window.innerWidth  - hdr.offsetWidth  - 8) + 'px';
+        hdr.style.top  = clamp(startTop  + dy, 8, window.innerHeight - hdr.offsetHeight - 8) + 'px';
+      }
+      function onEnd() {
+        if (!isDragging) return;
+        isDragging = false;
+        hdr.classList.remove('header-expanded');
+        topBar.style.cursor = '';
+      }
+      topBar.addEventListener('mousedown', function(e) {
+        if (e.button !== 0 || e.target === yellowBtn) return;
+        if (hdr.classList.contains('no-move')) return;
+        e.preventDefault(); onStart(e.clientX, e.clientY);
+      });
+      document.addEventListener('mousemove', function(e) { onMove(e.clientX, e.clientY); });
+      document.addEventListener('mouseup', onEnd);
+      topBar.addEventListener('touchstart', function(e) {
+        if (e.target === yellowBtn) return;
+        if (hdr.classList.contains('no-move')) return;
+        onStart(e.touches[0].clientX, e.touches[0].clientY);
+      }, { passive: true });
+      document.addEventListener('touchmove', function(e) {
+        if (!isDragging) return; e.preventDefault();
+        onMove(e.touches[0].clientX, e.touches[0].clientY);
+      }, { passive: false });
+      document.addEventListener('touchend', onEnd);
+
+      /* 黄色ボタン：定位置へ戻る */
+      if (yellowBtn) {
+        yellowBtn.onclick = function() {
+          if (!hdr.dataset.dragged) return;
+          var r = hdr.getBoundingClientRect();
+          hdr.style.transition = 'none';
+          hdr.style.left = r.left + 'px';
+          hdr.style.top  = r.top  + 'px';
+          hdr.style.transform = 'none';
+          void hdr.offsetWidth;
+          hdr.classList.add('returning');
+          hdr.style.left = '50%'; hdr.style.top = '12px';
+          hdr.style.transform = 'translateX(-50%)';
+          delete hdr.dataset.dragged;
+          hdr.addEventListener('transitionend', function cleanup(e) {
+            if (e.propertyName !== 'left') return;
+            hdr.removeEventListener('transitionend', cleanup);
+            hdr.classList.remove('returning');
+            hdr.style.left = ''; hdr.style.top = '';
+            hdr.style.transform = ''; hdr.style.transition = '';
+          });
+        };
+      }
+    })();
+
+    /* saveMetaModal 閉じるボタン */
+    $('saveMetaCloseBtn').onclick = closeSaveMetaModal;
   })();
 
   var themeColors = [
@@ -1534,7 +1833,10 @@
   }
   function doAutoSave() {
     if (!state.autoSave) return;
-    localStorage.setItem('autosave_text', $('edit').value); localStorage.setItem('autosave_file', state.curFile);
+    localStorage.setItem('autosave_text', $('edit').value);
+    localStorage.setItem('autosave_file', state.curFile);
+    localStorage.setItem('autosave_font', $('fSel') ? $('fSel').value : 'Arial');
+    localStorage.setItem('autosave_size', $('sSel') ? $('sSel').value : '18');
     queueToast('自動保存済み ' + new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}), 2000);
   }
   function scheduleAutoSave() {
@@ -1613,7 +1915,7 @@
   };
   window.deletePage = function(idx, e) {
     e.stopPropagation();
-    if (pages.length <= 1) { queueToast('最後のページは削除できません', 2000, 'left'); return; }
+    if (pages.length <= 1) { queueToast('最後のページは削除できません', 2000); return; }
     pages.splice(idx, 1);
     if (curPageIdx >= pages.length) curPageIdx = pages.length - 1;
     localStorage.setItem(PAGES_CUR, pages[curPageIdx].id);
@@ -1753,7 +2055,6 @@
     edit.placeholder         = state.browser + '_' + state.device + ' >';
     $('backdrop').className  = isAnyOpen ? 'show' : '';
     $('ft').className        = 'glass' + (state.isFooterHidden ? ' hidden' : '');
-    $('searchBar').className = 'glass' + (state.isSearchOpen ? ' show' : '');
   }
 
   /* 低スペック検出 */
@@ -1811,9 +2112,12 @@
     autoSaveToggle.checked = state.autoSave;
     if (state.autoSave) {
       var saved = localStorage.getItem('autosave_text'), savedFile = localStorage.getItem('autosave_file');
+      var savedFont = localStorage.getItem('autosave_font'), savedSize = localStorage.getItem('autosave_size');
       if (saved && saved.length > 0 && !edit.value) {
         edit.value = saved; if (savedFile) state.curFile = savedFile;
-        ActionHandlers.updateText(edit.value); queueToast('自動保存データを復元しました', 3000);
+        if (savedFont && $('fSel')) $('fSel').value = savedFont;
+        if (savedSize && $('sSel')) $('sSel').value = savedSize;
+        applyStyles(); ActionHandlers.updateText(edit.value); queueToast('自動保存データを復元しました', 3000);
       }
     }
     autoSaveToggle.onchange = function() {
@@ -1822,7 +2126,42 @@
     };
     $('clearAutoSaveBtn').onclick = function() {
       localStorage.removeItem('autosave_text'); localStorage.removeItem('autosave_file');
+      localStorage.removeItem('autosave_font'); localStorage.removeItem('autosave_size');
       queueToast('自動保存データを消去しました', 2000);
+    };
+
+    /* 保存メタトグル（設定内） */
+    var saveMetaToggle = $('saveMetaToggle');
+    saveMetaToggle.checked = state.saveMeta;
+    saveMetaToggle.onchange = function() {
+      state.saveMeta = saveMetaToggle.checked;
+      localStorage.setItem('saveMeta', state.saveMeta);
+      /* 手動変更時は記憶をリセット（次回保存時また確認） */
+      localStorage.removeItem('saveMetaRemembered');
+    };
+
+    /* 保存確認モーダルのボタン */
+    $('saveMetaYesBtn').onclick = function() {
+      var remember = $('saveMetaRememberToggle').checked;
+      if (remember) {
+        state.saveMeta = true;
+        localStorage.setItem('saveMeta', 'true');
+        localStorage.setItem('saveMetaRemembered', 'true');
+        $('saveMetaToggle').checked = true;
+      }
+      closeSaveMetaModal();
+      doFileSave(true);
+    };
+    $('saveMetaNoBtn').onclick = function() {
+      var remember = $('saveMetaRememberToggle').checked;
+      if (remember) {
+        state.saveMeta = false;
+        localStorage.setItem('saveMeta', 'false');
+        localStorage.setItem('saveMetaRemembered', 'true');
+        $('saveMetaToggle').checked = false;
+      }
+      closeSaveMetaModal();
+      doFileSave(false);
     };
 
     /* パスワードロックトグル */
@@ -1857,19 +2196,18 @@
     }
 
     /* 検索バー位置 */
-    function positionSearchBar() {
-      var header = document.querySelector('header'), bar = $('searchBar');
-      if (header && bar) { bar.style.top = (header.getBoundingClientRect().bottom + 12) + 'px'; if (state.isSearchOpen) updateTextareaPadding(); }
-    }
-    positionSearchBar(); window.addEventListener('resize', positionSearchBar);
-
     /* 検索入力 */
     var searchInput = $('searchInput');
     searchInput.oninput = function() { doSearch(0); };
     searchInput.addEventListener('keydown', function(e) {
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); e.stopPropagation(); doSearch(e.key === 'ArrowDown' ? 1 : -1); setTimeout(function() { searchInput.focus(); }, 0); }
       if (e.key === 'Enter')  { e.preventDefault(); doSearch(e.shiftKey ? -1 : 1); }
-      if (e.key === 'Escape') { act('toggleSearch'); render(); }
+      if (e.key === 'Escape') {
+        if (state.isSearchOpen) {
+          state.isSearchOpen = false; closePanel('searchPanel');
+          clearSearchHighlight(); $('searchCount').textContent = ''; updateTextareaPadding();
+        }
+      }
     });
 
     /* テキストエリア */
