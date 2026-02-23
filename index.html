@@ -55,10 +55,28 @@
       position: fixed; inset: 0; z-index: 9999;
       background: var(--bg);
       display: flex; align-items: center; justify-content: center;
-      transition: opacity 0.5s cubic-bezier(0.4,0,0.2,1);
+      transition: opacity 0.45s cubic-bezier(0.4,0,1,1),
+                  transform 0.45s cubic-bezier(0.4,0,1,1);
+      transform-origin: center center;
     }
-    #lockScreen.unlocking { opacity: 0; pointer-events: none; }
-    #lockScreen.hidden    { display: none; }
+    #lockScreen.unlocking {
+      opacity: 0; pointer-events: none;
+      transform: scale(1.08);
+    }
+    #lockScreen.hidden { display: none; }
+
+    /* メモ帳コンテンツ: ロック中は縮んで待機 → 解除で拡大フェードイン */
+    #appContent {
+      transition: opacity 0.4s cubic-bezier(0.22,1,0.36,1),
+                  transform 0.4s cubic-bezier(0.22,1,0.36,1);
+      transform-origin: center center;
+    }
+    #appContent.locked {
+      opacity: 0; transform: scale(0.94); pointer-events: none;
+    }
+    #appContent.unlocking-in {
+      opacity: 1; transform: scale(1);
+    }
 
     #lockCard {
       position: relative;
@@ -93,7 +111,7 @@
     }
     .lock-pw-input.error {
       border-color: #e53935;
-      animation: shake 0.38s cubic-bezier(0.34,1.56,0.64,1);
+      animation: shake 0.32s cubic-bezier(0.36,0.07,0.19,0.97);
     }
     @keyframes shake {
       0%,100% { transform: translateX(0); }
@@ -141,21 +159,16 @@
       width: fit-content; max-width: 95vw; justify-content: center;
       z-index: 9998; border-radius: var(--radius);
       overflow: visible;
-      transition: opacity 0.32s cubic-bezier(0.4,0,0.2,1),
-                  transform 0.32s cubic-bezier(0.4,0,0.2,1),
-                  border-radius 0.26s cubic-bezier(0.34,1.3,0.64,1),
-                  padding-top 0.26s cubic-bezier(0.34,1.2,0.64,1);
+      transition: opacity 0.22s cubic-bezier(0.4,0,0.2,1), transform 0.22s cubic-bezier(0.4,0,0.2,1), border-radius 0.18s, padding-top 0.18s;
     }
     header:hover,
     header.header-expanded { border-radius: 20px; padding-top: 38px; }
     header.no-move:hover   { border-radius: var(--radius); padding-top: 4px; }
     header.returning {
-      transition: left 0.52s cubic-bezier(0.4,0,0.2,1),
-                  top  0.52s cubic-bezier(0.4,0,0.2,1),
-                  opacity 0.32s cubic-bezier(0.4,0,0.2,1),
-                  transform 0.52s cubic-bezier(0.4,0,0.2,1),
-                  border-radius 0.26s cubic-bezier(0.34,1.3,0.64,1),
-                  padding-top 0.26s cubic-bezier(0.34,1.2,0.64,1) !important;
+      transition: left 0.38s cubic-bezier(0.4,0,0.2,1),
+                  top  0.38s cubic-bezier(0.4,0,0.2,1),
+                  opacity 0.22s cubic-bezier(0.4,0,0.2,1),
+                  transform 0.38s cubic-bezier(0.4,0,0.2,1) !important;
     }
     #headerTopBar {
       position: absolute; left: 0; right: 0;
@@ -206,14 +219,17 @@
     }
     header button:hover  { background: var(--hover); }
     header button:active { transform: scale(0.88); background: rgba(255,255,255,0.13); }
+    #headerShareBtn {
+      max-width: 0; opacity: 0; padding-left: 0; padding-right: 0; pointer-events: none; overflow: hidden;
+      transition: max-width 0.26s cubic-bezier(0.34,1.2,0.64,1), opacity 0.2s cubic-bezier(0.4,0,0.2,1), padding 0.26s cubic-bezier(0.34,1.2,0.64,1), transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #headerShareBtn.visible { max-width: 120px; opacity: 1; padding-left: 16px; padding-right: 16px; pointer-events: auto; }
     #headerPageBtn {
       max-width: 0; opacity: 0; padding-left: 0; padding-right: 0;
       overflow: hidden; pointer-events: none;
     }
     #headerPageBtn.animated {
-      transition: max-width 0.38s cubic-bezier(0.34,1.1,0.64,1),
-                  opacity 0.28s cubic-bezier(0.4,0,0.2,1),
-                  padding 0.38s cubic-bezier(0.34,1.1,0.64,1);
+      transition: max-width 0.26s cubic-bezier(0.34,1.2,0.64,1), opacity 0.2s cubic-bezier(0.4,0,0.2,1), padding 0.26s cubic-bezier(0.34,1.2,0.64,1), transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
     }
     #headerPageBtn.visible { max-width: 120px; opacity: 1; padding-left: 16px; padding-right: 16px; pointer-events: auto; }
     @media (max-width: 480px) {
@@ -234,7 +250,7 @@
     #options.show    { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
     #options.closing {
       opacity: 0; transform: translate(-50%, calc(-50% + 16px)) scale(0.9); pointer-events: none;
-      transition: opacity 0.25s cubic-bezier(0.4,0,1,1), transform 0.28s cubic-bezier(0.4,0,1,1);
+      transition: opacity 0.14s cubic-bezier(0.4,0,1,1), transform 0.18s cubic-bezier(0.4,0,1,1);
     }
     #options div { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: nowrap; }
     .label { width: 60px; color: var(--dim); font-size: 11px; white-space: nowrap; flex-shrink: 0; }
@@ -251,6 +267,7 @@
       text-align: center; display: flex; flex-direction: column;
     }
     #pwLockRow { border-top: 1px solid rgba(128,128,128,0.1); padding-top: 8px; margin-top: 4px; }
+    #pwLockRow + #bioRegisterRow { margin-top: 0; }
     #pwLockRow .label { white-space: nowrap; width: auto; }
 
     .close-dot {
@@ -284,13 +301,12 @@
       transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
       opacity: 0; pointer-events: none;
       box-shadow: 0 16px 50px rgba(0,0,0,0.3);
-      transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1),
-                  transform 0.38s cubic-bezier(0.34,1.3,0.64,1);
+      transition: opacity 0.22s cubic-bezier(0.4,0,0.2,1), transform 0.26s cubic-bezier(0.34,1.4,0.64,1);
     }
     .panel-modal.show    { opacity: 1; transform: translate(-50%,-50%) scale(1); pointer-events: auto; }
     .panel-modal.closing {
       opacity: 0; transform: translate(-50%, calc(-50% + 16px)) scale(0.9); pointer-events: none;
-      transition: opacity 0.25s cubic-bezier(0.4,0,1,1), transform 0.28s cubic-bezier(0.4,0,1,1);
+      transition: opacity 0.14s cubic-bezier(0.4,0,1,1), transform 0.18s cubic-bezier(0.4,0,1,1);
     }
 
     .modal { width: fit-content; min-width: 280px; padding: 24px 30px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 180; }
@@ -373,14 +389,14 @@
     @keyframes slideInLeft   { from { opacity:0; transform:translateX(-48px); } to { opacity:1; transform:translateX(0); } }
     @keyframes slideOutLeft  { from { opacity:1; transform:translateX(0); } to { opacity:0; transform:translateX(-48px); } }
     @keyframes slideOutRight { from { opacity:1; transform:translateX(0); } to { opacity:0; transform:translateX(48px);  } }
-    textarea.page-slide-in-right  { animation: slideInRight  0.32s cubic-bezier(0.34,1.1,0.64,1) forwards; }
-    textarea.page-slide-in-left   { animation: slideInLeft   0.32s cubic-bezier(0.34,1.1,0.64,1) forwards; }
-    textarea.page-slide-out-left  { animation: slideOutLeft  0.18s cubic-bezier(0.4,0,1,1) forwards; pointer-events:none; }
-    textarea.page-slide-out-right { animation: slideOutRight 0.18s cubic-bezier(0.4,0,1,1) forwards; pointer-events:none; }
-    #penCanvas.page-slide-in-right  { animation: slideInRight  0.32s cubic-bezier(0.34,1.1,0.64,1) forwards; }
-    #penCanvas.page-slide-in-left   { animation: slideInLeft   0.32s cubic-bezier(0.34,1.1,0.64,1) forwards; }
-    #penCanvas.page-slide-out-left  { animation: slideOutLeft  0.18s cubic-bezier(0.4,0,1,1) forwards; pointer-events:none; }
-    #penCanvas.page-slide-out-right { animation: slideOutRight 0.18s cubic-bezier(0.4,0,1,1) forwards; pointer-events:none; }
+    textarea.page-slide-in-right  { animation: slideInRight  0.26s cubic-bezier(0.34,1.2,0.64,1) forwards; }
+    textarea.page-slide-in-left   { animation: slideInLeft   0.26s cubic-bezier(0.34,1.2,0.64,1) forwards; }
+    textarea.page-slide-out-left  { animation: slideOutLeft  0.14s cubic-bezier(0.4,0,1,1) forwards; pointer-events:none; }
+    textarea.page-slide-out-right { animation: slideOutRight 0.14s cubic-bezier(0.4,0,1,1) forwards; pointer-events:none; }
+    #penCanvas.page-slide-in-right  { animation: slideInRight  0.26s cubic-bezier(0.34,1.2,0.64,1) forwards; }
+    #penCanvas.page-slide-in-left   { animation: slideInLeft   0.26s cubic-bezier(0.34,1.2,0.64,1) forwards; }
+    #penCanvas.page-slide-out-left  { animation: slideOutLeft  0.14s cubic-bezier(0.4,0,1,1) forwards; pointer-events:none; }
+    #penCanvas.page-slide-out-right { animation: slideOutRight 0.14s cubic-bezier(0.4,0,1,1) forwards; pointer-events:none; }
 
     footer {
       position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
@@ -388,7 +404,7 @@
       display: flex; gap: 8px; max-width: 90vw; justify-content: center;
       white-space: nowrap; border-radius: var(--radius);
       z-index: 150;
-      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s cubic-bezier(0.4,0,0.2,1);
+      transition: transform 0.22s cubic-bezier(0.4,0,0.2,1), opacity 0.22s cubic-bezier(0.4,0,0.2,1);
     }
     footer.hidden { transform: translate(-50%, 50px); opacity: 0; pointer-events: none; }
 
@@ -405,8 +421,8 @@
       from { transform: translateY(110%);  opacity: 0; filter: blur(4px); }
       to   { transform: translateY(0);     opacity: 1; filter: blur(0px); }
     }
-    .ft-slot-inner.slot-out { animation: ftSlotOut 0.18s cubic-bezier(0.4,0,1,1)       forwards; }
-    .ft-slot-inner.slot-in  { animation: ftSlotIn  0.26s cubic-bezier(0.34,1.2,0.64,1) forwards; }
+    .ft-slot-inner.slot-out { animation: ftSlotOut 0.14s cubic-bezier(0.4,0,1,1) forwards; }
+    .ft-slot-inner.slot-in  { animation: ftSlotIn  0.20s cubic-bezier(0.34,1.3,0.64,1) forwards; }
 
     #penToggleBtn {
       position: fixed; bottom: 15px; right: 16px;
@@ -422,6 +438,8 @@
                   box-shadow 0.2s, border-color 0.2s;
       -webkit-user-select: none; user-select: none;
     }
+    body.modal-open #penToggleBtn,
+    body.modal-open #penToolbar { opacity: 0; pointer-events: none; transition: opacity 0.18s; }
     #penToggleBtn:hover  { background: var(--hover); }
     #penToggleBtn:active { transform: scale(0.88); }
     #penToggleBtn.pen-active {
@@ -443,8 +461,8 @@
       transform: translateY(0) scale(0.6);
       pointer-events: none;
       transition:
-        opacity    0.18s cubic-bezier(0.4,0,1,1),
-        transform  0.18s cubic-bezier(0.4,0,1,1);
+        opacity   0.1s cubic-bezier(0.4,0,1,1),
+        transform 0.1s cubic-bezier(0.4,0,1,1);
     }
 
     #penToolbar.show .pen-toolbar-item {
@@ -453,20 +471,16 @@
       pointer-events: auto;
     }
     #penToolbar.show .pen-toolbar-item:nth-child(1) {
-      transition: opacity 0.32s cubic-bezier(0.34,1.5,0.64,1)  0.03s,
-                  transform 0.38s cubic-bezier(0.34,1.5,0.64,1) 0.03s;
+      transition: opacity 0.22s cubic-bezier(0.34,1.4,0.64,1) 0.02s, transform 0.26s cubic-bezier(0.34,1.4,0.64,1) 0.02s;
     }
     #penToolbar.show .pen-toolbar-item:nth-child(2) {
-      transition: opacity 0.32s cubic-bezier(0.34,1.5,0.64,1)  0.08s,
-                  transform 0.38s cubic-bezier(0.34,1.5,0.64,1) 0.08s;
+      transition: opacity 0.22s cubic-bezier(0.34,1.4,0.64,1) 0.06s, transform 0.26s cubic-bezier(0.34,1.4,0.64,1) 0.06s;
     }
     #penToolbar.show .pen-toolbar-item:nth-child(3) {
-      transition: opacity 0.32s cubic-bezier(0.34,1.5,0.64,1)  0.13s,
-                  transform 0.38s cubic-bezier(0.34,1.5,0.64,1) 0.13s;
+      transition: opacity 0.22s cubic-bezier(0.34,1.4,0.64,1) 0.10s, transform 0.26s cubic-bezier(0.34,1.4,0.64,1) 0.10s;
     }
     #penToolbar.show .pen-toolbar-item:nth-child(4) {
-      transition: opacity 0.32s cubic-bezier(0.34,1.5,0.64,1)  0.18s,
-                  transform 0.38s cubic-bezier(0.34,1.5,0.64,1) 0.18s;
+      transition: opacity 0.22s cubic-bezier(0.34,1.4,0.64,1) 0.14s, transform 0.26s cubic-bezier(0.34,1.4,0.64,1) 0.14s;
     }
 
     .pen-tool-btn {
@@ -534,8 +548,8 @@
       transition: width 0.08s, height 0.08s;
     }
     #eraserCursor.visible { display: block; }
-    #backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.15); z-index: 9; display: none; pointer-events: none; }
-    #backdrop.show { display: block; }
+    #backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0); z-index: 9; display: none; pointer-events: none; transition: background 0.22s cubic-bezier(0.4,0,0.2,1); }
+    #backdrop.show { display: block; pointer-events: auto; background: rgba(0,0,0,0.55); }
 
     .toast {
       position: fixed; right: 16px; bottom: 62px;
@@ -544,9 +558,7 @@
       overflow: hidden;
       opacity: 0; filter: blur(6px);
       transform: translateY(120%) scale(0.96);
-      transition: transform 0.38s cubic-bezier(0.34,1.1,0.64,1),
-                  opacity   0.35s cubic-bezier(0.34,1.1,0.64,1),
-                  filter    0.35s cubic-bezier(0.34,1.1,0.64,1);
+      transition: transform 0.28s cubic-bezier(0.34,1.2,0.64,1), opacity 0.24s cubic-bezier(0.34,1.2,0.64,1), filter 0.24s cubic-bezier(0.4,0,0.2,1);
       display: flex; align-items: center; padding: 10px 14px; gap: 10px; font-size: 13px;
     }
     .toast.show {
@@ -565,7 +577,7 @@
       min-width: 120px; box-shadow: 0 4px 20px rgba(0,0,0,0.22);
       border-radius: 20px; overflow: hidden; padding: 4px; transform-origin: top left;
     }
-    #contextMenu.animating { animation: contextMenuIn 0.22s cubic-bezier(0.34,1.45,0.64,1) forwards; }
+    #contextMenu.animating { animation: contextMenuIn 0.16s cubic-bezier(0.34,1.4,0.64,1) forwards; }
     #contextMenu button {
       width: 100%; padding: 8px 16px; background: transparent; border: none;
       text-align: left; cursor: pointer; font-size: 14px; color: var(--text); font-family: inherit;
@@ -595,7 +607,7 @@
     #searchPanel.show    { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
     #searchPanel.closing {
       opacity: 0; transform: translate(-50%, calc(-50% + 16px)) scale(0.9); pointer-events: none;
-      transition: opacity 0.25s cubic-bezier(0.4,0,1,1), transform 0.28s cubic-bezier(0.4,0,1,1);
+      transition: opacity 0.14s cubic-bezier(0.4,0,1,1), transform 0.18s cubic-bezier(0.4,0,1,1);
     }
     #searchPanelDragHandle::after {
       content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
@@ -630,7 +642,7 @@
     #translatePanel.show    { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
     #translatePanel.closing {
       opacity: 0; transform: translate(-50%, calc(-50% + 16px)) scale(0.9); pointer-events: none;
-      transition: opacity 0.25s cubic-bezier(0.4,0,1,1), transform 0.28s cubic-bezier(0.4,0,1,1);
+      transition: opacity 0.14s cubic-bezier(0.4,0,1,1), transform 0.18s cubic-bezier(0.4,0,1,1);
     }
     .drag-handle { cursor: grab; user-select: none; -webkit-user-select: none; }
     .drag-handle:active { cursor: grabbing; }
@@ -675,7 +687,7 @@
     #searchWebPanel.show    { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
     #searchWebPanel.closing {
       opacity: 0; transform: translate(-50%, calc(-50% + 16px)) scale(0.9); pointer-events: none;
-      transition: opacity 0.25s cubic-bezier(0.4,0,1,1), transform 0.28s cubic-bezier(0.4,0,1,1);
+      transition: opacity 0.14s cubic-bezier(0.4,0,1,1), transform 0.18s cubic-bezier(0.4,0,1,1);
     }
     #searchWebPanel .swp-header { display: flex; align-items: center; padding: 10px 14px 8px; border-bottom: 1px solid rgba(128,128,128,0.15); flex-shrink: 0; gap: 8px; position: relative; }
     #searchWebPanel .swp-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; background: radial-gradient(circle at 30% 30%, #ff6b6b, #e53935); border: 1px solid rgba(0,0,0,0.2); box-shadow: 0 1px 4px rgba(0,0,0,0.2); cursor: pointer; transition: 0.15s; }
@@ -683,7 +695,7 @@
     #searchWebPanel .swp-wiki-btn:hover { background: var(--hover); color: var(--text); }
     #searchWebPanel .swp-body { flex: 1; overflow-y: auto; scrollbar-width: none; padding: 12px 16px 16px; }
     #searchWebPanel .swp-body::-webkit-scrollbar { display: none; }
-    .result-anim-wrap { overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.62s cubic-bezier(0.76,0,0.24,1), opacity 0.22s cubic-bezier(0.4,0,0.2,1); }
+    .result-anim-wrap { overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.38s cubic-bezier(0.4,0,0.2,1), opacity 0.18s cubic-bezier(0.4,0,0.2,1); }
     .result-anim-wrap.open { opacity: 1; }
     .result-anim-item { opacity: 0; transform: translateY(-8px); transition: opacity 0.26s cubic-bezier(0.4,0,0.2,1), transform 0.26s cubic-bezier(0.34,1.2,0.64,1); }
     .result-anim-item.visible { opacity: 1; transform: translateY(0); }
@@ -706,13 +718,46 @@
     .ios-toggle { position: relative; display: inline-block; width: 44px; height: 26px; flex-shrink: 0; }
     .ios-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
     .ios-toggle-slider { position: absolute; cursor: pointer; inset: 0; background: rgba(120,120,128,0.32); border-radius: 13px; transition: background 0.3s cubic-bezier(0.4,0,0.2,1); }
-    .ios-toggle-slider::before { content: ''; position: absolute; height: 22px; width: 22px; left: 2px; top: 2px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: transform 0.32s cubic-bezier(0.34,1.3,0.64,1); }
+    .ios-toggle-slider::before { content: ''; position: absolute; height: 22px; width: 22px; left: 2px; top: 2px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: transform 0.24s cubic-bezier(0.34,1.3,0.64,1); }
     .ios-toggle input:checked + .ios-toggle-slider { background: #34c759; }
     .ios-toggle input:checked + .ios-toggle-slider::before { transform: translateX(18px); }
     .ios-toggle-sm { width: 28px; height: 17px; }
     .ios-toggle-sm .ios-toggle-slider { border-radius: 9px; }
     .ios-toggle-sm .ios-toggle-slider::before { height: 13px; width: 13px; left: 2px; top: 2px; }
     .ios-toggle-sm input:checked + .ios-toggle-slider::before { transform: translateX(11px); }
+
+    .lock-bio-btn {
+      width: 100%; background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15); border-radius: 20px;
+      padding: 10px 0; font-size: 14px; font-family: inherit;
+      font-weight: 200; color: var(--text); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: filter 0.15s, transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .lock-bio-btn:hover  { filter: brightness(1.15); }
+    .lock-bio-btn:active { transform: scale(0.95); }
+    .lock-bio-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    #bioRegisterRow { padding-top: 0; margin-top: 4px; }
+
+    #bioPromptModal .bio-prompt-icon { font-size: 36px; text-align: center; margin-bottom: 8px; }
+    #bioPromptModal .bio-prompt-title { font-size: 16px; font-weight: 700; text-align: center; margin-bottom: 6px; }
+    #bioPromptModal .bio-prompt-desc { font-size: 12px; color: var(--dim); text-align: center; line-height: 1.65; margin-bottom: 20px; }
+    #bioPromptModal .bio-prompt-btns { display: flex; flex-direction: column; gap: 8px; }
+    #bioPromptModal .btn-bio {
+      padding: 12px 0; border-radius: 16px; border: none; cursor: pointer;
+      font-size: 14px; font-family: inherit; font-weight: 200;
+      background: var(--accent); color: #fff;
+      transition: filter 0.15s, transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #bioPromptModal .btn-bio:hover  { filter: brightness(1.12); }
+    #bioPromptModal .btn-bio:active { transform: scale(0.96); }
+    #bioPromptModal .btn-bio-skip {
+      padding: 10px 0; border-radius: 16px; border: none; cursor: pointer;
+      font-size: 13px; font-family: inherit; font-weight: 200;
+      background: transparent; color: var(--dim);
+      transition: color 0.15s;
+    }
+    #bioPromptModal .btn-bio-skip:hover { color: var(--text); }
     .swatch {
       width: 20px; height: 20px; border-radius: 50%; cursor: pointer;
       border: 2px solid transparent; flex-shrink: 0;
@@ -729,7 +774,7 @@
       position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
       padding: 4px 8px; display: flex; align-items: center; gap: 6px;
       z-index: 310; border-radius: 25px;
-      transition: opacity 0.35s cubic-bezier(0.4,0,0.2,1), transform 0.35s cubic-bezier(0.4,0,0.2,1);
+      transition: opacity 0.22s cubic-bezier(0.4,0,0.2,1), transform 0.22s cubic-bezier(0.4,0,0.2,1);
     }
     #diffHeader.diff-enter   { opacity: 0; transform: translateX(-50%) scale(0.82); }
     #diffHeader.diff-visible { opacity: 1; transform: translateX(-50%) scale(1); }
@@ -750,12 +795,12 @@
     body.no-anim #devMessageModal, body.no-anim .modal { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: rgba(30,30,30,0.97) !important; }
 
     #pageSwipeTrigger { position: fixed; right: 0; top: 0; width: 24px; height: 100%; z-index: 300; }
-    #pageOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0); z-index: 310; pointer-events: none; transition: background 0.35s cubic-bezier(0.4,0,0.2,1); }
+    #pageOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0); z-index: 310; pointer-events: none; transition: background 0.28s cubic-bezier(0.4,0,0.2,1); }
     #pageOverlay.open { background: rgba(0,0,0,0.38); pointer-events: auto; }
     #pagePanel {
       position: fixed; top: 12px; right: 12px; bottom: 16px; width: min(300px, 82vw); height: auto;
       z-index: 320; display: flex; flex-direction: column;
-      transform: translateX(calc(100% + 20px)); transition: transform 0.42s cubic-bezier(0.34,1.1,0.64,1);
+      transform: translateX(calc(100% + 20px)); transition: transform 0.32s cubic-bezier(0.34,1.2,0.64,1);
       overflow: hidden; background: var(--ui-bg);
       backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255,255,255,0.2); border-radius: 18px; box-shadow: 0 8px 30px rgba(0,0,0,0.2);
@@ -777,7 +822,7 @@
     .page-card:active { background: rgba(255,255,255,0.12); }
     .page-num { width: 30px; height: 30px; border-radius: 8px; background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.10); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--dim); flex-shrink: 0; }
     .page-card.active .page-num { background: var(--accent); border-color: transparent; color: #fff; }
-    #pageNumIndicator { position: absolute; left: 0; right: 0; height: 61px; border-radius: 14px; background: rgba(var(--accent-rgb), 0.15); pointer-events: none; z-index: 0; transition: top 0.42s cubic-bezier(0.34,1.1,0.64,1), opacity 0.22s cubic-bezier(0.4,0,0.2,1); opacity: 1; }
+    #pageNumIndicator { position: absolute; left: 0; right: 0; height: 61px; border-radius: 14px; background: rgba(var(--accent-rgb), 0.15); pointer-events: none; z-index: 0; transition: top 0.32s cubic-bezier(0.34,1.2,0.64,1), opacity 0.18s cubic-bezier(0.4,0,0.2,1); opacity: 1; }
     .page-info { flex: 1; min-width: 0; }
     .page-title-text { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; cursor: text; }
     .page-preview { font-size: 11px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; line-height: 1.3; }
@@ -805,6 +850,7 @@
         <input id="lockPwInput" type="password" class="lock-pw-input"
                placeholder="パスワード" maxlength="64" autocomplete="current-password">
         <button class="lock-submit-btn" id="lockSubmitBtn">ロック解除</button>
+        <button class="lock-bio-btn" id="lockBioBtn" style="display:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M12 15h8M17 15v-2"/></svg> 生体認証でロック解除</button>
         <div class="lock-error-msg" id="lockErrorMsg"></div>
       </div>
     </div>
@@ -841,6 +887,7 @@
     </div>
   </div>
 
+  <div id="appContent">
   <header class="glass">
     <div id="headerTopBar">
       <button id="headerYellowBtn" title="メニューバーをリセット" aria-label="位置をリセット"></button>
@@ -848,6 +895,7 @@
     <button onclick="act('new')">新規</button>
     <button onclick="act('open')">開く</button>
     <button onclick="act('save')">保存</button>
+    <button id="headerShareBtn" onclick="act('share')">共有</button>
     <button id="headerPageBtn" onclick="act('togglePagePanel')">ページ</button>
     <button onclick="act('toggle')">設定</button>
   </header>
@@ -913,15 +961,28 @@
       <label class="ios-toggle"><input type="checkbox" id="footerAlwaysToggle"><span class="ios-toggle-slider"></span></label>
       <span style="font-size:10px; color:var(--dim); margin-left:4px; white-space:nowrap;">常時表示</span>
     </div>
-
     <div id="pwLockRow">
       <span class="label">パスワードロック</span>
       <label class="ios-toggle"><input type="checkbox" id="pwLockToggle"><span class="ios-toggle-slider"></span></label>
     </div>
+    <div id="bioRegisterRow" style="display:none">
+      <span class="label">生体認証</span>
+      <label class="ios-toggle"><input type="checkbox" id="bioToggle"><span class="ios-toggle-slider"></span></label>
+    </div>
     <div class="options-version">
-      <span>Build 2602230415</span>
-      <span>Version 26.2.3.1</span>
+      <span>Build 2602231328</span>
+      <span>Version 26.2.4</span>
       <span><strong>↓Creator↓</strong><br>Claude<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Chat GPT<br>Gemini<br>Cursor<br>Tikuwa</span>
+    </div>
+  </div>
+
+  <div id="bioPromptModal" class="glass panel-modal" style="width:min(300px,88vw);padding:28px 24px 22px;border-radius:22px;z-index:225;box-shadow:0 16px 50px rgba(0,0,0,0.3);">
+    <div class="bio-prompt-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M12 15h8M17 15v-2"/></svg></div>
+    <div class="bio-prompt-title">生体認証を登録しますか？</div>
+    <div class="bio-prompt-desc">Face ID・Touch ID・指紋認証でロック解除できるようになります。</div>
+    <div class="bio-prompt-btns">
+      <button class="btn-bio" id="bioPromptRegisterBtn">生体認証を登録する</button>
+      <button class="btn-bio-skip" id="bioPromptSkipBtn">あとで設定する</button>
     </div>
   </div>
 
@@ -986,13 +1047,10 @@
   <div id="devMessageModal" class="glass panel-modal">
     <div class="dev-title-main">Information</div>
     <div class="dev-body">アプリを使っている人へ
-私は最近開発にハマっており、このアプリもその一環として制作しました。
-しかし進学に伴い学業が忙しくなるため、今後は大規模な更新は難しくなる可能性があります。
-現在は主に細かな機能追加やバグ修正が中心になる予定ですが、可能な限り改善は続けていきます。
-まとまった時間が確保でき次第、改めて本格的なメンテナンスや機能強化を行う予定です。
-できるだけお休みがある日や放課後は作業に時間を当てていますのでできるだけ機能追加を増やすつもりです。
-
-ご了承の上今後ともよろしくお願いします。
+このアプリのベースのバージョンは😺Build 2602221940😺です
+26.2.3への互換性や後方互換性などの確認は行っていますがもし不具合があれば再度保存し直してもらえると幸いです
+またそれより以前のバージョンをお使いの方は"--- DON'T EDIT BELOW ---"などのテキストが表示される場合がありますが、旧バージョンの仕様であり、気になる場合は該当テキストを削除してから保存し直すと消えるかと思います
+これからもこのアプリをよろしくお願いします
 
  - Tikuwa - </div>
     <button class="dev-close" onclick="hideDevMessage()">閉じる</button>
@@ -1006,6 +1064,7 @@
     <div id="ctxDivider" class="ctx-divider"></div>
     <button id="ctxSearch"  onclick="searchWiki()">検索</button>
     <button id="ctxTrans"   onclick="translateText()">翻訳</button>
+    <button id="ctxShare"   onclick="ctxShareText()">共有</button>
     <button id="ctxCompare" onclick="openCompareFromContextMenu()">比較</button>
     <button id="ctxFind" onclick="ctxOpenSearch()">文字検索</button>
   </div>
@@ -1013,8 +1072,9 @@
   <textarea id="edit" spellcheck="false"></textarea>
   <footer id="ft" class="glass">
     <span id="b-info"></span>
-    <span id="f-info-label"></span><span id="f-info-wrap" class="ft-slot"><span id="f-info-num" class="ft-slot-inner"></span></span><span id="f-info-unit"></span>
+    <span id="f-info-label-wrap" class="ft-slot"><span id="f-info-label" class="ft-slot-inner"></span></span><span id="f-info-wrap" class="ft-slot"><span id="f-info-num" class="ft-slot-inner"></span></span><span id="f-info-unit"></span>
   </footer>
+  </div>
 
   <!-- 赤ペン機能 -->
   <canvas id="penCanvas"></canvas>
@@ -1150,6 +1210,96 @@
     };
   })();
 
+  /* ── WebAuthn 生体認証エンジン ── */
+  var BiometricEngine = (function() {
+    var CRED_KEY  = 'np26_bio_credId';
+    var PWENC_KEY = 'np26_bio_pw_enc'; /* 生体認証用にパスワードを暗号化して保持 */
+    var RP_ID     = location.hostname || 'localhost';
+    var RP_NAME   = 'Notepad26';
+
+    function buf2b64(buf) { return btoa(String.fromCharCode.apply(null, new Uint8Array(buf))); }
+    function b642buf(b64) { var s = atob(b64); var a = new Uint8Array(s.length); for (var i=0;i<s.length;i++) a[i]=s.charCodeAt(i); return a.buffer; }
+
+    /* パスワードをデバイス固有キー(固定salt+AES-GCM)で暗号化して保存 */
+    async function storePassword(password) {
+      var salt = new TextEncoder().encode('np26_bio_salt_v1');
+      var keyMat = await crypto.subtle.importKey('raw', salt, 'PBKDF2', false, ['deriveKey']);
+      var key = await crypto.subtle.deriveKey(
+        { name: 'PBKDF2', salt: new TextEncoder().encode(RP_ID), iterations: 1000, hash: 'SHA-256' },
+        keyMat, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
+      );
+      var iv  = crypto.getRandomValues(new Uint8Array(12));
+      var enc = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, key, new TextEncoder().encode(password));
+      var combined = new Uint8Array(12 + enc.byteLength);
+      combined.set(iv); combined.set(new Uint8Array(enc), 12);
+      localStorage.setItem(PWENC_KEY, buf2b64(combined.buffer));
+    }
+    async function retrievePassword() {
+      var stored = localStorage.getItem(PWENC_KEY); if (!stored) return null;
+      try {
+        var combined = new Uint8Array(b642buf(stored));
+        var iv   = combined.slice(0, 12);
+        var data = combined.slice(12);
+        var salt = new TextEncoder().encode('np26_bio_salt_v1');
+        var keyMat = await crypto.subtle.importKey('raw', salt, 'PBKDF2', false, ['deriveKey']);
+        var key = await crypto.subtle.deriveKey(
+          { name: 'PBKDF2', salt: new TextEncoder().encode(RP_ID), iterations: 1000, hash: 'SHA-256' },
+          keyMat, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
+        );
+        var dec = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv }, key, data);
+        return new TextDecoder().decode(dec);
+      } catch(e) { return null; }
+    }
+
+    return {
+      isSupported: function() { return !!(window.PublicKeyCredential && navigator.credentials); },
+      isRegistered: function() { return !!localStorage.getItem(CRED_KEY); },
+
+      register: async function(password) {
+        if (!this.isSupported()) throw new Error('この端末は生体認証に対応していません');
+        var userId = crypto.getRandomValues(new Uint8Array(16));
+        var cred = await navigator.credentials.create({
+          publicKey: {
+            challenge: crypto.getRandomValues(new Uint8Array(32)),
+            rp: { id: RP_ID, name: RP_NAME },
+            user: { id: userId, name: 'user', displayName: 'Notepad26 User' },
+            pubKeyCredParams: [
+              { type: 'public-key', alg: -7  },  /* ES256 */
+              { type: 'public-key', alg: -257 }   /* RS256 */
+            ],
+            authenticatorSelection: { userVerification: 'required' },
+            timeout: 60000,
+            attestation: 'none'
+          }
+        });
+        localStorage.setItem(CRED_KEY, buf2b64(cred.rawId));
+        await storePassword(password);
+        return true;
+      },
+
+      authenticate: async function() {
+        if (!this.isSupported() || !this.isRegistered()) return null;
+        var credId = b642buf(localStorage.getItem(CRED_KEY));
+        var cred = await navigator.credentials.get({
+          publicKey: {
+            challenge: crypto.getRandomValues(new Uint8Array(32)),
+            rpId: RP_ID,
+            allowCredentials: [{ type: 'public-key', id: credId }],
+            userVerification: 'required',
+            timeout: 60000
+          }
+        });
+        if (!cred) return null;
+        return await retrievePassword();
+      },
+
+      clear: function() {
+        localStorage.removeItem(CRED_KEY);
+        localStorage.removeItem(PWENC_KEY);
+      }
+    };
+  })();
+
   var sessionUnlocked = false;
   var sessionPassword = '';  // メモリのみ、外部送信なし
 
@@ -1167,8 +1317,17 @@
     if (ok) {
       sessionUnlocked = true;
       sessionPassword = pw;
+      var appContent = document.getElementById('appContent');
       lockScreen.classList.add('unlocking');
-      setTimeout(function() { lockScreen.classList.add('hidden'); }, 500);
+      if (appContent) {
+        appContent.classList.remove('locked');
+        appContent.classList.add('unlocking-in');
+      }
+      setTimeout(function() {
+        lockScreen.classList.add('hidden');
+        var _ac = document.getElementById('appContent');
+        if (_ac) { _ac.classList.remove('unlocking-in'); }
+      }, 480);
       loadEncryptedPages(pw);
     } else {
       showLockError('暗証番号が正しくありません');
@@ -1186,13 +1345,71 @@
   }
   lockSubmitBtn.onclick = tryUnlock;
 
+  document.getElementById('bioPromptRegisterBtn').addEventListener('click', async function() {
+    var btn = this;
+    btn.disabled = true; btn.textContent = '登録中...';
+    try {
+      await BiometricEngine.register(sessionPassword);
+      closePanel('bioPromptModal');
+      queueToast('生体認証を登録しました ✓', 2500);
+      if (typeof window.updateBioUI === 'function') window.updateBioUI();
+    } catch(e) {
+      btn.disabled = false; btn.textContent = '生体認証を登録する';
+      queueToast('登録失敗: ' + (e.message || '不明なエラー'), 3000);
+    }
+  });
+  document.getElementById('bioPromptSkipBtn').addEventListener('click', function() {
+    closePanel('bioPromptModal');
+  });
+
+  var lockBioBtn = document.getElementById('lockBioBtn');
+  if (lockBioBtn && BiometricEngine.isSupported() && BiometricEngine.isRegistered()) {
+    lockBioBtn.style.display = '';
+    lockBioBtn.addEventListener('click', async function() {
+      lockBioBtn.disabled = true;
+      lockBioBtn.textContent = '認証中...';
+      try {
+        var pw = await BiometricEngine.authenticate();
+        if (pw) {
+          var ok = await CryptoEngine.verifyPassword(pw);
+          if (ok) {
+            sessionUnlocked = true; sessionPassword = pw;
+            var appContent = document.getElementById('appContent');
+            lockScreen.classList.add('unlocking');
+            if (appContent) {
+              appContent.classList.remove('locked');
+              appContent.classList.add('unlocking-in');
+            }
+            setTimeout(function() {
+              lockScreen.classList.add('hidden');
+              var _ac = document.getElementById('appContent');
+              if (_ac) { _ac.classList.remove('unlocking-in'); }
+            }, 480);
+            loadEncryptedPages(pw);
+            return;
+          }
+        }
+        showLockError('生体認証に失敗しました');
+      } catch(e) {
+        showLockError('生体認証がキャンセルされました');
+      }
+      lockBioBtn.disabled = false;
+      lockBioBtn.textContent = '🔐 生体認証でロック解除';
+    });
+    /* 生体認証が登録済みなら自動的に認証ダイアログを起動 */
+    setTimeout(function() { lockBioBtn.click(); }, 400);
+  }
+
   lockPwInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') tryUnlock(); });
 
   (function checkInitialLock() {
+    var appContent = document.getElementById('appContent');
     if (!CryptoEngine.isEnabled()) {
       sessionUnlocked = true;
       lockScreen.classList.add('hidden');
+      if (appContent) appContent.classList.remove('locked');
     } else {
+      if (appContent) appContent.classList.add('locked');
       setTimeout(function() { lockPwInput.focus(); }, 100);
     }
   })();
@@ -1253,6 +1470,9 @@
       await CryptoEngine.encryptPages(pages, pw, function(msg) { pwSetProgress.textContent = msg; });
       closePanel('pwSetModal');
       queueToast('パスワードロックを設定しました', 3000);
+      if (BiometricEngine.isSupported()) {
+        setTimeout(function() { openPanel('bioPromptModal'); }, 400);
+      }
     } catch(e) {
       pwSetError.textContent = '設定に失敗しました: ' + e.message;
       pwSetSaveBtn.disabled = false;
@@ -1334,9 +1554,11 @@
 
   function openSaveMetaModal() {
     $('saveMetaRememberToggle').checked = false;
-    openPanel('saveMetaModal');
+    state.isModalOpen = true; openPanel('saveMetaModal'); render();
   }
-  function closeSaveMetaModal() { closePanel('saveMetaModal'); }
+  function closeSaveMetaModal() {
+    state.isModalOpen = false; closePanel('saveMetaModal'); render();
+  }
   function debounce(fn, wait) {
     var t;
     return function() { var ctx = this, args = arguments; clearTimeout(t); t = setTimeout(function() { fn.apply(ctx, args); }, wait); };
@@ -1428,6 +1650,13 @@
       if (state.isOptionsOpen) { state.isOptionsOpen = false; closePanel('options'); }
       else { state.isOptionsOpen = true; state.isModalOpen = false; hideContextMenu(); closePanel('translatePanel'); openPanel('options'); }
     },
+    share: function() {
+      if (!navigator.share) { queueToast('この環境では共有できません', 2000); return; }
+      var title = (pages && pages[curPageIdx]) ? pages[curPageIdx].title : state.curFile;
+      var text  = $('edit').value;
+      navigator.share({ title: title, text: text })
+        .catch(function(e) { if (e.name !== 'AbortError') queueToast('共有に失敗しました', 2000); });
+    },
     toggleSearch: function() {
       state.isSearchOpen = !state.isSearchOpen;
       if (state.isSearchOpen) {
@@ -1446,7 +1675,7 @@
     closeOverlays: function() {
       if (state.isOptionsOpen) { state.isOptionsOpen = false; closePanel('options'); }
       if (state.isModalOpen)   { state.isModalOpen   = false; closePanel('confirmModal'); }
-      closePanel('translatePanel'); closePanel('searchWebPanel');
+      closePanel('translatePanel'); closePanel('searchWebPanel'); closeSaveMetaModal();
     },
     updateText: function(val) {
       var lines = val.split(/\r?\n/), bodyLines = [], changed = false;
@@ -1495,7 +1724,7 @@
     if (!contextMenu) contextMenu = $('contextMenu');
     var isMob = state.device === 'Mobile';
     [$('ctxCopy'), $('ctxCut')].forEach(function(el) { if (el) el.style.display = (!isMob && hasSel) ? '' : 'none'; });
-    [$('ctxDivider'), $('ctxSearch'), $('ctxTrans'), $('ctxCompare')].forEach(function(el) { if (el) el.style.display = hasSel ? '' : 'none'; });
+    [$('ctxDivider'), $('ctxSearch'), $('ctxTrans'), $('ctxCompare'), $('ctxShare')].forEach(function(el) { if (el) el.style.display = hasSel ? '' : 'none'; });
     var ctxFind = $('ctxFind'); if (ctxFind) ctxFind.style.display = '';
     var paste = $('ctxPaste'), hasClip = (localStorage.getItem(CLIP_KEY) || '').length > 0;
     paste.style.display = (!isMob && !hasSel) ? '' : 'none';
@@ -1515,6 +1744,14 @@
     hideContextMenu();
     if (!state.isSearchOpen) { state.isSearchOpen = true; openPanel('searchPanel'); doSearch(0); }
     setTimeout(function() { $('searchInput').focus(); }, 60);
+  };
+  window.ctxShareText = function() {
+    var text = selectedText;
+    hideContextMenu();
+    if (!text) return;
+    if (!navigator.share) { copyToClipboard(text, function() { queueToast('共有不可のためコピーしました', 2000); }); return; }
+    navigator.share({ text: text })
+      .catch(function(e) { if (e.name !== 'AbortError') queueToast('共有に失敗しました', 2000); });
   };
   window.ctxCutText   = function() {
     if (!selectedText) { hideContextMenu(); return; }
@@ -1967,9 +2204,15 @@
   function loadPages() {
     try {
       var raw = localStorage.getItem(PAGES_KEY);
-      if (raw) { var arr = JSON.parse(raw); if (Array.isArray(arr) && arr.length) return arr; }
+      if (raw) {
+        var arr = JSON.parse(raw);
+        if (Array.isArray(arr) && arr.length) {
+          arr.forEach(function(p) { if (p.titleLocked === undefined) p.titleLocked = false; });
+          return arr;
+        }
+      }
     } catch(e) {}
-    return [{ id: genPageId(), title: 'ページ 1', text: '', font: 'Arial', size: 18 }];
+    return [{ id: genPageId(), title: 'ページ 1', text: '', font: 'Arial', size: 18, titleLocked: false }];
   }
   function savePages() {
     try {
@@ -1998,10 +2241,7 @@
     pages[curPageIdx].text = edit ? edit.value : '';
     pages[curPageIdx].font = fSel ? fSel.value : 'Arial';
     pages[curPageIdx].size = sSel ? parseInt(sSel.value) : 18;
-    if (!pages[curPageIdx].titleLocked) {
-      var firstLine = pages[curPageIdx].text.split('\n')[0].trim().slice(0, 20);
-      if (firstLine) pages[curPageIdx].title = firstLine;
-    }
+
     savePages();
   }
   function switchPage(idx) {
@@ -2035,7 +2275,7 @@
     var penSlideIn = window.penPageSwitch ? window.penPageSwitch(fromId, newId, 'right') : null;
     setTimeout(function() {
       saveCurrentPage();
-      var np = { id: newId, title: 'ページ ' + (pages.length + 1), text: '', font: $('fSel').value || 'Arial', size: parseInt($('sSel').value) || 18 };
+      var np = { id: newId, title: 'ページ ' + (pages.length + 1), text: '', font: $('fSel').value || 'Arial', size: parseInt($('sSel').value) || 18, titleLocked: false };
       pages.push(np); curPageIdx = pages.length - 1; localStorage.setItem(PAGES_CUR, np.id);
       edit.value = ''; ActionHandlers.updateText(''); savePages(); render(); renderPageList();
       requestAnimationFrame(function() { updatePageIndicator(true); });
@@ -2051,10 +2291,10 @@
     var wasCurrentPage = (idx === curPageIdx);
     var fromId         = wasCurrentPage ? deletedId : null;
     pages.splice(idx, 1);
+    if (idx < curPageIdx) curPageIdx--;
     if (curPageIdx >= pages.length) curPageIdx = pages.length - 1;
     localStorage.setItem(PAGES_CUR, pages[curPageIdx].id);
     var p = pages[curPageIdx], edit = $('edit');
-    if (window.penPageDelete) window.penPageDelete(deletedId);
     var penSlideIn = (wasCurrentPage && window.penPageSwitch)
       ? window.penPageSwitch(fromId, pages[curPageIdx].id, 'left')
       : null;
@@ -2087,7 +2327,7 @@
       pages[i].title       = edited || ('ページ ' + (i + 1));
       pages[i].titleLocked = edited.length > 0; /* 入力があればロック */
     });
-    savePages(); titleEditMode = false; list.classList.remove('editing'); resetEditBtn();
+    savePages(); titleEditMode = false; list.classList.remove('editing'); resetEditBtn(); render();
     setTimeout(function() { renderPageList(); }, 240);
   }
   function cancelTitleEdit() {
@@ -2141,7 +2381,7 @@
   var pagePanelOpen = false;
   function openPagePanel() {
     if (pagePanelOpen) return; pagePanelOpen = true;
-    saveCurrentPage(); renderPageList(); $('pagePanel').classList.add('open'); $('pageOverlay').classList.add('open');
+    renderPageList(); $('pagePanel').classList.add('open'); $('pageOverlay').classList.add('open');
   }
   window.closePagePanel = function() {
     if (!pagePanelOpen) return; pagePanelOpen = false;
@@ -2190,8 +2430,33 @@
     if (trigger) trigger.addEventListener('mouseenter', function() { if (!pagePanelOpen) openPagePanel(); });
   })();
 
-  var ftNumTimer = null;
-  var ftLastNum  = null;
+  var ftNumTimer   = null;
+  var ftLastNum    = null;
+  var ftLabelTimer = null;
+  var ftLastLabel  = null;
+
+  function updateFtLabel(newLabel) {
+    var wrap  = $('f-info-label-wrap');
+    var inner = $('f-info-label');
+    if (!wrap || !inner) return;
+    if (newLabel === ftLastLabel) return;
+    ftLastLabel = newLabel;
+    if (!state.footerAlways) {
+      inner.textContent = newLabel;
+      return;
+    }
+    clearTimeout(ftLabelTimer);
+    wrap.style.width = wrap.offsetWidth + 'px';
+    inner.classList.remove('slot-in');
+    inner.classList.add('slot-out');
+    ftLabelTimer = setTimeout(function() {
+      inner.textContent = newLabel;
+      inner.classList.remove('slot-out');
+      wrap.style.width  = '';
+      inner.classList.add('slot-in');
+      setTimeout(function() { inner.classList.remove('slot-in'); }, 300);
+    }, 120);
+  }
 
   function updateFtNum(newNum) {
     var wrap  = $('f-info-wrap');
@@ -2220,29 +2485,29 @@
 
   function render() {
     var edit = $('edit'), isAnyOpen = state.isOptionsOpen || state.isModalOpen;
+    if (isAnyOpen) { clearTimeout(state.hideTimer); state.isFooterHidden = false; }
     var pageTitle = (pages && pages[curPageIdx]) ? pages[curPageIdx].title.slice(0, 20) : state.curFile.slice(0, 20);
     var charCount = edit.value.length;
 
     $('b-info').textContent = state.browser + '_' + state.device;
 
-    var labelEl = $('f-info-label');
-    var unitEl  = $('f-info-unit');
-    if (labelEl) labelEl.textContent = pageTitle + ' · ';
-    if (unitEl)  unitEl.textContent  = ' 文字';
+    var unitEl = $('f-info-unit');
+    if (unitEl) unitEl.textContent = ' 文字';
+    updateFtLabel(pageTitle + ' · ');
     updateFtNum(charCount);
 
     edit.placeholder        = state.browser + '_' + state.device + ' >';
     $('backdrop').className = isAnyOpen ? 'show' : '';
+    document.body.classList.toggle('modal-open', isAnyOpen);
     if (state.footerAlways) {
       $('ft').className = 'glass';
     } else {
       $('ft').className = 'glass' + (state.isFooterHidden ? ' hidden' : '');
     }
-  }
-
-  /* 低スペック検出 */
+  } /* 低スペック検出（モバイルは除外） */
   (function() {
-    var WARMUP = 2000, MEASURE = 5000, DROP_THRESH = 33, DROP_LIMIT = 25;
+    if (state.device === 'Mobile') return;
+    var WARMUP = 4000, MEASURE = 8000, DROP_THRESH = 80, DROP_LIMIT = 60;
     setTimeout(function() {
       var drops = 0, last = performance.now(), elapsed = 0, prev = last;
       function check(now) {
@@ -2339,11 +2604,44 @@
       doFileSave(false);
     };
 
+    var bioRegisterRow = $('bioRegisterRow');
+    var bioToggle      = $('bioToggle');
+    window.updateBioUI = function updateBioUI() {
+      if (!BiometricEngine.isSupported() || !CryptoEngine.isEnabled()) {
+        if (bioRegisterRow) bioRegisterRow.style.display = 'none';
+        return;
+      }
+      if (bioRegisterRow) bioRegisterRow.style.display = '';
+      if (bioToggle) bioToggle.checked = BiometricEngine.isRegistered();
+    };
+    updateBioUI();
+    if (bioToggle) {
+      bioToggle.addEventListener('change', async function() {
+        if (bioToggle.checked) {
+          bioToggle.disabled = true;
+          try {
+            if (!sessionPassword) { queueToast('先にパスワードでロック解除してください', 2500); bioToggle.checked = false; bioToggle.disabled = false; return; }
+            await BiometricEngine.register(sessionPassword);
+            queueToast('生体認証を登録しました ✓', 2000);
+          } catch(e) {
+            queueToast('登録失敗: ' + (e.message || 'キャンセルされました'), 3000);
+            bioToggle.checked = false;
+          }
+          bioToggle.disabled = false;
+        } else {
+          BiometricEngine.clear();
+          queueToast('生体認証の連携を解除しました', 2000);
+          updateBioUI();
+        }
+      });
+    }
+
     var pwLockToggle = $('pwLockToggle');
     pwLockToggle.checked = CryptoEngine.isEnabled();
     pwLockToggle.onchange = function() {
       if (pwLockToggle.checked) { openPwSetModal(); }
       else { openPwUnlockModal(); }
+      setTimeout(updateBioUI, 300);
     };
 
     var isMob = state.device === 'Mobile', headerPageBtn = $('headerPageBtn');
@@ -2400,7 +2698,7 @@
       var file = e.target.files[0]; if (!file) return;
       state.curFile = file.name;
       var reader = new FileReader();
-      reader.onload = function() { edit.value = reader.result; ActionHandlers.updateText(edit.value); render(); };
+      reader.onload = function() { edit.value = reader.result; ActionHandlers.updateText(edit.value); saveCurrentPage(); render(); };
       reader.readAsText(file);
     };
 
@@ -2435,7 +2733,7 @@
       }, 50);
     });
 
-    /* アウトサイドクリック */
+    
     function handleOutside(e) {
       if (ctxJustOpened) return;
       if (contextMenu && contextMenu.style.display !== 'none') { if (!contextMenu.contains(e.target)) hideContextMenu(); return; }
@@ -2452,28 +2750,26 @@
     document.addEventListener('mousedown',  handleOutside);
     document.addEventListener('touchstart', handleOutside, { passive: true });
 
-    /* オフライン通知 */
+    
     window.addEventListener('offline', function() { if (!hasShownOfflineToast) { hasShownOfflineToast = true; queueToast('エラー: インターネット接続が遮断されました', 5000); } });
     window.addEventListener('online',  function() { hasShownOfflineToast = false; });
 
-    /* 初期ページ読み込み */
+    
     var p = pages[curPageIdx];
     if (p && !edit.value && p.text) {
       edit.value = p.text;
       for (var i = 0; i < fSel.options.length; i++) { if (fSel.options[i].value === p.font) { fSel.selectedIndex = i; break; } }
       sSel.value = String(p.size || 18);
     }
+
+    if (navigator.share) {
+      var shareBtn = $('headerShareBtn');
+      if (shareBtn) {
+        shareBtn.classList.add('visible');
+      }
+    }
     applyStyles(); ActionHandlers.updateText(edit.value); render();
   })();
-
-  window.addEventListener('load', function() {
-    var p = pages[curPageIdx], edit = $('edit'), fSel = $('fSel'), sSel = $('sSel');
-    if (p && !edit.value && p.text) {
-      edit.value = p.text;
-      for (var i = 0; i < fSel.options.length; i++) { if (fSel.options[i].value === p.font) { fSel.selectedIndex = i; break; } }
-      sSel.value = String(p.size || 18); applyStyles(); ActionHandlers.updateText(edit.value); render();
-    }
-  });
 
   function computeDiff(aLines, bLines) {
     var n = aLines.length, m = bLines.length, max = n + m;
@@ -2551,10 +2847,6 @@
       mainHeader.classList.remove('diff-exit','diff-restore');
     }, 350);
   };
-
-  /* ═══════════════════════════════════════════
-     赤ペン機能
-  ═══════════════════════════════════════════ */
   (function initPen() {
     var canvas       = $('penCanvas');
     var toggleBtn    = $('penToggleBtn');
@@ -2574,33 +2866,23 @@
     var strokes      = [];
     var activeStroke = null;
 
+    var currentPageId = 'p0';
+
     window.penPageSwitch = function(fromId, toId, dir) {
       var outClass = (dir === 'right') ? 'page-slide-out-left'  : 'page-slide-out-right';
       var inClass  = (dir === 'right') ? 'page-slide-in-right'  : 'page-slide-in-left';
-
       canvas.style.transition = '';
-      canvas.style.opacity    = '';
-      canvas.classList.remove(
-        'page-slide-in-right','page-slide-in-left',
-        'page-slide-out-left','page-slide-out-right'
-      );
+      canvas.classList.remove('page-slide-in-right','page-slide-in-left','page-slide-out-left','page-slide-out-right');
       requestAnimationFrame(function() {
         requestAnimationFrame(function() { canvas.classList.add(outClass); });
       });
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      strokes = [];
-      redrawAll();
-      canvas.classList.add(inClass);
-      setTimeout(function() { canvas.classList.remove(inClass); }, 350);
-
       return function() {
         canvas.classList.remove(outClass);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        strokes = []; currentPageId = toId; redrawAll();
+        canvas.classList.add(inClass);
+        setTimeout(function() { canvas.classList.remove(inClass); }, 280);
       };
-    };
-
-    window.penPageDelete = function(deletedId) {
-      // 削除時は何もしない（保存機能なし）
     };
 
     function resizeCanvas() {
@@ -2767,6 +3049,7 @@
       drawing = false;
       strokes.push(activeStroke);
       activeStroke = null;
+
     }
 
     canvas.addEventListener('mousedown', startDraw);
@@ -2797,14 +3080,11 @@
       if (!strokes.length) return;
       strokes.pop();
       redrawAll();
-      scheduleSave();
     });
 
     clearBtn.addEventListener('click', function() {
       strokes = [];
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      clearTimeout(saveDebounceTimer);
-      if (saveEnabled) clearPageDB(currentPageId);
     });
 
     canvas.width  = window.innerWidth;
@@ -2812,13 +3092,9 @@
     ctx.lineCap   = 'round';
     ctx.lineJoin  = 'round';
 
-      window.penSetInitialPage = function(pageId) {
-      currentPageId = pageId;
-      initRestoreIfNeeded(pageId);
-    };
+    window.penSetInitialPage = function(pageId) { currentPageId = pageId; };
   })();
 
   </script>
 </body>
 </html>
-
