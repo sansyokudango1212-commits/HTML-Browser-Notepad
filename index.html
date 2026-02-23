@@ -850,7 +850,7 @@
         <input id="lockPwInput" type="password" class="lock-pw-input"
                placeholder="パスワード" maxlength="64" autocomplete="current-password">
         <button class="lock-submit-btn" id="lockSubmitBtn">ロック解除</button>
-        <button class="lock-bio-btn" id="lockBioBtn" style="display:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M12 15h8M17 15v-2"/></svg> 生体認証でロック解除</button>
+        <button class="lock-bio-btn" id="lockBioBtn" style="display:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M12 15h8M17 15v-2"/></svg> パスキーでロック解除</button>
         <div class="lock-error-msg" id="lockErrorMsg"></div>
       </div>
     </div>
@@ -966,7 +966,7 @@
       <label class="ios-toggle"><input type="checkbox" id="pwLockToggle"><span class="ios-toggle-slider"></span></label>
     </div>
     <div id="bioRegisterRow" style="display:none">
-      <span class="label">生体認証</span>
+      <span class="label">パスキー</span>
       <label class="ios-toggle"><input type="checkbox" id="bioToggle"><span class="ios-toggle-slider"></span></label>
     </div>
     <div class="options-version">
@@ -981,7 +981,7 @@
     <div class="bio-prompt-title">パスキーを登録しますか？</div>
     <div class="bio-prompt-desc">パスキーを登録することによりパスワードを打たずにシームレスなログインが可能になります。</div>
     <div class="bio-prompt-btns">
-      <button class="btn-bio" id="bioPromptRegisterBtn">生体認証を登録する</button>
+      <button class="btn-bio" id="bioPromptRegisterBtn">パスキーを登録する</button>
       <button class="btn-bio-skip" id="bioPromptSkipBtn">あとで設定する</button>
     </div>
   </div>
@@ -1210,10 +1210,9 @@
     };
   })();
 
-  /* ── WebAuthn 生体認証エンジン ── */
   var BiometricEngine = (function() {
     var CRED_KEY  = 'np26_bio_credId';
-    var PWENC_KEY = 'np26_bio_pw_enc'; /* 生体認証用にパスワードを暗号化して保持 */
+    var PWENC_KEY = 'np26_bio_pw_enc'; 
     var RP_ID     = location.hostname || 'localhost';
     var RP_NAME   = 'Notepad26';
 
@@ -1256,7 +1255,7 @@
       isRegistered: function() { return !!localStorage.getItem(CRED_KEY); },
 
       register: async function(password) {
-        if (!this.isSupported()) throw new Error('この端末は生体認証に対応していません');
+        if (!this.isSupported()) throw new Error('この端末ではパスキー認証は利用できません。');
         var userId = crypto.getRandomValues(new Uint8Array(16));
         var cred = await navigator.credentials.create({
           publicKey: {
@@ -1330,7 +1329,7 @@
       }, 480);
       loadEncryptedPages(pw);
     } else {
-      showLockError('暗証番号が正しくありません');
+      showLockError('パスワードが正しくありません');
       lockPwInput.classList.add('error');
       setTimeout(function() { lockPwInput.classList.remove('error'); }, 400);
       lockPwInput.value = '';
@@ -1351,10 +1350,10 @@
     try {
       await BiometricEngine.register(sessionPassword);
       closePanel('bioPromptModal');
-      queueToast('生体認証を登録しました ✓', 2500);
+      queueToast('パスキーを登録しました', 2500);
       if (typeof window.updateBioUI === 'function') window.updateBioUI();
     } catch(e) {
-      btn.disabled = false; btn.textContent = '生体認証を登録する';
+      btn.disabled = false; btn.textContent = 'パスワードを登録する';
       queueToast('登録失敗: ' + (e.message || '不明なエラー'), 3000);
     }
   });
@@ -1389,14 +1388,13 @@
             return;
           }
         }
-        showLockError('生体認証に失敗しました');
+        showLockError('認証に失敗しました');
       } catch(e) {
-        showLockError('生体認証がキャンセルされました');
+        showLockError('パスキーでの認証がキャンセルされました');
       }
       lockBioBtn.disabled = false;
-      lockBioBtn.textContent = '🔐 生体認証でロック解除';
+      lockBioBtn.textContent = 'パスキーでロック解除';
     });
-    /* 生体認証が登録済みなら自動的に認証ダイアログを起動 */
     setTimeout(function() { lockBioBtn.click(); }, 400);
   }
 
@@ -2620,9 +2618,9 @@
         if (bioToggle.checked) {
           bioToggle.disabled = true;
           try {
-            if (!sessionPassword) { queueToast('先にパスワードでロック解除してください', 2500); bioToggle.checked = false; bioToggle.disabled = false; return; }
+            if (!sessionPassword) { queueToast('先にパスワードを登録してください', 2500); bioToggle.checked = false; bioToggle.disabled = false; return; }
             await BiometricEngine.register(sessionPassword);
-            queueToast('生体認証を登録しました ✓', 2000);
+            queueToast('パスキーを登録しました', 2000);
           } catch(e) {
             queueToast('登録失敗: ' + (e.message || 'キャンセルされました'), 3000);
             bioToggle.checked = false;
@@ -2630,7 +2628,7 @@
           bioToggle.disabled = false;
         } else {
           BiometricEngine.clear();
-          queueToast('生体認証の連携を解除しました', 2000);
+          queueToast('パスキー認証の連携を解除しました', 2000);
           updateBioUI();
         }
       });
@@ -3098,4 +3096,5 @@
   </script>
 </body>
 </html>
+
 
