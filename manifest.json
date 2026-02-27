@@ -2,7 +2,7 @@
   "name": "Notepad26",
   "short_name": "Notepad26",
   "description": "学生が個人開発しているメモ帳。",
-  "start_url": "/HTML-Browser-Notepad/",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#121212",
   "theme_color": "#121212",
@@ -26,5 +26,5 @@
       "type": "image/png"
     }
   ],
-  "scope": "/HTML-Browser-Notepad/"
+  "scope": "/"
 }
