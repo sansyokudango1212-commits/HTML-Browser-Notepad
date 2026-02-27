@@ -57,27 +57,18 @@
       position: fixed; inset: 0; z-index: 9999;
       background: var(--bg);
       display: flex; align-items: center; justify-content: center;
-      transition: opacity 0.45s cubic-bezier(0.4,0,1,1),
-                  transform 0.45s cubic-bezier(0.4,0,1,1);
-      transform-origin: center center;
+      transition: opacity 0.35s cubic-bezier(0.4,0,1,1);
     }
-    #lockScreen.unlocking {
-      opacity: 0; pointer-events: none;
-      transform: scale(1.08);
-    }
-    #lockScreen.hidden { display: none; }
+    #lockScreen.unlocking { opacity: 0; pointer-events: none; }
+    #lockScreen.hidden    { display: none; }
 
-    /* メモ帳コンテンツ: ロック中は縮んで待機 → 解除で拡大フェードイン */
-    #appContent {
-      transition: opacity 0.4s cubic-bezier(0.22,1,0.36,1),
-                  transform 0.4s cubic-bezier(0.22,1,0.36,1);
-      transform-origin: center center;
+    @keyframes lockCardUnlock {
+      0%   { transform: translateY(0);    animation-timing-function: cubic-bezier(0.4,0,0.6,1); }
+      18%  { transform: translateY(32px); animation-timing-function: cubic-bezier(0.8,0,1,1); }
+      100% { transform: translateY(-200vh); }
     }
-    #appContent.locked {
-      opacity: 0; transform: scale(0.94); pointer-events: none;
-    }
-    #appContent.unlocking-in {
-      opacity: 1; transform: scale(1);
+    #lockCard.unlocking {
+      animation: lockCardUnlock 0.55s linear forwards;
     }
 
     #lockCard {
@@ -223,6 +214,8 @@
     header button:active { transform: scale(0.88); background: rgba(255,255,255,0.13); }
     #headerShareBtn {
       max-width: 0; opacity: 0; padding-left: 0; padding-right: 0; pointer-events: none; overflow: hidden;
+    }
+    #headerShareBtn.animated {
       transition: max-width 0.26s cubic-bezier(0.34,1.2,0.64,1), opacity 0.2s cubic-bezier(0.4,0,0.2,1), padding 0.26s cubic-bezier(0.34,1.2,0.64,1), transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
     }
     #headerShareBtn.visible { max-width: 120px; opacity: 1; padding-left: 16px; padding-right: 16px; pointer-events: auto; }
@@ -1054,7 +1047,7 @@
         <div class="lock-app-name">Notepad26</div>
       </div>
       <div class="lock-right">
-        <div class="lock-label">暗証番号を入力してください</div>
+        <div class="lock-label">パスワードを入力してください</div>
         <input id="lockPwInput" type="password" class="lock-pw-input"
                placeholder="パスワード" maxlength="64" autocomplete="current-password">
         <button class="lock-submit-btn" id="lockSubmitBtn">ロック解除</button>
@@ -1067,7 +1060,7 @@
   <div id="pwUnlockModal" class="glass panel-modal">
     <button class="close-dot" onclick="closePwUnlockModal()" aria-label="閉じる"></button>
     <div class="pwunlock-title">パスワードロック解除</div>
-    <div class="pwunlock-desc">ロックを解除すると、データは暗号化されずlocalStorageに保存されます。</div>
+    <div class="pwunlock-desc">ロックを解除すると、このサイトに保存しているデータが無条件で他人に見られる可能性があります。</div>
     <div class="pwunlock-btns">
       <button class="btn-cancel" onclick="closePwUnlockModal()">キャンセル</button>
       <button class="btn-danger" onclick="confirmPwUnlock()">解除する</button>
@@ -1078,7 +1071,7 @@
     <button class="close-dot" onclick="closePwSetModal()" aria-label="閉じる"></button>
     <div class="pwset-title">パスワードロック設定</div>
     <div class="pwset-field">
-      <label>暗証番号（数字のみ）</label>
+      <label>パスワード</label>
       <input type="password" id="pwSetNew" class="pwset-input" placeholder="パスワードを入力..."
              maxlength="64" autocomplete="new-password">
       <div id="pwStrength"></div>
@@ -1565,17 +1558,14 @@
     if (ok) {
       sessionUnlocked = true;
       sessionPassword = pw;
-      var appContent = document.getElementById('appContent');
-      lockScreen.classList.add('unlocking');
-      if (appContent) {
-        appContent.classList.remove('locked');
-        appContent.classList.add('unlocking-in');
-      }
+      var lockCard = document.getElementById('lockCard');
+      if (lockCard) lockCard.classList.add('unlocking');
+      setTimeout(function() {
+        lockScreen.classList.add('unlocking');
+      }, 320);
       setTimeout(function() {
         lockScreen.classList.add('hidden');
-        var _ac = document.getElementById('appContent');
-        if (_ac) { _ac.classList.remove('unlocking-in'); }
-      }, 480);
+      }, 650);
       loadEncryptedPages(pw);
       return; /* 解除成功: ボタンのリセットは不要 */
     }
@@ -1622,17 +1612,14 @@
           var ok = await CryptoEngine.verifyPassword(pw);
           if (ok) {
             sessionUnlocked = true; sessionPassword = pw;
-            var appContent = document.getElementById('appContent');
-            lockScreen.classList.add('unlocking');
-            if (appContent) {
-              appContent.classList.remove('locked');
-              appContent.classList.add('unlocking-in');
-            }
+            var lockCard = document.getElementById('lockCard');
+            if (lockCard) lockCard.classList.add('unlocking');
+            setTimeout(function() {
+              lockScreen.classList.add('unlocking');
+            }, 320);
             setTimeout(function() {
               lockScreen.classList.add('hidden');
-              var _ac = document.getElementById('appContent');
-              if (_ac) { _ac.classList.remove('unlocking-in'); }
-            }, 480);
+            }, 650);
             loadEncryptedPages(pw);
             return;
           }
@@ -1650,14 +1637,10 @@
   lockPwInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') tryUnlock(); });
 
   (function checkInitialLock() {
-    var appContent = document.getElementById('appContent');
     if (!CryptoEngine.isEnabled()) {
-      /* ロック未設定: lockScreenはhiddenのまま、appContentはそのまま表示 */
       sessionUnlocked = true;
     } else {
-      /* ロック設定済み: lockScreenを表示してappContentを隠す */
       lockScreen.classList.remove('hidden');
-      if (appContent) appContent.classList.add('locked');
       setTimeout(function() { lockPwInput.focus(); }, 100);
     }
   })();
@@ -1759,12 +1742,13 @@
     var p = pages[curPageIdx], edit = document.getElementById('edit');
     var fSel = document.getElementById('fSel'), sSel = document.getElementById('sSel');
     if (p && edit) {
-      edit.value = p.text || '';
       for (var i = 0; i < fSel.options.length; i++) {
         if (fSel.options[i].value === p.font) { fSel.selectedIndex = i; break; }
       }
       sSel.value = String(p.size || 18);
-      applyStyles(); ActionHandlers.updateText(edit.value); render();
+      applyStyles();
+      edit.value = p.text || '';
+      ActionHandlers.updateText(edit.value); render();
       if (typeof renderPageList === 'function') renderPageList();
     }
   }
@@ -3072,7 +3056,7 @@
     /* --- フォルダを開く --- */
     async function openDirectory() {
       if (!window.showDirectoryPicker) {
-        queueToast('このブラウザはフォルダ選択に対応していません（Chrome/Edge推奨）', 3500);
+        queueToast('フォルダ選択に未対応ブラウザ', 3500);
         return;
       }
       try {
@@ -3309,7 +3293,9 @@
     } else {
       $('ft').className = 'glass' + (state.isFooterHidden ? ' hidden' : '');
     }
-  } /* 低スペック検出（モバイルは除外） */
+  }
+
+  /* 低スペック検出（モバイルは除外） */
   (function() {
     if (state.device === 'Mobile') return;
     var WARMUP = 4000, MEASURE = 8000, DROP_THRESH = 80, DROP_LIMIT = 60;
@@ -3362,10 +3348,12 @@
       var saved = localStorage.getItem('autosave_text'), savedFile = localStorage.getItem('autosave_file');
       var savedFont = localStorage.getItem('autosave_font'), savedSize = localStorage.getItem('autosave_size');
       if (saved && saved.length > 0 && !edit.value) {
-        edit.value = saved; if (savedFile) state.curFile = savedFile;
+        if (savedFile) state.curFile = savedFile;
         if (savedFont && $('fSel')) $('fSel').value = savedFont;
         if (savedSize && $('sSel')) $('sSel').value = savedSize;
-        applyStyles(); ActionHandlers.updateText(edit.value); queueToast('自動保存データを復元しました', 3000);
+        applyStyles();
+        edit.value = saved;
+        ActionHandlers.updateText(edit.value); queueToast('自動保存データを復元しました', 3000);
       }
     }
     autoSaveToggle.onchange = function() {
@@ -3558,18 +3546,28 @@
     
     var p = pages[curPageIdx];
     if (p && !edit.value && p.text) {
-      edit.value = p.text;
+      /* スタイルを先に適用してからテキストをセット（逆順だとリレイアウト時にフラッシュが出る） */
       for (var i = 0; i < fSel.options.length; i++) { if (fSel.options[i].value === p.font) { fSel.selectedIndex = i; break; } }
       sSel.value = String(p.size || 18);
+      applyStyles();
+      edit.value = p.text;
+    } else {
+      applyStyles();
     }
 
     if (navigator.share) {
       var shareBtn = $('headerShareBtn');
       if (shareBtn) {
         shareBtn.classList.add('visible');
+        /* transitionは次フレーム以降に有効化してロード時アニメーションを防ぐ */
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            shareBtn.classList.add('animated');
+          });
+        });
       }
     }
-    applyStyles(); ActionHandlers.updateText(edit.value); render();
+    ActionHandlers.updateText(edit.value); render();
   })();
 
   function computeDiff(aLines, bLines) {
