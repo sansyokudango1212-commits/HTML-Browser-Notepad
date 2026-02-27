@@ -1,21 +1,18 @@
 /* ============================================================
-   Notepad26 — Service Worker
+   Notepad26 — Service Worker  (Cloudflare Pages)
    戦略: Cache First（静的アセット） + Network First（HTML）
    ============================================================ */
 
-const CACHE_NAME = 'notepad26-v1';
-
-// キャッシュする静的アセット
-const CACHE_BASE = self.registration.scope; // 例: https://...github.io/HTML-Browser-Notepad/
+const CACHE_NAME = 'notepad26-v2';
 
 const STATIC_ASSETS = [
-  CACHE_BASE,
-  CACHE_BASE + 'index.html',
-  CACHE_BASE + 'favicon.ico',
-  CACHE_BASE + 'favicon-32.png',
-  CACHE_BASE + 'favicon-192.png',
-  CACHE_BASE + 'apple-touch-icon.png',
-  CACHE_BASE + 'manifest.json',
+  '/',
+  '/index.html',
+  '/favicon.ico',
+  '/favicon-32.png',
+  '/favicon-192.png',
+  '/apple-touch-icon.png',
+  '/manifest.json',
 ];
 
 // インストール: 静的アセットを事前キャッシュ
