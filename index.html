@@ -817,7 +817,12 @@
     #pagePullTab:hover  { background: rgba(60,60,60,0.7); }
     #pagePullTab:active { transform: translateY(-50%) translateX(0) scale(0.93); }
     #pagePullTab.visible { opacity: 1; pointer-events: auto; transform: translateY(-50%) translateX(0); }
-    #pagePullTab.panel-open { opacity: 0; pointer-events: none; transform: translateY(-50%) translateX(100%); }
+    #pagePullTab.panel-open {
+      opacity: 0; pointer-events: none; transform: translateY(-50%) translateX(100%);
+      transition: opacity 0.28s cubic-bezier(0.36,0,0.66,-0.2),
+                  transform 0.32s cubic-bezier(0.36,0,0.66,-0.2),
+                  background 0.15s;
+    }
     #pagePullTab svg { opacity: 0.7; }
     #folderSwipeTrigger { position: fixed; left: 0; top: 0; width: 24px; height: 100%; z-index: 300; }
 
@@ -843,7 +848,12 @@
     #folderPullTab:hover { background: rgba(60,60,60,0.7); }
     #folderPullTab:active { transform: translateY(-50%) translateX(0) scale(0.93); }
     #folderPullTab.visible { opacity: 1; pointer-events: auto; transform: translateY(-50%) translateX(0); }
-    #folderPullTab.panel-open { opacity: 0; pointer-events: none; transform: translateY(-50%) translateX(-100%); }
+    #folderPullTab.panel-open {
+      opacity: 0; pointer-events: none; transform: translateY(-50%) translateX(-100%);
+      transition: opacity 0.28s cubic-bezier(0.36,0,0.66,-0.2),
+                  transform 0.32s cubic-bezier(0.36,0,0.66,-0.2),
+                  background 0.15s;
+    }
     #folderPullTab svg { opacity: 0.7; }
     #pageOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0); z-index: 310; pointer-events: none; transition: background 0.28s cubic-bezier(0.4,0,0.2,1); }
     #pageOverlay.open { background: rgba(0,0,0,0.38); pointer-events: auto; }
@@ -1171,8 +1181,8 @@
       <label class="ios-toggle"><input type="checkbox" id="bioToggle"><span class="ios-toggle-slider"></span></label>
     </div>
     <div class="options-version">
-      <span>Build 2602262156</span>
-      <span>Version 26.2.4</span>
+      <span>Build 2602271858</span>
+      <span>Version 26.2.4.1</span>
       <span><strong>↓Creator↓</strong><br>Claude<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Chat GPT<br>Gemini<br>Cursor<br>Tikuwa</span>
     </div>
   </div>
@@ -1248,10 +1258,12 @@
   <div id="devMessageModal" class="glass panel-modal">
     <div class="dev-title-main">Information</div>
     <div class="dev-body">アプリを使っている人へ
-このアプリのベースのバージョンはBuild2602252034BETA2(private)です
+このアプリのベースのバージョンはBuild2602271758です
 26.2.4への互換性や後方互換性などの確認は行っていますがもし不具合があれば再度保存し直してもらえると幸いです
 またそれより以前のバージョンをお使いの方は"--- DON'T EDIT BELOW ---"などのテキストが表示される場合がありますが、旧バージョンの仕様であり、気になる場合は該当テキストを削除してから保存し直すと消えるかと思います
-これからもこのアプリをよろしくお願いします
+これからもこのアプリをよろしくお願いします]
+
+追記:考えうる限り機能追加したつもりだけどまた思いついたら追加するかも
 
  - Tikuwa - </div>
     <button class="dev-close" onclick="hideDevMessage()">閉じる</button>
