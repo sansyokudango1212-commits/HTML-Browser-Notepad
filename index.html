@@ -147,12 +147,12 @@
     #pwUnlockModal .btn-danger:hover { background: rgba(229,57,53,0.28); }
 
     header {
-      position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+      position: fixed; top: var(--header-top, 12px); left: 50%; transform: translateX(-50%);
       padding: 4px; padding-top: 4px; display: flex; gap: 4px; align-items: center;
       width: fit-content; max-width: 95vw; justify-content: center;
       z-index: 9998; border-radius: var(--radius);
       overflow: visible;
-      transition: opacity 0.22s cubic-bezier(0.4,0,0.2,1), transform 0.22s cubic-bezier(0.4,0,0.2,1), border-radius 0.18s, padding-top 0.18s;
+      transition: opacity 0.22s cubic-bezier(0.4,0,0.2,1), transform 0.22s cubic-bezier(0.4,0,0.2,1), border-radius 0.18s, padding-top 0.18s, top 0.38s cubic-bezier(0.4,0,0.2,1);
     }
     header:hover,
     header.header-expanded { border-radius: 20px; padding-top: 38px; }
@@ -249,6 +249,18 @@
     }
     #options div { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: nowrap; }
     .label { width: 60px; color: var(--dim); font-size: 11px; white-space: nowrap; flex-shrink: 0; }
+    .page-nav-mode-btn {
+      flex: 1; padding: 5px 0; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12);
+      background: transparent; color: var(--dim); cursor: pointer;
+      font-size: 11px; font-family: inherit;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .page-nav-mode-btn:hover  { background: rgba(255,255,255,0.08); color: var(--text); }
+    .page-nav-mode-btn.active {
+      background: rgba(var(--accent-rgb), 0.2);
+      border-color: rgba(var(--accent-rgb), 0.5);
+      color: var(--accent);
+    }
     #clearAutoSaveBtn {
       background: rgba(229,57,53,0.12); border: 1px solid rgba(229,57,53,0.4);
       border-radius: 8px; cursor: pointer; padding: 0 7px; height: 26px;
@@ -1046,6 +1058,176 @@
       transition: color 0.15s;
     }
     .oc-cancel:hover { color: var(--text); }
+
+    /* ===== フローティング丸タブバー (PC専用・VSCodeスタイル) ===== */
+    #pageTabBar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 56px;
+      z-index: 200; display: none;
+      background: transparent;
+      overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
+      align-items: center;
+      padding: 8px 56px 8px 12px; gap: 6px;
+      transform: translateY(-100%);
+      opacity: 0;
+      transition: transform 0.36s cubic-bezier(0.4,0,0.2,1),
+                  opacity   0.28s cubic-bezier(0.4,0,0.2,1);
+      will-change: transform, opacity;
+    }
+    #pageTabBar::-webkit-scrollbar { display: none; }
+    #pageTabBar.active  { display: flex; }
+    #pageTabBar.tab-slide-in { transform: translateY(0); opacity: 1; }
+
+    /* 浮遊タブ本体 */
+    .page-tab {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 0 10px 0 14px;
+      height: 34px;
+      min-width: 90px; max-width: 180px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.03);
+      cursor: pointer; flex-shrink: 0;
+      font-family: inherit; color: rgba(255,255,255,0.3); font-size: 12px;
+      transition: background 0.16s, border-color 0.16s, color 0.16s;
+      position: relative; overflow: hidden;
+      -webkit-user-select: none; user-select: none;
+    }
+    /* 下端アクセントライン */
+    .page-tab::after {
+      content: ''; position: absolute;
+      bottom: 0; left: 14%; right: 14%; height: 2px;
+      background: var(--accent); border-radius: 2px;
+      opacity: 0; transition: opacity 0.22s cubic-bezier(0.4,0,0.2,1);
+    }
+    /* 削除中：インジケーター非表示（再描画後にフェードイン） */
+    #pageTabBar.hide-indicators .page-tab::after { opacity: 0 !important; transition: none !important; }
+    /* 追加アニメ：上から降りてくる（幅は即時確保・内容だけ動く） */
+    .page-tab-wrap.tab-add-enter .page-tab {
+      opacity: 0;
+      transform: translateY(-14px) scale(0.9);
+      transition: none;
+    }
+    .page-tab-wrap.tab-add-active .page-tab {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      transition: opacity 0.26s cubic-bezier(0.4,0,0.2,1),
+                  transform 0.30s cubic-bezier(0.34,1.15,0.64,1);
+    }
+    .page-tab:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.55);
+    }
+    .page-tab.active {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.09);
+      color: rgba(255,255,255,0.80);
+    }
+    .page-tab.active::after { opacity: 1; }
+    .page-tab-name {
+      flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      font-size: 12px; font-weight: 400; line-height: 1;
+    }
+    /* タブインライン編集 */
+    .page-tab-name-input {
+      flex: 1; background: transparent; border: none; outline: none;
+      color: rgba(255,255,255,0.85); font-size: 12px; font-family: inherit;
+      font-weight: 400; line-height: 1; min-width: 0;
+      caret-color: var(--accent);
+    }
+    .page-tab-close {
+      position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
+      width: 14px; height: 14px; border-radius: 3px; border: none;
+      background: transparent; color: inherit; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; line-height: 1; padding: 0;
+      opacity: 0; transition: opacity 0.12s, background 0.12s, color 0.12s;
+    }
+    .page-tab:hover .page-tab-close,
+    .page-tab.active .page-tab-close { opacity: 0.45; }
+    .page-tab-close:hover { opacity: 1 !important; background: rgba(229,57,53,0.28); color: #e57373; }
+    /* 閉じるボタン分の右パディング確保 */
+    .page-tab { padding-right: 22px; }
+
+    /* ＋ボタン：円形 */
+    #pageTabAddBtn {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: rgba(255,255,255,0.3); font-size: 17px; line-height: 1;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      font-family: inherit;
+      transition: background 0.15s, color 0.15s, border-color 0.15s,
+                  transform 0.38s cubic-bezier(0.4,0,0.2,1);
+    }
+    #pageTabAddBtn:hover {
+      background: rgba(255,255,255,0.09); color: rgba(255,255,255,0.75);
+      border-color: rgba(255,255,255,0.20); transform: scale(1.1);
+    }
+    /* 名前編集ボタン（右端固定） */
+    #pageTabEditBtn {
+      position: fixed; right: 10px; top: 11px;
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.35); font-size: 13px;
+      cursor: pointer; display: none; align-items: center; justify-content: center;
+      z-index: 202;
+      transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #pageTabEditBtn.active-mode { display: flex; }
+    #pageTabEditBtn.editing {
+      background: rgba(229,57,53,0.18) !important;
+      border-color: rgba(229,57,53,0.3) !important;
+      color: #e57373 !important;
+    }
+    #pageTabEditBtn:hover { background: rgba(255,255,255,0.09); color: rgba(255,255,255,0.75); transform: scale(1.08); }
+
+    /* ===== タブラッパー（幅アニメ専用） ===== */
+    .page-tab-wrap {
+      display: flex; align-items: center; flex-shrink: 0;
+      /* overflow は削除アニメ中のみ inline で付与 */
+    }
+    /* ===== タブ名編集ポップアップ ===== */
+    #tabNamePopup {
+      position: fixed; z-index: 300;
+      background: rgba(30,30,30,0.96); backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 14px;
+      padding: 10px 12px; display: none; flex-direction: column; gap: 6px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.4);
+      min-width: 180px;
+      transform-origin: top center;
+      animation: tabPopupIn 0.18s cubic-bezier(0.34,1.4,0.64,1) both;
+    }
+    #tabNamePopup.open { display: flex; }
+    @keyframes tabPopupIn {
+      from { opacity:0; transform: translateY(-6px) scale(0.95); }
+      to   { opacity:1; transform: translateY(0)    scale(1);    }
+    }
+    #tabNamePopup label {
+      font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 0.04em;
+    }
+    #tabNamePopupInput {
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px; color: rgba(255,255,255,0.9); font-family: inherit;
+      font-size: 13px; padding: 7px 10px; outline: none; width: 100%; box-sizing: border-box;
+      transition: border-color 0.15s;
+    }
+    #tabNamePopupInput:focus { border-color: var(--accent); }
+    #tabNamePopupHint {
+      font-size: 10px; color: rgba(255,255,255,0.28); text-align: right;
+    }
+
+    /* タブバーモード時のヘッダー・テキストエリア位置調整 */
+    body.tab-bar-mode { --header-top: 64px; }
+    body.tab-bar-mode header[data-dragged] { top: 64px !important; }
+    body.tab-bar-mode textarea,
+    body.tab-bar-mode #searchHighlightMirror { padding-top: 120px !important; }
+    @media (max-width: 480px) {
+      body.tab-bar-mode textarea,
+      body.tab-bar-mode #searchHighlightMirror { padding-top: 112px !important; }
+    }
   </style>
 </head>
 <body>
@@ -1163,6 +1345,13 @@
       <span class="label">ページ</span>
       <label class="ios-toggle"><input type="checkbox" id="pageBarToggle"><span class="ios-toggle-slider"></span></label>
     </div>
+    <div id="pageNavModeRow" style="display:none">
+      <span class="label">ページ表示</span>
+      <div style="display:flex;gap:4px;flex:1;">
+        <button id="pageNavSlideBtn" class="page-nav-mode-btn active" title="スライドパネル方式">サイドバー</button>
+        <button id="pageNavTabBtn"   class="page-nav-mode-btn"        title="タブバー方式">タブ</button>
+      </div>
+    </div>
     <div>
       <span class="label">バーの移動</span>
       <label class="ios-toggle"><input type="checkbox" id="headerMoveToggle"><span class="ios-toggle-slider"></span></label>
@@ -1181,8 +1370,8 @@
       <label class="ios-toggle"><input type="checkbox" id="bioToggle"><span class="ios-toggle-slider"></span></label>
     </div>
     <div class="options-version">
-      <span>Build 2602271858</span>
-      <span>Version 26.2.4.1</span>
+      <span>Build 2602280253</span>
+      <span>Version 26.2.4.2</span>
       <span><strong>↓Creator↓</strong><br>Claude<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Chat GPT<br>Gemini<br>Cursor<br>Tikuwa</span>
     </div>
   </div>
@@ -1334,6 +1523,15 @@
   </div>
   <div id="toastContainer"></div>
   <div id="pageSwipeTrigger"></div>
+  <!-- ページタブバー (PC専用・タブバーモード時に表示) -->
+  <div id="pageTabBar"></div>
+  <button id="pageTabEditBtn" title="ページ名を編集" style="transform:scaleX(-1);">✎</button>
+  <!-- タブ名編集ポップアップ -->
+  <div id="tabNamePopup">
+    <label>ページ名</label>
+    <input id="tabNamePopupInput" type="text" maxlength="20" placeholder="ページ名を入力..." autocomplete="off">
+    <span id="tabNamePopupHint">Enter で確定 · Esc でキャンセル</span>
+  </div>
   <div id="pagePullTab" aria-label="ページを開く"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
   <div id="folderSwipeTrigger"></div>
   <div id="folderPullTab" aria-label="サイドバーを開く"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
@@ -2665,26 +2863,102 @@
     if (penSlideIn) penSlideIn();
   };
   window.deletePage = function(idx, e) {
-    e.stopPropagation();
-    if (pages[idx] && pages[idx]._fileEditor) return; /* 仮ページは削除不可 */
-    var realCount = pages.filter(function(p){return !p._fileEditor;}).length;
-    if (realCount <= 1) { queueToast('最後のページは削除できません', 2000); return; }
-    var deletedId      = pages[idx].id;
+  e.stopPropagation();
+  if (pages[idx] && pages[idx]._fileEditor) return;
+  var realCount = pages.filter(function(p){ return !p._fileEditor; }).length;
+  if (realCount <= 1) {
+    queueToast('最後のページは削除できません', 2000);
+    return;
+  }
+
+  // --- Animate Tab Bar ---
+  var tabBar = document.getElementById('pageTabBar');
+  var tabs = Array.from(tabBar.children);
+  var tabToRemove = tabs[idx];
+  var firstRects = tabs.map(tab => tab.getBoundingClientRect());
+
+  var animDuration = 0.28; // Unified duration
+  var animEase = 'cubic-bezier(0.4, 0, 0.2, 1)'; // Unified easing
+
+  tabToRemove.style.transition = `opacity ${animDuration}s ${animEase}, transform ${animDuration}s ${animEase}, max-width ${animDuration}s ${animEase}, padding ${animDuration}s ${animEase}, border ${animDuration}s ${animEase}`;
+  tabToRemove.style.opacity = '0';
+  tabToRemove.style.transform = 'scale(0.8)';
+  tabToRemove.style.maxWidth = '0px';
+  tabToRemove.style.paddingLeft = '0';
+  tabToRemove.style.paddingRight = '0';
+  tabToRemove.style.border = 'none';
+
+  // --- Animate Side Panel List Item ---
+  var pageList = document.getElementById('pageList');
+  var cardToRemove = pageList.children[idx];
+  if (cardToRemove) {
+      cardToRemove.style.transition = `opacity ${animDuration}s ${animEase}, transform ${animDuration}s ${animEase}, max-height ${animDuration}s ${animEase}, margin ${animDuration}s ${animEase}, padding ${animDuration}s ${animEase}, border ${animDuration}s ${animEase}`;
+      cardToRemove.style.opacity = '0';
+      cardToRemove.style.transform = 'scale(0.8)';
+      cardToRemove.style.maxHeight = '0px';
+      cardToRemove.style.margin = '0';
+      cardToRemove.style.padding = '0';
+      cardToRemove.style.border = 'none';
+  }
+
+  requestAnimationFrame(() => {
+    // Update data model and re-render
+    var deletedId = pages[idx].id;
     var wasCurrentPage = (idx === curPageIdx);
-    var fromId         = wasCurrentPage ? deletedId : null;
+    var fromId = wasCurrentPage ? deletedId : null;
+
     pages.splice(idx, 1);
     if (idx < curPageIdx) curPageIdx--;
     if (curPageIdx >= pages.length) curPageIdx = pages.length - 1;
     localStorage.setItem(PAGES_CUR, pages[curPageIdx].id);
+
     var p = pages[curPageIdx], edit = $('edit');
     var penSlideIn = (wasCurrentPage && window.penPageSwitch)
       ? window.penPageSwitch(fromId, pages[curPageIdx].id, 'left')
       : null;
-    edit.value = p.text || ''; $('fSel').value = p.font || 'Arial'; $('sSel').value = String(p.size || 18);
-    applyStyles(); ActionHandlers.updateText(edit.value); savePages(); render(); renderPageList();
-    requestAnimationFrame(function() { updatePageIndicator(true); });
+
+    edit.value = p.text || '';
+    $('fSel').value = p.font || 'Arial';
+    $('sSel').value = String(p.size || 18);
+
+    applyStyles();
+    ActionHandlers.updateText(edit.value);
+    savePages();
+    render(); // This re-renders the tabBar
+    renderPageList();
     if (penSlideIn) penSlideIn();
-  };
+
+    // --- Animate remaining tabs (FLIP) ---
+    var newTabs = Array.from(document.getElementById('pageTabBar').children);
+    var lastRects = newTabs.map(tab => tab.getBoundingClientRect());
+
+    newTabs.forEach((tab, i) => {
+      var firstIdx = i < idx ? i : i + 1;
+      var firstRect = firstRects[firstIdx];
+      var lastRect = lastRects[i];
+
+      var deltaX = firstRect.left - lastRect.left;
+      var deltaY = firstRect.top - lastRect.top;
+
+      if (deltaX !== 0 || deltaY !== 0) {
+        tab.style.transition = 'none';
+        tab.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+        tab.getBoundingClientRect(); // Reflow
+        tab.style.transition = `transform ${animDuration}s ${animEase}`;
+        tab.style.transform = 'translate(0, 0)';
+      }
+    });
+
+    // Clean up styles
+    setTimeout(() => {
+      newTabs.forEach(tab => {
+        tab.style.transition = '';
+        tab.style.transform = '';
+      });
+    }, animDuration * 1000);
+
+  });
+};
 
   var titleEditMode = false;
   function openTitleEdit() {
@@ -2754,6 +3028,8 @@
     var realCount = pages.filter(function(p){return !p._fileEditor;}).length;
     var msg = $('pageMaxMsg'); if (msg) msg.textContent = realCount >= MAX_PAGES ? '最大' + MAX_PAGES + 'ページに達しました' : '';
     updatePageIndicator(false);
+    /* タブバーモード時はタブも更新 */
+    if (window.renderPageTabs) window.renderPageTabs();
   }
   function updatePageIndicator(animate) {
     var indicator = $('pageNumIndicator'), list = $('pageList'); if (!indicator || !list) return;
@@ -2764,6 +3040,266 @@
       requestAnimationFrame(function() { indicator.style.transition = ''; });
     } else { indicator.style.top = top + 'px'; indicator.style.opacity = '1'; }
   }
+
+  /* ===== ページタブバー描画 ===== */
+  /* ===== タブバー アニメーション付き描画 ===== */
+  var _tabAddPending = false;
+
+  /* ===== タブバー描画（ラッパー方式）===== */
+  window.renderPageTabs = function() {
+    var bar = $('pageTabBar'); if (!bar || !bar.classList.contains('active')) return;
+    var doAddAnim = _tabAddPending;
+    _tabAddPending = false;
+
+    bar.innerHTML = '';
+    pages.forEach(function(p, i) {
+      if (p._fileEditor) return;
+      var isNew = doAddAnim && (i === curPageIdx);
+
+      var wrap = document.createElement('div');
+      wrap.className = 'page-tab-wrap';
+      wrap.dataset.wrapIdx = String(i);
+
+      var tab = document.createElement('button');
+      tab.className = 'page-tab' + (i === curPageIdx ? ' active' : '');
+      tab.dataset.pageIdx = String(i);
+
+      var nameSpan = document.createElement('span');
+      nameSpan.className = 'page-tab-name';
+      nameSpan.textContent = (p.title || ('ページ ' + (i + 1))).slice(0, 18);
+
+      var closeBtn = document.createElement('button');
+      closeBtn.className = 'page-tab-close';
+      closeBtn.innerHTML = '&#x2715;';
+      closeBtn.title = 'ページを削除';
+      closeBtn.addEventListener('click', function(e) { deletePage(i, e); });
+
+      tab.appendChild(nameSpan);
+      tab.appendChild(closeBtn);
+      tab.addEventListener('click', function() { switchPage(i); });
+      wrap.appendChild(tab);
+
+      if (isNew) {
+        /* 上からスライドイン：幅は即時確保、内容だけ上から降りる */
+        wrap.classList.add('tab-add-enter');
+      }
+      bar.appendChild(wrap);
+    });
+
+    var addBtn = document.createElement('button');
+    addBtn.id = 'pageTabAddBtn';
+    addBtn.textContent = '+';
+    addBtn.title = 'ページを追加';
+    addBtn.addEventListener('click', function() { addPage(); });
+    bar.appendChild(addBtn);
+
+    if (doAddAnim) {
+      var newWrap = bar.querySelector('.tab-add-enter');
+      if (newWrap) {
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            newWrap.classList.remove('tab-add-enter');
+            newWrap.classList.add('tab-add-active');
+            /* transitionend後にクラスだけ除去 — スタイルは一切触らない */
+            newWrap.querySelector('.page-tab').addEventListener('transitionend', function onDone(ev) {
+              if (ev.propertyName !== 'transform') return;
+              newWrap.classList.remove('tab-add-active');
+              newWrap.querySelector('.page-tab').removeEventListener('transitionend', onDone);
+            });
+          });
+        });
+      }
+    }
+
+    /* 削除後の再描画時 — インジケーターをフェードイン */
+    if (bar.classList.contains('hide-indicators')) {
+      /* 次フレームで hide を外してフェードイン */
+      requestAnimationFrame(function() {
+        bar.classList.remove('hide-indicators');
+      });
+    }
+
+    requestAnimationFrame(function() {
+      var activeEl = bar.querySelector('.page-tab.active');
+      if (activeEl) activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    });
+  };
+
+  /* addPage ラップ */
+  (function() {
+    var origAdd = window.addPage;
+    window.addPage = function() { _tabAddPending = true; origAdd(); };
+  })();
+
+
+
+  /* ===== タブ名ポップアップ編集 ===== */
+  (function() {
+    var popup   = $('tabNamePopup');
+    var input   = $('tabNamePopupInput');
+    var editBtn = $('pageTabEditBtn');
+    var _targetIdx = -1;
+    var _popupOpen = false;
+
+    function openPopup(tabEl, pageIdx) {
+      if (!popup || !input) return;
+      _targetIdx = pageIdx;
+      _popupOpen = true;
+
+      /* ポップアップ位置：タブの真下 */
+      var rect = tabEl.getBoundingClientRect();
+      var popW = 210;
+      var left = Math.min(rect.left, window.innerWidth - popW - 12);
+      popup.style.left = Math.max(8, left) + 'px';
+      popup.style.top  = (rect.bottom + 6) + 'px';
+
+      input.value = (pages[pageIdx] && pages[pageIdx].title) || ('ページ ' + (pageIdx + 1));
+      popup.classList.add('open');
+      /* animation restart */
+      popup.style.animation = 'none';
+      popup.getBoundingClientRect();
+      popup.style.animation = '';
+      setTimeout(function() { input.focus(); input.select(); }, 20);
+
+      /* ✎→✕ */
+      if (editBtn) {
+        editBtn.textContent = '✕';
+        editBtn.style.transform = '';
+        editBtn.classList.add('editing');
+      }
+    }
+
+    function commitPopup() {
+      if (!_popupOpen) return;
+      var val = input.value.trim().slice(0, 20);
+      if (_targetIdx >= 0 && pages[_targetIdx]) {
+        pages[_targetIdx].title       = val || ('ページ ' + (_targetIdx + 1));
+        pages[_targetIdx].titleLocked = val.length > 0;
+        savePages();
+        /* タブ名を即更新 */
+        var bar = $('pageTabBar');
+        if (bar) {
+          var nameEl = bar.querySelector('[data-page-idx="' + _targetIdx + '"] .page-tab-name');
+          if (nameEl) nameEl.textContent = pages[_targetIdx].title.slice(0, 18);
+        }
+        /* ページパネルのリストも同期 */
+        renderPageList();
+      }
+      closePopup();
+    }
+
+    function closePopup() {
+      if (!popup) return;
+      _popupOpen = false;
+      _targetIdx = -1;
+      popup.classList.remove('open');
+      if (editBtn) {
+        editBtn.textContent = '✎';
+        editBtn.style.transform = 'scaleX(-1)';
+        editBtn.classList.remove('editing');
+      }
+    }
+
+    if (input) {
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter')  { e.preventDefault(); commitPopup(); }
+        if (e.key === 'Escape') { e.preventDefault(); closePopup(); }
+        e.stopPropagation();
+      });
+      input.addEventListener('blur', function() {
+        setTimeout(function() { if (_popupOpen) commitPopup(); }, 120);
+      });
+    }
+
+    /* 編集ボタン：ポップアップのトグル */
+    if (editBtn) {
+      editBtn.addEventListener('click', function() {
+        if (_popupOpen) { commitPopup(); return; }
+        var bar = $('pageTabBar'); if (!bar) return;
+        var activeTab = bar.querySelector('.page-tab.active'); if (!activeTab) return;
+        var idx = parseInt(activeTab.dataset.pageIdx);
+        if (!isNaN(idx)) openPopup(activeTab, idx);
+      });
+    }
+
+    /* タブをダブルクリックでも編集 */
+    document.addEventListener('click', function(e) {
+      if (!_popupOpen) return;
+      if (popup && popup.contains(e.target)) return;
+      if (editBtn && editBtn.contains(e.target)) return;
+      commitPopup();
+    });
+
+    /* 外部から名前更新されたらタブも更新（ページパネル側の編集対応） */
+    window._syncTabName = function(idx) {
+      var bar = $('pageTabBar'); if (!bar) return;
+      var nameEl = bar.querySelector('[data-page-idx="' + idx + '"] .page-tab-name');
+      if (nameEl && pages[idx]) nameEl.textContent = (pages[idx].title || ('ページ ' + (idx + 1))).slice(0, 18);
+    };
+  })();
+
+  /* switchPage をラップしてタブバーのアクティブ状態を同期 */
+  (function() {
+    var origSwitch = switchPage;
+    switchPage = function(idx) {
+      origSwitch(idx);
+      if (document.body.classList.contains('tab-bar-mode')) {
+        var bar = $('pageTabBar');
+        if (bar) {
+          bar.querySelectorAll('.page-tab').forEach(function(t) {
+            var ti = parseInt(t.dataset.pageIdx);
+            t.classList.toggle('active', ti === idx);
+          });
+          var activeTab = bar.querySelector('.page-tab.active');
+          if (activeTab) activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+      }
+    };
+  })();
+
+  /* ===== ページナビモード適用 ===== */
+  window.applyPageNavMode = function(mode) {
+    var tabBar     = $('pageTabBar');
+    var pullTab    = $('pagePullTab');
+    var swipeTrig  = $('pageSwipeTrigger');
+    var hdrPageBtn = $('headerPageBtn');
+    var slideBtn   = $('pageNavSlideBtn');
+    var tabBtn     = $('pageNavTabBtn');
+    if (mode === 'tabbar') {
+      tabBar.classList.add('active');
+      window.renderPageTabs();
+      /* 上からスライドイン (transform: translateY(-100%) → 0) */
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          tabBar.classList.add('tab-slide-in');
+        });
+      });
+      document.body.classList.add('tab-bar-mode');
+      if (pullTab)   { pullTab.style.display = 'none'; pullTab.classList.remove('visible','panel-open'); }
+      if (swipeTrig) swipeTrig.style.display = 'none';
+      if (hdrPageBtn) hdrPageBtn.classList.remove('visible');
+      if (slideBtn)  slideBtn.classList.remove('active');
+      if (tabBtn)    tabBtn.classList.add('active');
+      if (pagePanelOpen) closePagePanel();
+      var editBtn = $('pageTabEditBtn'); if (editBtn) editBtn.classList.add('active-mode');
+    } else {
+      /* スライドアウト後に非表示 */
+      tabBar.classList.remove('tab-slide-in');
+      document.body.classList.remove('tab-bar-mode');
+      var onEnd = function() {
+        tabBar.removeEventListener('transitionend', onEnd);
+        tabBar.classList.remove('active');
+      };
+      tabBar.addEventListener('transitionend', onEnd);
+      if (pullTab)   { pullTab.style.display = ''; }
+      if (swipeTrig) swipeTrig.style.display = '';
+      var pageBarToggle = $('pageBarToggle');
+      if (hdrPageBtn && pageBarToggle && pageBarToggle.checked) hdrPageBtn.classList.add('visible');
+      if (slideBtn) slideBtn.classList.add('active');
+      if (tabBtn)   tabBtn.classList.remove('active');
+      var editBtn2 = $('pageTabEditBtn'); if (editBtn2) editBtn2.classList.remove('active-mode','editing');
+    }
+  };
 
   var pagePanelOpen = false;
   function openPagePanel() {
@@ -3469,6 +4005,29 @@
       }
       if (pageBarOn && headerPageBtn) { headerPageBtn.classList.add('visible'); requestAnimationFrame(function() { headerPageBtn.classList.add('animated'); }); }
       else if (headerPageBtn) headerPageBtn.classList.add('animated');
+
+      /* ページナビゲーション方式 (スライド / タブバー) */
+      var pageNavModeRow  = $('pageNavModeRow');
+      var pageNavSlideBtn = $('pageNavSlideBtn');
+      var pageNavTabBtn   = $('pageNavTabBtn');
+      if (pageNavModeRow) pageNavModeRow.style.display = '';
+      var savedNavMode = localStorage.getItem('pageNavMode') || 'slide';
+      if (savedNavMode === 'tabbar') {
+        /* ページボタンが visible になる前にタブバーモードを適用 */
+        requestAnimationFrame(function() { window.applyPageNavMode('tabbar'); });
+      }
+      if (pageNavSlideBtn) {
+        pageNavSlideBtn.addEventListener('click', function() {
+          localStorage.setItem('pageNavMode', 'slide');
+          window.applyPageNavMode('slide');
+        });
+      }
+      if (pageNavTabBtn) {
+        pageNavTabBtn.addEventListener('click', function() {
+          localStorage.setItem('pageNavMode', 'tabbar');
+          window.applyPageNavMode('tabbar');
+        });
+      }
     }
 
     var searchInput = $('searchInput');
