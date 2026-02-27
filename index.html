@@ -1070,13 +1070,20 @@
       padding: 8px 56px 8px 12px; gap: 6px;
       transform: translateY(-100%);
       opacity: 0;
-      transition: transform 0.36s cubic-bezier(0.4,0,0.2,1),
-                  opacity   0.28s cubic-bezier(0.4,0,0.2,1);
+      /* 閉じるアニメは速度調整のみ */
+      transition: transform 0.20s cubic-bezier(0.4,0,1,1),
+                  opacity   0.16s cubic-bezier(0.4,0,1,1);
       will-change: transform, opacity;
     }
     #pageTabBar::-webkit-scrollbar { display: none; }
     #pageTabBar.active  { display: flex; }
-    #pageTabBar.tab-slide-in { transform: translateY(0); opacity: 1; }
+    /* 開くアニメ：iOS風スプリング（.tab-slide-in 付与時のtransitionで適用） */
+    #pageTabBar.tab-slide-in {
+      transform: translateY(0);
+      opacity: 1;
+      transition: transform 0.54s cubic-bezier(0.34, 1.28, 0.64, 1),
+                  opacity   0.38s cubic-bezier(0.34, 1.28, 0.64, 1) !important;
+    }
 
     /* 浮遊タブ本体 */
     .page-tab {
@@ -1089,7 +1096,7 @@
       background: rgba(255,255,255,0.03);
       cursor: pointer; flex-shrink: 0;
       font-family: inherit; color: rgba(255,255,255,0.3); font-size: 12px;
-      transition: background 0.16s, border-color 0.16s, color 0.16s;
+      transition: background 0.22s cubic-bezier(0.34,1.2,0.64,1), border-color 0.22s cubic-bezier(0.34,1.2,0.64,1), color 0.22s cubic-bezier(0.34,1.2,0.64,1);
       position: relative; overflow: hidden;
       -webkit-user-select: none; user-select: none;
     }
@@ -1102,17 +1109,14 @@
     }
     /* 削除中：インジケーター非表示（再描画後にフェードイン） */
     #pageTabBar.hide-indicators .page-tab::after { opacity: 0 !important; transition: none !important; }
-    /* 追加アニメ：上から降りてくる（幅は即時確保・内容だけ動く） */
+    /* 追加アニメ：上からスライドイン（速い→遅い） */
     .page-tab-wrap.tab-add-enter .page-tab {
-      opacity: 0;
-      transform: translateY(-14px) scale(0.9);
+      transform: translateY(-14px);
       transition: none;
     }
     .page-tab-wrap.tab-add-active .page-tab {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      transition: opacity 0.26s cubic-bezier(0.4,0,0.2,1),
-                  transform 0.30s cubic-bezier(0.34,1.15,0.64,1);
+      transform: translateY(0);
+      transition: transform 0.24s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
     .page-tab:hover {
       background: rgba(255,255,255,0.06);
@@ -1158,6 +1162,8 @@
       border: 1px solid rgba(255,255,255,0.10);
       background: rgba(255,255,255,0.04);
       font-family: inherit;
+      position: relative; z-index: 100;
+      isolation: isolate;
       transition: background 0.15s, color 0.15s, border-color 0.15s,
                   transform 0.38s cubic-bezier(0.4,0,0.2,1);
     }
@@ -1187,6 +1193,7 @@
     /* ===== タブラッパー（幅アニメ専用） ===== */
     .page-tab-wrap {
       display: flex; align-items: center; flex-shrink: 0;
+      position: relative; z-index: 1;
       /* overflow は削除アニメ中のみ inline で付与 */
     }
     /* ===== タブ名編集ポップアップ ===== */
@@ -1198,12 +1205,12 @@
       box-shadow: 0 8px 28px rgba(0,0,0,0.4);
       min-width: 180px;
       transform-origin: top center;
-      animation: tabPopupIn 0.18s cubic-bezier(0.34,1.4,0.64,1) both;
+      animation: tabPopupIn 0.32s cubic-bezier(0.34,1.56,0.64,1) both;
     }
     #tabNamePopup.open { display: flex; }
     @keyframes tabPopupIn {
-      from { opacity:0; transform: translateY(-6px) scale(0.95); }
-      to   { opacity:1; transform: translateY(0)    scale(1);    }
+      from { opacity:0; transform: translateY(-10px) scale(0.88); filter: blur(3px); }
+      to   { opacity:1; transform: translateY(0)     scale(1);    filter: blur(0px); }
     }
     #tabNamePopup label {
       font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 0.04em;
@@ -1221,7 +1228,7 @@
 
     /* タブバーモード時のヘッダー・テキストエリア位置調整 */
     body.tab-bar-mode { --header-top: 64px; }
-    body.tab-bar-mode header[data-dragged] { top: 64px !important; }
+    /* header[data-dragged] の top はJSのclampで制御するためCSS固定は削除 */
     body.tab-bar-mode textarea,
     body.tab-bar-mode #searchHighlightMirror { padding-top: 120px !important; }
     @media (max-width: 480px) {
@@ -1239,11 +1246,12 @@
         <div class="lock-app-name">Notepad26</div>
       </div>
       <div class="lock-right">
-        <div class="lock-label">パスワードを入力してください</div>
+        <div class="lock-label" data-i18n="lock.label">パスワードを入力してください</div>
         <input id="lockPwInput" type="password" class="lock-pw-input"
-               placeholder="パスワード" maxlength="64" autocomplete="current-password">
-        <button class="lock-submit-btn" id="lockSubmitBtn">ロック解除</button>
-        <button class="lock-bio-btn" id="lockBioBtn" style="display:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M12 15h8M17 15v-2"/></svg> パスキーでロック解除</button>
+               placeholder="パスワード" maxlength="64" autocomplete="current-password"
+               data-i18n="lock.placeholder" data-i18n-attr="placeholder">
+        <button class="lock-submit-btn" id="lockSubmitBtn" data-i18n="lock.submit">ロック解除</button>
+        <button class="lock-bio-btn" id="lockBioBtn" style="display:none" data-i18n="lock.bio">🔑 パスキーでロック解除</button>
         <div class="lock-error-msg" id="lockErrorMsg"></div>
       </div>
     </div>
@@ -1251,32 +1259,35 @@
 
   <div id="pwUnlockModal" class="glass panel-modal">
     <button class="close-dot" onclick="closePwUnlockModal()" aria-label="閉じる"></button>
-    <div class="pwunlock-title">パスワードロック解除</div>
-    <div class="pwunlock-desc">ロックを解除すると、このサイトに保存しているデータが無条件で他人に見られる可能性があります。</div>
+    <div class="pwunlock-title" data-i18n="pwu.title">パスワードロック解除</div>
+    <div class="pwunlock-desc"  data-i18n="pwu.desc">ロックを解除すると、このサイトに保存しているデータが無条件で他人に見られる可能性があります。</div>
     <div class="pwunlock-btns">
-      <button class="btn-cancel" onclick="closePwUnlockModal()">キャンセル</button>
-      <button class="btn-danger" onclick="confirmPwUnlock()">解除する</button>
+      <button class="btn-cancel" onclick="closePwUnlockModal()" data-i18n="common.cancel">キャンセル</button>
+      <button class="btn-danger" onclick="confirmPwUnlock()"    data-i18n="pwu.confirm">解除する</button>
     </div>
   </div>
 
   <div id="pwSetModal" class="glass panel-modal">
     <button class="close-dot" onclick="closePwSetModal()" aria-label="閉じる"></button>
-    <div class="pwset-title">パスワードロック設定</div>
+    <div class="pwset-title" data-i18n="pws.title">パスワードロック設定</div>
     <div class="pwset-field">
-      <label>パスワード</label>
-      <input type="password" id="pwSetNew" class="pwset-input" placeholder="パスワードを入力..."
-             maxlength="64" autocomplete="new-password">
+      <label data-i18n="pws.pw">パスワード</label>
+      <input type="password" id="pwSetNew" class="pwset-input"
+             placeholder="パスワードを入力..." maxlength="64" autocomplete="new-password"
+             data-i18n="pws.pw.placeholder" data-i18n-attr="placeholder">
       <div id="pwStrength"></div>
     </div>
     <div class="pwset-field">
-      <label>確認入力</label>
-      <input type="password" id="pwSetConfirm" class="pwset-input" placeholder="もう一度入力..." maxlength="64" autocomplete="new-password">
+      <label data-i18n="pws.confirm">確認入力</label>
+      <input type="password" id="pwSetConfirm" class="pwset-input"
+             placeholder="もう一度入力..." maxlength="64" autocomplete="new-password"
+             data-i18n="pws.confirm.placeholder" data-i18n-attr="placeholder">
     </div>
     <div id="pwSetProgress"></div>
     <div id="pwSetError"></div>
     <div class="pwset-btns">
-      <button id="pwSetCancelBtn" onclick="closePwSetModal()">キャンセル</button>
-      <button id="pwSetSaveBtn" onclick="savePassword()" disabled>設定する</button>
+      <button id="pwSetCancelBtn" onclick="closePwSetModal()" data-i18n="common.cancel">キャンセル</button>
+      <button id="pwSetSaveBtn"   onclick="savePassword()" disabled data-i18n="pws.save">設定する</button>
     </div>
   </div>
 
@@ -1285,23 +1296,23 @@
     <div id="headerTopBar">
       <button id="headerYellowBtn" title="メニューバーをリセット" aria-label="位置をリセット"></button>
     </div>
-    <button onclick="act('new')">新規</button>
-    <button onclick="act('open')">開く</button>
-    <button onclick="act('save')">保存</button>
-    <button id="headerShareBtn" onclick="act('share')">共有</button>
-    <button id="headerPageBtn" onclick="act('togglePagePanel')">ページ</button>
-    <button onclick="act('toggle')">設定</button>
+    <button onclick="act('new')"              data-i18n="hdr.new">新規</button>
+    <button onclick="act('open')"             data-i18n="hdr.open">開く</button>
+    <button onclick="act('save')"             data-i18n="hdr.save">保存</button>
+    <button id="headerShareBtn" onclick="act('share')"          data-i18n="hdr.share">共有</button>
+    <button id="headerPageBtn"  onclick="act('togglePagePanel')" data-i18n="hdr.pages">ページ</button>
+    <button onclick="act('toggle')"           data-i18n="hdr.settings">設定</button>
   </header>
   <div id="searchPanel" class="glass">
     <div id="searchPanelDragHandle" class="drag-handle" style="position:absolute;top:0;left:0;right:0;height:36px;border-radius:18px 18px 0 0;"></div>
     <button class="close-dot" id="searchPanelCloseBtn" aria-label="閉じる"></button>
     <span id="searchCount" class="s-count"></span>
     <div class="sp-row">
-      <input id="searchInput" type="text" placeholder="検索..." autocomplete="off">
+      <input id="searchInput" type="text" placeholder="検索..." autocomplete="off" data-i18n="sp.placeholder" data-i18n-attr="placeholder">
     </div>
     <div class="sp-row" style="justify-content:center; gap:6px;">
-      <button class="sp-btn" id="spPrevBtn" title="前へ">↑ 前へ</button>
-      <button class="sp-btn" id="spNextBtn" title="次へ">↓ 次へ</button>
+      <button class="sp-btn" id="spPrevBtn" title="前へ" data-i18n="sp.prev">↑ 前へ</button>
+      <button class="sp-btn" id="spNextBtn" title="次へ" data-i18n="sp.next">↓ 次へ</button>
     </div>
   </div>
 
@@ -1309,23 +1320,23 @@
     <div id="optionsDragHandle" class="drag-handle" style="position:absolute;top:0;left:0;right:0;height:36px;border-radius:18px 18px 0 0;"></div>
     <button class="close-dot" onclick="act('toggle')" aria-label="閉じる"></button>
     <button class="info-dot" onclick="showDevMessage()" aria-label="開発者メッセージ">i</button>
-    <div><span class="label">フォント</span><select id="fSel"></select></div>
-    <div><span class="label">サイズ</span><select id="sSel"></select></div>
-    <div><span class="label">検索</span>
+    <div><span class="label" data-i18n="opt.font">フォント</span><select id="fSel"></select></div>
+    <div><span class="label" data-i18n="opt.size">サイズ</span><select id="sSel"></select></div>
+    <div><span class="label" data-i18n="opt.search">検索</span>
       <select id="dictSel">
         <option value="wikipedia">Wikipedia_JP</option>
         <option value="wiktionary">Wiktionary_JP</option>
       </select>
     </div>
-    <div><span class="label">翻訳</span>
+    <div><span class="label" data-i18n="opt.translate">翻訳</span>
       <select id="translateSel">
         <option value="google">Google 翻訳</option>
         <option value="bing">Bing 翻訳</option>
       </select>
     </div>
-    <div><span class="label">テーマ</span><div class="color-swatches" id="colorSwatches"></div></div>
+    <div><span class="label" data-i18n="opt.theme">テーマ</span><div class="color-swatches" id="colorSwatches"></div></div>
     <div>
-      <span class="label">自動保存</span>
+      <span class="label" data-i18n="opt.autosave">自動保存</span>
       <label class="ios-toggle"><input type="checkbox" id="autoSaveToggle"><span class="ios-toggle-slider"></span></label>
       <button id="clearAutoSaveBtn" title="保存済みデータを消去">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#e53935;display:block;">
@@ -1337,75 +1348,83 @@
       </button>
     </div>
     <div>
-      <span class="label">保存</span>
+      <span class="label" data-i18n="opt.save">保存</span>
       <label class="ios-toggle"><input type="checkbox" id="saveMetaToggle"><span class="ios-toggle-slider"></span></label>
-      <span style="font-size:10px; color:var(--dim); margin-left:4px; white-space:nowrap;">文章情報を含める</span>
+      <span style="font-size:10px; color:var(--dim); margin-left:4px; white-space:nowrap;" data-i18n="opt.savespan">文章情報を含める</span>
     </div>
     <div id="pageToggleRow" style="display:none">
-      <span class="label">ページ</span>
+      <span class="label" data-i18n="opt.page">ページ</span>
       <label class="ios-toggle"><input type="checkbox" id="pageBarToggle"><span class="ios-toggle-slider"></span></label>
     </div>
     <div id="pageNavModeRow" style="display:none">
-      <span class="label">ページ表示</span>
+      <span class="label" data-i18n="opt.pageview">ページ表示</span>
       <div style="display:flex;gap:4px;flex:1;">
-        <button id="pageNavSlideBtn" class="page-nav-mode-btn active" title="スライドパネル方式">サイドバー</button>
-        <button id="pageNavTabBtn"   class="page-nav-mode-btn"        title="タブバー方式">タブ</button>
+        <button id="pageNavSlideBtn" class="page-nav-mode-btn active" title="スライドパネル方式" data-i18n="opt.sidebar">サイドバー</button>
+        <button id="pageNavTabBtn"   class="page-nav-mode-btn"        title="タブバー方式"      data-i18n="opt.tab">タブ</button>
       </div>
     </div>
     <div>
-      <span class="label">バーの移動</span>
+      <span class="label" data-i18n="opt.movebar">バーの移動</span>
       <label class="ios-toggle"><input type="checkbox" id="headerMoveToggle"><span class="ios-toggle-slider"></span></label>
     </div>
     <div>
-      <span class="label">下部バー</span>
+      <span class="label" data-i18n="opt.footer">下部バー</span>
       <label class="ios-toggle"><input type="checkbox" id="footerAlwaysToggle"><span class="ios-toggle-slider"></span></label>
-      <span style="font-size:10px; color:var(--dim); margin-left:4px; white-space:nowrap;">常時表示</span>
+      <span style="font-size:10px; color:var(--dim); margin-left:4px; white-space:nowrap;" data-i18n="opt.footerspan">常時表示</span>
     </div>
     <div id="pwLockRow">
-      <span class="label">パスワードロック</span>
+      <span class="label" data-i18n="opt.pwlock">パスワードロック</span>
       <label class="ios-toggle"><input type="checkbox" id="pwLockToggle"><span class="ios-toggle-slider"></span></label>
     </div>
     <div id="bioRegisterRow" style="display:none">
-      <span class="label">パスキー</span>
+      <span class="label" data-i18n="opt.passkey">パスキー</span>
       <label class="ios-toggle"><input type="checkbox" id="bioToggle"><span class="ios-toggle-slider"></span></label>
     </div>
+    <div>
+      <span class="label" data-i18n="opt.lang">言語</span>
+      <div style="display:flex;gap:4px;flex:1;">
+        <button id="langJaBtn" class="page-nav-mode-btn active" onclick="window.i18n.setLang('ja')">日本語</button>
+        <button id="langEnBtn" class="page-nav-mode-btn"        onclick="window.i18n.setLang('en')">English</button>
+      </div>
+    </div>
     <div class="options-version">
-      <span>Build 2602280253</span>
+      <span>Build 2602280852</span>
       <span>Version 26.2.4.2</span>
-      <span><strong>↓Creator↓</strong><br>Claude<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Chat GPT<br>Gemini<br>Cursor<br>Tikuwa</span>
+      <span><strong>↓Creator↓</strong><br>Claude<br>Trae_Chat GPT5.2Codex<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Chat GPT<br>Gemini<br>Cursor<br>Tikuwa</span>
     </div>
   </div>
 
   <div id="bioPromptModal" class="glass panel-modal">
     <div class="bio-prompt-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M12 15h8M17 15v-2"/></svg></div>
-    <div class="bio-prompt-title">パスキーを登録しますか？</div>
-    <div class="bio-prompt-desc">パスキーを登録することによりパスワードを打たずにシームレスなログインが可能になります。</div>
+    <div class="bio-prompt-title" data-i18n="bio.title">パスキーを登録しますか？</div>
+    <div class="bio-prompt-desc"  data-i18n="bio.desc">パスキーを登録することによりパスワードを打たずにシームレスなログインが可能になります。</div>
     <div class="bio-prompt-btns">
-      <button class="btn-bio" id="bioPromptRegisterBtn">パスキーを登録する</button>
-      <button class="btn-bio-skip" id="bioPromptSkipBtn">あとで設定する</button>
+      <button class="btn-bio"      id="bioPromptRegisterBtn" data-i18n="bio.register">パスキーを登録する</button>
+      <button class="btn-bio-skip" id="bioPromptSkipBtn"     data-i18n="bio.skip">あとで設定する</button>
     </div>
   </div>
 
   <div id="confirmModal" class="glass modal panel-modal" role="dialog" aria-modal="true">
-    <p id="modalMsg">内容をすべて消去しますか？</p>
-    <input type="text" id="fileNameInput" placeholder="ファイル名を入力..." style="display:none">
+    <p id="modalMsg" data-i18n="confirm.new">内容をすべて消去しますか？</p>
+    <input type="text" id="fileNameInput" placeholder="ファイル名を入力..."
+           data-i18n="confirm.filename" data-i18n-attr="placeholder" style="display:none">
     <div class="modal-btns">
-      <button class="btn-sub" onclick="closeConfirm(false)">キャンセル</button>
-      <button id="modalConfirmBtn" class="btn-main" onclick="closeConfirm(true)">確定</button>
+      <button class="btn-sub" onclick="closeConfirm(false)" data-i18n="common.cancel">キャンセル</button>
+      <button id="modalConfirmBtn" class="btn-main" onclick="closeConfirm(true)" data-i18n="common.ok">確定</button>
     </div>
   </div>
 
   <div id="saveMetaModal" class="glass modal panel-modal save-meta-modal">
     <button class="close-dot" id="saveMetaCloseBtn" style="left:13px;" aria-label="閉じる"></button>
-    <p>ファイルを保存</p>
-    <div class="save-meta-desc">フォント・サイズ情報をファイルに含めますか？<br><span>含めると次回読み込み時に設定が復元されます</span></div>
+    <p data-i18n="savemeta.title">ファイルを保存</p>
+    <div class="save-meta-desc" data-i18n="savemeta.desc">フォント・サイズ情報をファイルに含めますか？<br><span>含めると次回読み込み時に設定が復元されます</span></div>
     <div class="save-meta-remember">
       <label class="ios-toggle ios-toggle-sm"><input type="checkbox" id="saveMetaRememberToggle"><span class="ios-toggle-slider"></span></label>
-      <span>この選択を記憶する</span>
+      <span data-i18n="savemeta.remember">この選択を記憶する</span>
     </div>
     <div class="modal-btns">
-      <button id="saveMetaNoBtn" class="btn-sub">情報なしで保存</button>
-      <button id="saveMetaYesBtn" class="btn-main">情報ありで保存</button>
+      <button id="saveMetaNoBtn"  class="btn-sub"  data-i18n="savemeta.no">情報なしで保存</button>
+      <button id="saveMetaYesBtn" class="btn-main" data-i18n="savemeta.yes">情報ありで保存</button>
     </div>
   </div>
 
@@ -1439,7 +1458,7 @@
   <div id="searchWebPanel" class="glass">
     <div class="swp-header drag-handle" id="searchWebDragHandle">
       <button class="swp-dot" onclick="closePanel('searchWebPanel')" aria-label="閉じる"></button>
-      <button class="swp-wiki-btn" id="swpWikiBtn">開く</button>
+      <button class="swp-wiki-btn" id="swpWikiBtn" data-i18n="swp.open">開く</button>
     </div>
     <div class="swp-body" id="swpBody"></div>
   </div>
@@ -1455,20 +1474,20 @@
 追記:考えうる限り機能追加したつもりだけどまた思いついたら追加するかも
 
  - Tikuwa - </div>
-    <button class="dev-close" onclick="hideDevMessage()">閉じる</button>
+    <button class="dev-close" onclick="hideDevMessage()" data-i18n="common.close">閉じる</button>
   </div>
 
   <div id="backdrop" onclick="act('closeOverlays')"></div>
   <div id="contextMenu" class="glass">
-    <button id="ctxCopy"   onclick="ctxCopyText()">コピー</button>
-    <button id="ctxCut"    onclick="ctxCutText()">切り取り</button>
-    <button id="ctxPaste"  onclick="ctxPasteText()">貼り付け</button>
+    <button id="ctxCopy"    onclick="ctxCopyText()"              data-i18n="ctx.copy">コピー</button>
+    <button id="ctxCut"     onclick="ctxCutText()"               data-i18n="ctx.cut">切り取り</button>
+    <button id="ctxPaste"   onclick="ctxPasteText()"             data-i18n="ctx.paste">貼り付け</button>
     <div id="ctxDivider" class="ctx-divider"></div>
-    <button id="ctxSearch"  onclick="searchWiki()">検索</button>
-    <button id="ctxTrans"   onclick="translateText()">翻訳</button>
-    <button id="ctxShare"   onclick="ctxShareText()">共有</button>
-    <button id="ctxCompare" onclick="openCompareFromContextMenu()">比較</button>
-    <button id="ctxFind" onclick="ctxOpenSearch()">文字検索</button>
+    <button id="ctxSearch"  onclick="searchWiki()"               data-i18n="ctx.search">検索</button>
+    <button id="ctxTrans"   onclick="translateText()"            data-i18n="ctx.translate">翻訳</button>
+    <button id="ctxShare"   onclick="ctxShareText()"             data-i18n="ctx.share">共有</button>
+    <button id="ctxCompare" onclick="openCompareFromContextMenu()" data-i18n="ctx.compare">比較</button>
+    <button id="ctxFind"    onclick="ctxOpenSearch()"            data-i18n="ctx.find">文字検索</button>
   </div>
   <div id="searchHighlightMirror"></div>
   <textarea id="edit" spellcheck="false"></textarea>
@@ -1512,12 +1531,12 @@
   <input type="file" id="compareFileInput" hidden accept=".txt">
   <div id="diffOverlay" style="display:none;position:fixed;inset:0;z-index:300;overflow:hidden;background:var(--bg);">
     <div id="diffHeader" class="glass diff-enter">
-      <span class="diff-label">比較結果</span>
+      <span class="diff-label"  data-i18n="diff.title">比較結果</span>
       <span class="diff-divider"></span>
-      <span id="diffLegendAdd" class="diff-legend"><span class="diff-legend-dot add"></span>追加</span>
-      <span id="diffLegendDel" class="diff-legend"><span class="diff-legend-dot del"></span>削除</span>
+      <span id="diffLegendAdd" class="diff-legend"><span class="diff-legend-dot add"></span><span data-i18n="diff.add">追加</span></span>
+      <span id="diffLegendDel" class="diff-legend"><span class="diff-legend-dot del"></span><span data-i18n="diff.del">削除</span></span>
       <span class="diff-divider"></span>
-      <button class="diff-close-btn" onclick="closeDiffOverlay()">✕ 閉じる</button>
+      <button class="diff-close-btn" onclick="closeDiffOverlay()" data-i18n="diff.close">✕ 閉じる</button>
     </div>
     <div id="diffContent"></div>
   </div>
@@ -1528,30 +1547,31 @@
   <button id="pageTabEditBtn" title="ページ名を編集" style="transform:scaleX(-1);">✎</button>
   <!-- タブ名編集ポップアップ -->
   <div id="tabNamePopup">
-    <label>ページ名</label>
-    <input id="tabNamePopupInput" type="text" maxlength="20" placeholder="ページ名を入力..." autocomplete="off">
-    <span id="tabNamePopupHint">Enter で確定 · Esc でキャンセル</span>
+    <label data-i18n="tab.label">ページ名</label>
+    <input id="tabNamePopupInput" type="text" maxlength="20" placeholder="ページ名を入力..." autocomplete="off"
+           data-i18n="tab.placeholder" data-i18n-attr="placeholder">
+    <span id="tabNamePopupHint" data-i18n="tab.hint">Enter で確定 · Esc でキャンセル</span>
   </div>
   <div id="pagePullTab" aria-label="ページを開く"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
   <div id="folderSwipeTrigger"></div>
   <div id="folderPullTab" aria-label="サイドバーを開く"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
   <div id="openChooserModal" class="glass panel-modal">
-    <div class="oc-title">開く方法を選択</div>
+    <div class="oc-title" data-i18n="oc.title">開く方法を選択</div>
     <div class="oc-btns">
       <button class="oc-btn" id="ocFileBtn">
         <span class="oc-label">
-          <strong>ファイルを開く</strong>
-          <span>.txt .html .json など</span>
+          <strong data-i18n="oc.file.title">ファイルを開く</strong>
+          <span data-i18n="oc.file.desc">.txt .html .json など</span>
         </span>
       </button>
       <button class="oc-btn" id="ocFolderBtn">
         <span class="oc-label">
-          <strong>フォルダを開く</strong>
-          <span>サイドバーにファイル一覧を表示</span>
+          <strong data-i18n="oc.folder.title">フォルダを開く</strong>
+          <span data-i18n="oc.folder.desc">サイドバーにファイル一覧を表示</span>
         </span>
       </button>
     </div>
-    <button class="oc-cancel" id="ocCancelBtn">キャンセル</button>
+    <button class="oc-cancel" id="ocCancelBtn" data-i18n="oc.cancel">キャンセル</button>
   </div>
 
   <div id="folderOverlay" onclick="closeFolderPanel()"></div>
@@ -1565,18 +1585,18 @@
       </div>
     </div>
     <div id="folderFileList">
-      <div class="folder-empty">フォルダを開くと<br>ファイルが表示されます</div>
+      <div class="folder-empty" data-i18n="folder.empty">フォルダを開くと<br>ファイルが表示されます</div>
     </div>
     <div id="folderWriteStatus">
       <span class="ws-dot"></span>
-      <span id="folderWriteStatusText">読み取り専用</span>
+      <span id="folderWriteStatusText" data-i18n="folder.readonly">読み取り専用</span>
     </div>
   </div>
 
   <div id="pageOverlay" onclick="closePagePanel()"></div>
   <div id="pagePanel">
     <div id="pagePanelHeader">
-      <span class="pph-title">ページ</span>
+      <span class="pph-title" data-i18n="pp.title">ページ</span>
       <div class="pph-btns">
         <button class="pph-edit" onclick="openTitleEdit()" style="transform:scaleX(-1);">✎</button>
         <button class="pph-add" onclick="addPage()">＋</button>
@@ -1585,6 +1605,131 @@
     <div id="pageList"><div id="pageNumIndicator"></div></div>
     <div id="pageMaxMsg"></div>
   </div>
+
+  <script>
+  /* ===== i18n (国際化) ===== */
+  (function() {
+    var LANG_KEY = 'np26_lang';
+    var _lang = localStorage.getItem(LANG_KEY) || 'ja';
+
+    var dict = {
+      ja: {
+        'hdr.new':'新規','hdr.open':'開く','hdr.save':'保存',
+        'hdr.share':'共有','hdr.pages':'ページ','hdr.settings':'設定',
+        'opt.font':'フォント','opt.size':'サイズ','opt.search':'検索',
+        'opt.translate':'翻訳','opt.theme':'テーマ','opt.autosave':'自動保存',
+        'opt.save':'保存','opt.page':'ページ','opt.pageview':'ページ表示',
+        'opt.movebar':'バーの移動','opt.footer':'下部バー','opt.footerspan':'常時表示',
+        'opt.savespan':'文章情報を含める','opt.pwlock':'パスワードロック',
+        'opt.passkey':'パスキー','opt.lang':'言語',
+        'opt.sidebar':'サイドバー','opt.tab':'タブ',
+        'ctx.copy':'コピー','ctx.cut':'切り取り','ctx.paste':'貼り付け',
+        'ctx.search':'検索','ctx.translate':'翻訳','ctx.share':'共有',
+        'ctx.compare':'比較','ctx.find':'文字検索',
+        'sp.placeholder':'検索...','sp.prev':'↑ 前へ','sp.next':'↓ 次へ',
+        'tab.label':'ページ名','tab.placeholder':'ページ名を入力...',
+        'tab.hint':'Enter で確定 · Esc でキャンセル',
+        'pp.title':'ページ',
+        'oc.title':'開く方法を選択',
+        'oc.file.title':'ファイルを開く','oc.file.desc':'.txt .html .json など',
+        'oc.folder.title':'フォルダを開く','oc.folder.desc':'サイドバーにファイル一覧を表示',
+        'oc.cancel':'キャンセル',
+        'lock.label':'パスワードを入力してください',
+        'lock.placeholder':'パスワード','lock.submit':'ロック解除',
+        'lock.bio':'🔑 パスキーでロック解除',
+        'pwu.title':'パスワードロック解除',
+        'pwu.desc':'ロックを解除すると、このサイトに保存しているデータが無条件で他人に見られる可能性があります。',
+        'pwu.confirm':'解除する',
+        'pws.title':'パスワードロック設定','pws.pw':'パスワード',
+        'pws.pw.placeholder':'パスワードを入力...','pws.confirm':'確認入力',
+        'pws.confirm.placeholder':'もう一度入力...','pws.save':'設定する',
+        'bio.title':'パスキーを登録しますか？',
+        'bio.desc':'パスキーを登録することによりパスワードを打たずにシームレスなログインが可能になります。',
+        'bio.register':'パスキーを登録する','bio.skip':'あとで設定する',
+        'confirm.new':'内容をすべて消去しますか？','confirm.filename':'ファイル名を入力...',
+        'common.cancel':'キャンセル','common.ok':'確定','common.close':'閉じる',
+        'savemeta.title':'ファイルを保存',
+        'savemeta.desc':'フォント・サイズ情報をファイルに含めますか？',
+        'savemeta.remember':'この選択を記憶する',
+        'savemeta.no':'情報なしで保存','savemeta.yes':'情報ありで保存',
+        'folder.empty':'フォルダを開くと\nファイルが表示されます',
+        'folder.readonly':'読み取り専用',
+        'diff.title':'比較結果','diff.add':'追加','diff.del':'削除','diff.close':'✕ 閉じる',
+        'swp.open':'開く'
+      },
+      en: {
+        'hdr.new':'New','hdr.open':'Open','hdr.save':'Save',
+        'hdr.share':'Share','hdr.pages':'Pages','hdr.settings':'Settings',
+        'opt.font':'Font','opt.size':'Size','opt.search':'Search',
+        'opt.translate':'Translate','opt.theme':'Theme','opt.autosave':'Auto Save',
+        'opt.save':'Save','opt.page':'Pages','opt.pageview':'Page View',
+        'opt.movebar':'Move Bar','opt.footer':'Footer','opt.footerspan':'Always On',
+        'opt.savespan':'Incl. metadata','opt.pwlock':'PW Lock',
+        'opt.passkey':'Passkey','opt.lang':'Language',
+        'opt.sidebar':'Sidebar','opt.tab':'Tab',
+        'ctx.copy':'Copy','ctx.cut':'Cut','ctx.paste':'Paste',
+        'ctx.search':'Search','ctx.translate':'Translate','ctx.share':'Share',
+        'ctx.compare':'Compare','ctx.find':'Find',
+        'sp.placeholder':'Search...','sp.prev':'↑ Prev','sp.next':'↓ Next',
+        'tab.label':'Page Name','tab.placeholder':'Enter page name...',
+        'tab.hint':'Enter to confirm · Esc to cancel',
+        'pp.title':'Pages',
+        'oc.title':'Choose how to open',
+        'oc.file.title':'Open File','oc.file.desc':'.txt .html .json etc.',
+        'oc.folder.title':'Open Folder','oc.folder.desc':'Show file list in sidebar',
+        'oc.cancel':'Cancel',
+        'lock.label':'Enter your password',
+        'lock.placeholder':'Password','lock.submit':'Unlock',
+        'lock.bio':'🔑 Unlock with Passkey',
+        'pwu.title':'Remove Password Lock',
+        'pwu.desc':'Removing the lock means anyone with access to this site could view your saved data.',
+        'pwu.confirm':'Remove Lock',
+        'pws.title':'Set Password Lock','pws.pw':'Password',
+        'pws.pw.placeholder':'Enter password...','pws.confirm':'Confirm',
+        'pws.confirm.placeholder':'Enter again...','pws.save':'Set Password',
+        'bio.title':'Register Passkey?',
+        'bio.desc':'Register a passkey to log in seamlessly without typing your password.',
+        'bio.register':'Register Passkey','bio.skip':'Set up later',
+        'confirm.new':'Clear all content?','confirm.filename':'Enter file name...',
+        'common.cancel':'Cancel','common.ok':'OK','common.close':'Close',
+        'savemeta.title':'Save File',
+        'savemeta.desc':'Include font & size info in the file?',
+        'savemeta.remember':'Remember this choice',
+        'savemeta.no':'Save without info','savemeta.yes':'Save with info',
+        'folder.empty':'Open a folder to\nshow files here',
+        'folder.readonly':'Read only',
+        'diff.title':'Diff Result','diff.add':'Added','diff.del':'Removed','diff.close':'✕ Close',
+        'swp.open':'Open'
+      }
+    };
+
+    function apply() {
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        var key  = el.dataset.i18n;
+        var attr = el.dataset.i18nAttr;
+        var val  = (dict[_lang] && dict[_lang][key]) || dict['ja'][key] || key;
+        if (attr) { el[attr] = val; } else { el.textContent = val; }
+      });
+      var jaBtn = document.getElementById('langJaBtn');
+      var enBtn = document.getElementById('langEnBtn');
+      if (jaBtn) jaBtn.classList.toggle('active', _lang === 'ja');
+      if (enBtn) enBtn.classList.toggle('active', _lang === 'en');
+    }
+
+    window.i18n = {
+      t: function(key) { return (dict[_lang] && dict[_lang][key]) || dict['ja'][key] || key; },
+      lang: function() { return _lang; },
+      setLang: function(lang) { _lang = lang; localStorage.setItem(LANG_KEY, lang); apply(); },
+      apply: apply
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', apply);
+    } else {
+      apply();
+    }
+  })();
+  </script>
 
   <script>
 
@@ -2520,6 +2665,10 @@
         void panel.offsetWidth; panel.style.transition = '';
       }
       function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+      function tabBarMinTop() {
+        if (document.body.classList.contains('tab-bar-mode')) return 56 + 16; /* タブバー高さ56px + 余白16px */
+        return 8;
+      }
       function onStart(cx, cy) {
         if (!panel.dataset.dragged) { snapToPos(); panel.dataset.dragged = '1'; }
         isDragging = true; hasMoved = false; startX = cx; startY = cy;
@@ -2532,7 +2681,7 @@
         if (!hasMoved && Math.abs(dx) + Math.abs(dy) > 3) hasMoved = true;
         if (!hasMoved) return;
         panel.style.left = clamp(startLeft + dx, 8, window.innerWidth  - panel.offsetWidth  - 8) + 'px';
-        panel.style.top  = clamp(startTop  + dy, 8, window.innerHeight - panel.offsetHeight - 8) + 'px';
+        panel.style.top  = clamp(startTop  + dy, tabBarMinTop(), window.innerHeight - panel.offsetHeight - 8) + 'px';
       }
       function onEnd() { if (!isDragging) return; isDragging = false; handle.style.cursor = ''; }
       new MutationObserver(function() {
@@ -2634,6 +2783,10 @@
         hdr.style.transition = '';
       }
       function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+      function tabBarMinTop() {
+        if (document.body.classList.contains('tab-bar-mode')) return 56 + 16;
+        return 8;
+      }
 
       function onStart(cx, cy) {
         if (!hdr.dataset.dragged) { snapHeader(); hdr.dataset.dragged = '1'; }
@@ -2650,7 +2803,7 @@
         if (!hasMoved && Math.abs(dx) + Math.abs(dy) > 3) hasMoved = true;
         if (!hasMoved) return;
         hdr.style.left = clamp(startLeft + dx, 8, window.innerWidth  - hdr.offsetWidth  - 8) + 'px';
-        hdr.style.top  = clamp(startTop  + dy, 8, window.innerHeight - hdr.offsetHeight - 8) + 'px';
+        hdr.style.top  = clamp(startTop  + dy, tabBarMinTop(), window.innerHeight - hdr.offsetHeight - 8) + 'px';
       }
       function onEnd() {
         if (!isDragging) return;
@@ -2877,8 +3030,8 @@
   var tabToRemove = tabs[idx];
   var firstRects = tabs.map(tab => tab.getBoundingClientRect());
 
-  var animDuration = 0.28; // Unified duration
-  var animEase = 'cubic-bezier(0.4, 0, 0.2, 1)'; // Unified easing
+  var animDuration = 0.32; // Close duration
+  var animEase = 'cubic-bezier(0.45, 0, 0.55, 1)'; // slow→fast→slow
 
   tabToRemove.style.transition = `opacity ${animDuration}s ${animEase}, transform ${animDuration}s ${animEase}, max-width ${animDuration}s ${animEase}, padding ${animDuration}s ${animEase}, border ${animDuration}s ${animEase}`;
   tabToRemove.style.opacity = '0';
@@ -3078,9 +3231,7 @@
       tab.appendChild(closeBtn);
       tab.addEventListener('click', function() { switchPage(i); });
       wrap.appendChild(tab);
-
       if (isNew) {
-        /* 上からスライドイン：幅は即時確保、内容だけ上から降りる */
         wrap.classList.add('tab-add-enter');
       }
       bar.appendChild(wrap);
@@ -3100,7 +3251,6 @@
           requestAnimationFrame(function() {
             newWrap.classList.remove('tab-add-enter');
             newWrap.classList.add('tab-add-active');
-            /* transitionend後にクラスだけ除去 — スタイルは一切触らない */
             newWrap.querySelector('.page-tab').addEventListener('transitionend', function onDone(ev) {
               if (ev.propertyName !== 'transform') return;
               newWrap.classList.remove('tab-add-active');
@@ -3125,10 +3275,35 @@
     });
   };
 
-  /* addPage ラップ */
+  /* addPage ラッパー：+ボタンを先にアニメしてからタブ追加 */
   (function() {
     var origAdd = window.addPage;
-    window.addPage = function() { _tabAddPending = true; origAdd(); };
+    window.addPage = function() {
+      var bar = $('pageTabBar');
+      if (!bar || !bar.classList.contains('active')) {
+        /* タブバーモードでなければ即実行 */
+        origAdd();
+        return;
+      }
+      var existingAddBtn = bar.querySelector('#pageTabAddBtn');
+      if (!existingAddBtn) { origAdd(); return; }
+
+      /* タブ1枚分の幅を推定（min-width 90px + gap 6px） */
+      var ANIM_DUR = 320; /* ms */
+      var SLIDE_PX = 96;
+
+      /* +ボタンを右へスライド */
+      existingAddBtn.style.transition = 'none';
+      existingAddBtn.getBoundingClientRect();
+      existingAddBtn.style.transition = 'transform ' + ANIM_DUR + 'ms cubic-bezier(0.45,0,0.55,1)';
+      existingAddBtn.style.transform  = 'translateX(' + SLIDE_PX + 'px)';
+
+      /* アニメ完了後にタブを追加 */
+      setTimeout(function() {
+        _tabAddPending = true;
+        origAdd();
+      }, ANIM_DUR);
+    };
   })();
 
 
@@ -3206,9 +3381,7 @@
         if (e.key === 'Escape') { e.preventDefault(); closePopup(); }
         e.stopPropagation();
       });
-      input.addEventListener('blur', function() {
-        setTimeout(function() { if (_popupOpen) commitPopup(); }, 120);
-      });
+      /* blur では閉じない：Enter / Escape / 鉛筆ボタンのみで終了 */
     }
 
     /* 編集ボタン：ポップアップのトグル */
@@ -3222,13 +3395,7 @@
       });
     }
 
-    /* タブをダブルクリックでも編集 */
-    document.addEventListener('click', function(e) {
-      if (!_popupOpen) return;
-      if (popup && popup.contains(e.target)) return;
-      if (editBtn && editBtn.contains(e.target)) return;
-      commitPopup();
-    });
+    /* 外クリックでは閉じない：Enter / Escape / 鉛筆ボタンのみで終了 */
 
     /* 外部から名前更新されたらタブも更新（ページパネル側の編集対応） */
     window._syncTabName = function(idx) {
