@@ -1407,7 +1407,7 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 2602281821</span>
+      <span>Build 2602281941</span>
       <span>Version 26.2.5.1</span>
       <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Chat GPT<br>Gemini<br>Cursor<br>Tikuwa</span>
     </div>
@@ -1485,12 +1485,13 @@
   <div id="devMessageModal" class="glass panel-modal">
     <div class="dev-title-main">Information</div>
     <div class="dev-body">アプリを使っている人へ
-このアプリのベースのバージョンはBuild2602271758です
-26.2.4への互換性や後方互換性などの確認は行っていますがもし不具合があれば再度保存し直してもらえると幸いです
+このアプリのベースのバージョンはBuild2602281858です
+26.2.5への互換性や後方互換性などの確認は行っていますがもし不具合があれば再度保存し直してもらえると幸いです
 またそれより以前のバージョンをお使いの方は"--- DON'T EDIT BELOW ---"などのテキストが表示される場合がありますが、旧バージョンの仕様であり、気になる場合は該当テキストを削除してから保存し直すと消えるかと思います
 これからもこのアプリをよろしくお願いします]
 
-追記:考えうる限り機能追加したつもりだけどまた思いついたら追加するかも
+追記:今のところユーザー数0(2025/2/28)
+もしかしたら使ってる人がいるかもの精神で開発中
 
  - Tikuwa - </div>
     <button class="dev-close" onclick="hideDevMessage()" data-i18n="common.close">閉じる</button>
@@ -3409,6 +3410,11 @@
 
   /* ===== タブバー描画（ラッパー方式）===== */
   window.renderPageTabs = function() {
+    /* ファイルエディタ起動中はファイルタブを表示 */
+    if (window.folderFileActive && window.renderFolderTabs) {
+      window.renderFolderTabs();
+      return;
+    }
     var bar = $('pageTabBar'); if (!bar || !bar.classList.contains('active')) return;
     var doAddAnim = _tabAddPending;
     _tabAddPending = false;
@@ -3482,6 +3488,33 @@
       var activeEl = bar.querySelector('.page-tab.active');
       if (activeEl) activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     });
+  };
+
+  /* ===== タブバー切り替えアニメーション (ページ↔ファイル) ===== */
+  window.animateTabSwitch = function(renderFn) {
+    var bar = $('pageTabBar');
+    if (!bar || !bar.classList.contains('active')) { if (renderFn) renderFn(); return; }
+    /* フェーズ1: 現タブを上へスライドアウト */
+    bar.style.transition = 'transform 0.18s cubic-bezier(0.55,0,1,0.45), opacity 0.14s ease';
+    bar.style.transform  = 'translateY(-100%)';
+    bar.style.opacity    = '0';
+    setTimeout(function() {
+      /* フェーズ2: 新コンテンツを描画（まだ上に隠れた状態） */
+      if (renderFn) renderFn();
+      bar.style.transition = 'none';
+      bar.style.transform  = 'translateY(-100%)';
+      bar.style.opacity    = '0';
+      bar.offsetWidth; /* reflow */
+      /* フェーズ3: 上から下へスライドイン */
+      bar.style.transition = 'transform 0.40s cubic-bezier(0.34,1.28,0.64,1), opacity 0.28s ease';
+      bar.style.transform  = 'translateY(0)';
+      bar.style.opacity    = '1';
+      setTimeout(function() {
+        bar.style.transition = '';
+        bar.style.transform  = '';
+        bar.style.opacity    = '';
+      }, 430);
+    }, 210);
   };
 
   /* addPage ラッパー：+ボタンを先にアニメしてからタブ追加 */
@@ -3891,6 +3924,15 @@
         item.onclick = function() { loadFile(i); };
         fileList.appendChild(item);
       });
+      /* タブバーモードのとき、アクティブ状態を同期 */
+      if (window.folderFileActive && document.body.classList.contains('tab-bar-mode')) {
+        var bar = $('pageTabBar');
+        if (bar) {
+          bar.querySelectorAll('.page-tab').forEach(function(t, i) {
+            t.classList.toggle('active', i === activeIdx);
+          });
+        }
+      }
     }
 
     /* --- ファイル読み込み --- */
@@ -3948,18 +3990,26 @@
           localStorage.setItem(PAGES_CUR, pages[curPageIdx].id);
 
           window.folderFileActive = true;
-          /* ファイルエディタ起動中はタブバーを強制で閉じ、設定のページ表示行を非表示にする */
-          if (document.body.classList.contains('tab-bar-mode')) {
-            window.applyPageNavMode('slide');
+          /* タブバーモードでない場合のみ設定行を非表示にする */
+          if (!document.body.classList.contains('tab-bar-mode')) {
+            var navModeRow = $('pageNavModeRow');
+            if (navModeRow) navModeRow.style.display = 'none';
           }
-          var navModeRow = $('pageNavModeRow');
-          if (navModeRow) navModeRow.style.display = 'none';
           edit.value = newText;
           ActionHandlers.updateText(newText);
           render();
           activeIdx = idx; hasUnsaved = false;
           f.size = file.size;
           renderFileList();
+          /* タブバーモードならファイルをタブとして表示 */
+          if (document.body.classList.contains('tab-bar-mode') && window.renderFolderTabs) {
+            if (!wasInFileEditor && window.animateTabSwitch) {
+              /* 初回移行：ページタブ→ファイルタブ（アニメーション付き） */
+              window.animateTabSwitch(window.renderFolderTabs);
+            } else {
+              window.renderFolderTabs();
+            }
+          }
           if (!wasInFileEditor) {
             queueToast(window.i18n.t('toast.fileeditor_enter_prefix') + f.name, 2400);
           } else {
@@ -4047,6 +4097,41 @@
       }
     });
 
+    /* --- ファイルタブ描画（タブバーモード用） --- */
+    function renderFolderTabs() {
+      var bar = $('pageTabBar');
+      if (!bar || !bar.classList.contains('active')) return;
+      bar.innerHTML = '';
+      fileHandles.forEach(function(f, i) {
+        var wrap = document.createElement('div');
+        wrap.className = 'page-tab-wrap';
+
+        var tab = document.createElement('button');
+        tab.className = 'page-tab' + (i === activeIdx ? ' active' : '');
+
+        var extBadgeSpan = document.createElement('span');
+        extBadgeSpan.style.cssText = 'font-size:9px;opacity:0.5;margin-right:2px;flex-shrink:0;';
+        extBadgeSpan.textContent = f.ext.toUpperCase();
+
+        var nameSpan = document.createElement('span');
+        nameSpan.className = 'page-tab-name';
+        nameSpan.textContent = f.name.slice(0, 20);
+
+        tab.appendChild(extBadgeSpan);
+        tab.appendChild(nameSpan);
+        (function(idx) {
+          tab.addEventListener('click', function() { loadFile(idx); });
+        })(i);
+        wrap.appendChild(tab);
+        bar.appendChild(wrap);
+      });
+      requestAnimationFrame(function() {
+        var activeEl = bar.querySelector('.page-tab.active');
+        if (activeEl) activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      });
+    }
+    window.renderFolderTabs = renderFolderTabs;
+
     openBtn.onclick    = openDirectory;
     refreshBtn.onclick = refreshDirectory;
 
@@ -4066,10 +4151,16 @@
         }
         window.folderFileActive = false;
         activeIdx = -1; hasUnsaved = false;
-        /* ファイルエディタ終了時にページ表示行を復元し、タブバーモードを復元 */
+        /* ファイルエディタ終了時にページ表示行を復元し、タブバーを復元 */
         var navModeRow = $('pageNavModeRow');
         if (navModeRow) navModeRow.style.display = '';
-        if (localStorage.getItem('pageNavMode') === 'tabbar') {
+        if (document.body.classList.contains('tab-bar-mode')) {
+          /* タブバーモードのまま → ファイルタブ→ページタブ（アニメーション付き） */
+          if (window.animateTabSwitch && window.renderPageTabs) {
+            requestAnimationFrame(function() { window.animateTabSwitch(window.renderPageTabs); });
+          }
+        } else if (localStorage.getItem('pageNavMode') === 'tabbar') {
+          /* スライドモード中だったが設定はタブ → タブバーを復元 */
           requestAnimationFrame(function() { window.applyPageNavMode('tabbar'); });
         }
         renderFileList();
