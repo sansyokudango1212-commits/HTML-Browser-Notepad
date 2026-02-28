@@ -605,7 +605,6 @@
       font-size: 11px; pointer-events: none;
     }
 
-
     #searchPanel {
       position: fixed; top: 50%; left: 50%; z-index: 170;
       box-shadow: 0 8px 30px rgba(0,0,0,0.2);
@@ -1071,8 +1070,8 @@
       transform: translateY(-100%);
       opacity: 0;
       /* 閉じるアニメは速度調整のみ */
-      transition: transform 0.20s cubic-bezier(0.4,0,1,1),
-                  opacity   0.16s cubic-bezier(0.4,0,1,1);
+      transition: transform 0.12s cubic-bezier(0.4,0,1,1),
+                  opacity   0.10s cubic-bezier(0.4,0,1,1);
       will-change: transform, opacity;
     }
     #pageTabBar::-webkit-scrollbar { display: none; }
@@ -1227,13 +1226,33 @@
     }
 
     /* タブバーモード時のヘッダー・テキストエリア位置調整 */
-    body.tab-bar-mode { --header-top: 64px; }
+    body.tab-bar-mode { --header-top: 68px; }
     /* header[data-dragged] の top はJSのclampで制御するためCSS固定は削除 */
     body.tab-bar-mode textarea,
     body.tab-bar-mode #searchHighlightMirror { padding-top: 120px !important; }
     @media (max-width: 480px) {
       body.tab-bar-mode textarea,
       body.tab-bar-mode #searchHighlightMirror { padding-top: 112px !important; }
+    }
+
+    /* ===== 言語切り替えオーバーレイ ===== */
+    #langTransitionOverlay {
+      position: fixed; inset: 0; z-index: 99999;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.32s cubic-bezier(0.4,0,0.2,1);
+    }
+    #langTransitionOverlay.fade-in  { opacity: 1; pointer-events: auto; }
+    #langTransitionOverlay.fade-out { opacity: 0; pointer-events: none; }
+    #langTransitionLabel {
+      font-size: 15px; font-weight: 200; color: var(--dim);
+      letter-spacing: 0.5px;
+      animation: langLabelPulse 0.9s ease-in-out infinite alternate;
+    }
+    @keyframes langLabelPulse {
+      from { opacity: 0.4; }
+      to   { opacity: 1; }
     }
   </style>
 </head>
@@ -1388,9 +1407,9 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 2602280852</span>
-      <span>Version 26.2.4.2</span>
-      <span><strong>↓Creator↓</strong><br>Claude<br>Trae_Chat GPT5.2Codex<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Chat GPT<br>Gemini<br>Cursor<br>Tikuwa</span>
+      <span>Build 2602281405</span>
+      <span>Version 26.2.5</span>
+      <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Chat GPT<br>Gemini<br>Cursor<br>Tikuwa</span>
     </div>
   </div>
 
@@ -1493,7 +1512,7 @@
   <textarea id="edit" spellcheck="false"></textarea>
   <footer id="ft" class="glass">
     <span id="b-info"></span>
-    <span id="f-info-label-wrap" class="ft-slot"><span id="f-info-label" class="ft-slot-inner"></span></span><span id="f-info-wrap" class="ft-slot"><span id="f-info-num" class="ft-slot-inner"></span></span><span id="f-info-unit"></span>
+    <span id="f-info-label-wrap" class="ft-slot"><span id="f-info-label" class="ft-slot-inner"></span></span><span id="f-info-wrap" class="ft-slot"><span id="f-info-num" class="ft-slot-inner"></span></span><span id="f-info-unit" data-i18n="footer.unit"></span>
   </footer>
   </div>
 
@@ -1577,7 +1596,7 @@
   <div id="folderOverlay" onclick="closeFolderPanel()"></div>
   <div id="folderPanel">
     <div id="folderPanelHeader">
-      <span class="fph-title" id="folderPanelTitle">フォルダ</span>
+      <span class="fph-title" id="folderPanelTitle" data-i18n="folder.title">フォルダ</span>
       <div class="fph-btns">
         <button class="fph-btn" id="folderRefreshBtn" title="再読み込み">↺</button>
         <button class="fph-btn accent" id="folderOpenBtn" title="フォルダを変更">＋</button>
@@ -1636,6 +1655,10 @@
         'oc.cancel':'キャンセル',
         'lock.label':'パスワードを入力してください',
         'lock.placeholder':'パスワード','lock.submit':'ロック解除',
+        'lock.empty':'暗証番号を入力してください',
+        'lock.invalid':'パスワードが正しくありません',
+        'lock.checking':'確認中...',
+        'lock.bio.checking':'認証中...',
         'lock.bio':'🔑 パスキーでロック解除',
         'pwu.title':'パスワードロック解除',
         'pwu.desc':'ロックを解除すると、このサイトに保存しているデータが無条件で他人に見られる可能性があります。',
@@ -1654,8 +1677,64 @@
         'savemeta.no':'情報なしで保存','savemeta.yes':'情報ありで保存',
         'folder.empty':'フォルダを開くと\nファイルが表示されます',
         'folder.readonly':'読み取り専用',
+        'folder.writable':'書き込み可能',
+        'folder.no_files':'対応ファイルが見つかりません',
+        'folder.save_overwrite':'ファイルに上書き保存',
         'diff.title':'比較結果','diff.add':'追加','diff.del':'削除','diff.close':'✕ 閉じる',
-        'swp.open':'開く'
+        'swp.open':'開く',
+        'bio.registering':'登録中...',
+        'toast.passkey_registered':'パスキーを登録しました',
+        'toast.register_failed':'登録失敗: ',
+        'toast.register_failed_unknown':'不明なエラー',
+        'toast.register_failed_cancel':'キャンセルされました',
+        'toast.pwlock_set':'パスワードロックを設定しました',
+        'toast.pwlock_removed':'パスワードロックを解除しました',
+        'toast.saved_prefix':'保存しました：',
+        'toast.save_failed':'保存に失敗しました。',
+        'toast.open_file_failed':'ファイルを開けませんでした',
+        'toast.folder_not_supported':'フォルダ選択は対応していません（Chrome/Edge推奨）',
+        'toast.share_not_supported':'この環境では共有できません',
+        'toast.share_failed':'共有に失敗しました',
+        'toast.copied':'コピーしました',
+        'toast.share_copied':'共有不可のためコピーしました',
+        'toast.cut_done':'切り取りました',
+        'toast.autosave_prefix':'自動保存済み ',
+        'toast.page_blocked_fileeditor':'ファイルエディタ起動中はページを使用できません',
+        'toast.page_add_blocked_fileeditor':'ファイルエディタ中はページを追加できません',
+        'toast.page_max_prefix':'ページは最大',
+        'toast.page_max_suffix':'枚までです',
+        'toast.page_last_delete_blocked':'最後のページは削除できません',
+        'toast.fileeditor_enter_prefix':'ファイルエディタに移行しました ― ',
+        'toast.file_loaded_suffix':' を読み込みました',
+        'toast.load_failed_prefix':'読み込みに失敗しました: ',
+        'toast.file_saved_suffix':' に保存しました',
+        'toast.save_failed_detail_prefix':'保存に失敗しました: ',
+        'toast.folder_picker_unsupported':'フォルダ選択に未対応ブラウザ',
+        'toast.folder_open_failed':'フォルダを開けませんでした',
+        'toast.folder_refreshed':'フォルダを再読み込みしました',
+        'toast.folder_refresh_failed':'再読み込みに失敗しました',
+        'toast.memo_returned':'メモ帳に戻りました',
+        'toast.autosave_restored':'自動保存データを復元しました',
+        'toast.autosave_cleared':'自動保存データを消去しました',
+        'toast.passkey_require_password':'先にパスワードを登録してください',
+        'toast.passkey_unlinked':'パスキー認証の連携を解除しました',
+        'toast.font_size_prefix':'フォントサイズ: ',
+        'toast.offline_error':'エラー: インターネット接続が遮断されました',
+        'pws.strength_prefix':'強度: ',
+        'pws.strength_weak':'弱い（6文字以上推奨）',
+        'pws.strength_medium':'普通',
+        'pws.strength_strong':'強い',
+        'pws.error_mismatch':'パスワードが一致しません',
+        'pws.error_tooshort':'4文字以上入力してください',
+        'pws.progress_deriving':'鍵を導出中... (しばらくお待ちください)',
+        'pws.progress_encrypting':'データを暗号化中...',
+        'pws.error_failed':'設定に失敗しました: ',
+        'pagemax.msg':'最大MAXページに達しました',
+        'page.default':'ページ ',
+        'page.placeholder':'ページ名...',
+        'footer.unit':' 文字',
+        'pp.empty':'空のページ',
+        'folder.title':'フォルダ'
       },
       en: {
         'hdr.new':'New','hdr.open':'Open','hdr.save':'Save',
@@ -1680,6 +1759,10 @@
         'oc.cancel':'Cancel',
         'lock.label':'Enter your password',
         'lock.placeholder':'Password','lock.submit':'Unlock',
+        'lock.empty':'Please enter your passcode',
+        'lock.invalid':'Incorrect password',
+        'lock.checking':'Checking...',
+        'lock.bio.checking':'Authenticating...',
         'lock.bio':'🔑 Unlock with Passkey',
         'pwu.title':'Remove Password Lock',
         'pwu.desc':'Removing the lock means anyone with access to this site could view your saved data.',
@@ -1698,8 +1781,64 @@
         'savemeta.no':'Save without info','savemeta.yes':'Save with info',
         'folder.empty':'Open a folder to\nshow files here',
         'folder.readonly':'Read only',
+        'folder.writable':'Writable',
+        'folder.no_files':'No supported files found',
+        'folder.save_overwrite':'Overwrite file',
         'diff.title':'Diff Result','diff.add':'Added','diff.del':'Removed','diff.close':'✕ Close',
-        'swp.open':'Open'
+        'swp.open':'Open',
+        'bio.registering':'Registering...',
+        'toast.passkey_registered':'Passkey registered',
+        'toast.register_failed':'Registration failed: ',
+        'toast.register_failed_unknown':'Unknown error',
+        'toast.register_failed_cancel':'Cancelled',
+        'toast.pwlock_set':'Password lock enabled',
+        'toast.pwlock_removed':'Password lock disabled',
+        'toast.saved_prefix':'Saved: ',
+        'toast.save_failed':'Save failed.',
+        'toast.open_file_failed':'Failed to open file',
+        'toast.folder_not_supported':'Folder picker not supported (Chrome/Edge recommended)',
+        'toast.share_not_supported':'Sharing is not supported in this environment',
+        'toast.share_failed':'Share failed',
+        'toast.copied':'Copied',
+        'toast.share_copied':'Sharing not available, copied instead',
+        'toast.cut_done':'Cut',
+        'toast.autosave_prefix':'Autosaved ',
+        'toast.page_blocked_fileeditor':'Pages are unavailable while the file editor is open',
+        'toast.page_add_blocked_fileeditor':'Cannot add pages while the file editor is open',
+        'toast.page_max_prefix':'Maximum pages: ',
+        'toast.page_max_suffix':'',
+        'toast.page_last_delete_blocked':'The last page cannot be deleted',
+        'toast.fileeditor_enter_prefix':'Switched to file editor — ',
+        'toast.file_loaded_suffix':' loaded',
+        'toast.load_failed_prefix':'Failed to load: ',
+        'toast.file_saved_suffix':' saved',
+        'toast.save_failed_detail_prefix':'Save failed: ',
+        'toast.folder_picker_unsupported':'Folder picker not supported',
+        'toast.folder_open_failed':'Failed to open folder',
+        'toast.folder_refreshed':'Folder reloaded',
+        'toast.folder_refresh_failed':'Reload failed',
+        'toast.memo_returned':'Returned to memo',
+        'toast.autosave_restored':'Autosave restored',
+        'toast.autosave_cleared':'Autosave cleared',
+        'toast.passkey_require_password':'Please register a password first',
+        'toast.passkey_unlinked':'Passkey link removed',
+        'toast.font_size_prefix':'Font size: ',
+        'toast.offline_error':'Error: Internet connection lost',
+        'pws.strength_prefix':'Strength: ',
+        'pws.strength_weak':'Weak (6+ chars recommended)',
+        'pws.strength_medium':'Medium',
+        'pws.strength_strong':'Strong',
+        'pws.error_mismatch':'Passwords do not match',
+        'pws.error_tooshort':'Must be at least 4 characters',
+        'pws.progress_deriving':'Deriving key... (please wait)',
+        'pws.progress_encrypting':'Encrypting data...',
+        'pws.error_failed':'Setup failed: ',
+        'pagemax.msg':'Maximum MAX pages reached',
+        'page.default':'Page ',
+        'page.placeholder':'Page name...',
+        'footer.unit':' chars',
+        'pp.empty':'Empty page',
+        'folder.title':'Folder'
       }
     };
 
@@ -1707,6 +1846,8 @@
       document.querySelectorAll('[data-i18n]').forEach(function(el) {
         var key  = el.dataset.i18n;
         var attr = el.dataset.i18nAttr;
+        /* フォルダパネルタイトルは実フォルダ名が入っているときスキップ */
+        if (el.id === 'folderPanelTitle' && el.dataset.i18nLocked) return;
         var val  = (dict[_lang] && dict[_lang][key]) || dict['ja'][key] || key;
         if (attr) { el[attr] = val; } else { el.textContent = val; }
       });
@@ -1719,7 +1860,26 @@
     window.i18n = {
       t: function(key) { return (dict[_lang] && dict[_lang][key]) || dict['ja'][key] || key; },
       lang: function() { return _lang; },
-      setLang: function(lang) { _lang = lang; localStorage.setItem(LANG_KEY, lang); apply(); },
+      setLang: function(lang) {
+        if (lang === _lang) return;
+        var overlay = document.getElementById('langTransitionOverlay');
+        var label   = document.getElementById('langTransitionLabel');
+        /* 切り替え先言語の「変更中」メッセージ */
+        var msg = lang === 'en' ? 'Changing language...' : '言語を変更中...';
+        if (label) label.textContent = msg;
+        /* フェードイン */
+        if (overlay) overlay.classList.add('fade-in');
+        setTimeout(function() {
+          /* 言語適用 */
+          _lang = lang;
+          localStorage.setItem(LANG_KEY, lang);
+          apply();
+          /* フェードアウト */
+          setTimeout(function() {
+            if (overlay) overlay.classList.remove('fade-in');
+          }, 900);
+        }, 380);
+      },
       apply: apply
     };
 
@@ -1906,9 +2066,9 @@
 
   async function tryUnlock() {
     var pw = lockPwInput.value;
-    if (!pw) { showLockError('暗証番号を入力してください'); return; }
+    if (!pw) { showLockError(window.i18n.t('lock.empty')); return; }
     lockSubmitBtn.disabled = true;
-    lockSubmitBtn.textContent = '確認中...';
+    lockSubmitBtn.textContent = window.i18n.t('lock.checking');
     var ok = await CryptoEngine.verifyPassword(pw);
     if (ok) {
       sessionUnlocked = true;
@@ -1924,13 +2084,13 @@
       loadEncryptedPages(pw);
       return; /* 解除成功: ボタンのリセットは不要 */
     }
-    showLockError('パスワードが正しくありません');
+    showLockError(window.i18n.t('lock.invalid'));
     lockPwInput.classList.add('error');
     setTimeout(function() { lockPwInput.classList.remove('error'); }, 400);
     lockPwInput.value = '';
     lockPwInput.focus();
     lockSubmitBtn.disabled = false;
-    lockSubmitBtn.textContent = 'ロック解除';
+    lockSubmitBtn.textContent = window.i18n.t('lock.submit');
   }
   function showLockError(msg) {
     lockErrorMsg.textContent = msg;
@@ -1940,15 +2100,15 @@
 
   document.getElementById('bioPromptRegisterBtn').addEventListener('click', async function() {
     var btn = this;
-    btn.disabled = true; btn.textContent = '登録中...';
+    btn.disabled = true; btn.textContent = window.i18n.t('bio.registering');
     try {
       await BiometricEngine.register(sessionPassword);
       closePanel('bioPromptModal');
-      queueToast('パスキーを登録しました', 2500);
+      queueToast(window.i18n.t('toast.passkey_registered'), 2500);
       if (typeof window.updateBioUI === 'function') window.updateBioUI();
     } catch(e) {
-      btn.disabled = false; btn.textContent = 'パスワードを登録する';
-      queueToast('登録失敗: ' + (e.message || '不明なエラー'), 3000);
+      btn.disabled = false; btn.textContent = window.i18n.t('bio.register');
+      queueToast(window.i18n.t('toast.register_failed') + (e.message || window.i18n.t('toast.register_failed_unknown')), 3000);
     }
   });
   document.getElementById('bioPromptSkipBtn').addEventListener('click', function() {
@@ -1960,7 +2120,7 @@
     lockBioBtn.style.display = '';
     lockBioBtn.addEventListener('click', async function() {
       lockBioBtn.disabled = true;
-      lockBioBtn.textContent = '認証中...';
+      lockBioBtn.textContent = window.i18n.t('lock.bio.checking');
       try {
         var pw = await BiometricEngine.authenticate();
         if (pw) {
@@ -2010,18 +2170,18 @@
   function getStrength(pw) {
     if (!pw) return null;
     var len = pw.length;
-    if (len < 6)  return { level: 'weak',   label: '弱い（6文字以上推奨）' };
-    if (len < 8)  return { level: 'medium', label: '普通' };
-    return { level: 'strong', label: '強い' };
+    if (len < 6)  return { level: 'weak',   labelKey: 'pws.strength_weak' };
+    if (len < 8)  return { level: 'medium', labelKey: 'pws.strength_medium' };
+    return { level: 'strong', labelKey: 'pws.strength_strong' };
   }
   function updatePwSaveBtn() {
     var pw1 = pwSetNew.value, pw2 = pwSetConfirm.value;
     var str = getStrength(pw1);
-    if (str) { pwStrength.className = 'pwset-strength ' + str.level; pwStrength.textContent = '強度: ' + str.label; }
+    if (str) { pwStrength.className = 'pwset-strength ' + str.level; pwStrength.textContent = window.i18n.t('pws.strength_prefix') + window.i18n.t(str.labelKey); }
     else     { pwStrength.className = 'pwset-strength'; pwStrength.textContent = ''; }
     var ok = pw1.length >= 4 && pw1 === pw2;
     pwSetSaveBtn.disabled = !ok;
-    pwSetError.textContent = pw2.length > 0 && pw1 !== pw2 ? 'パスワードが一致しません' : '';
+    pwSetError.textContent = pw2.length > 0 && pw1 !== pw2 ? window.i18n.t('pws.error_mismatch') : '';
   }
   pwSetNew.oninput     = updatePwSaveBtn;
   pwSetConfirm.oninput = updatePwSaveBtn;
@@ -2042,22 +2202,28 @@
   };
   window.savePassword = async function() {
     var pw = pwSetNew.value;
-    if (!pw || pw.length < 4) { pwSetError.textContent = '4文字以上入力してください'; return; }
+    if (!pw || pw.length < 4) { pwSetError.textContent = window.i18n.t('pws.error_tooshort'); return; }
     pwSetSaveBtn.disabled = true;
-    pwSetProgress.textContent = '鍵を導出中... (しばらくお待ちください)';
+    pwSetProgress.textContent = window.i18n.t('pws.progress_deriving');
     try {
-      await CryptoEngine.savePasswordToken(pw, function(msg) { pwSetProgress.textContent = msg; });
+      await CryptoEngine.savePasswordToken(pw, function(msg) {
+        /* CryptoEngine内部のハードコード日本語を翻訳してから表示 */
+        var translated = msg
+          .replace('鍵導出中... (600,000回)', window.i18n.t('pws.progress_deriving'))
+          .replace('暗号化中...', window.i18n.t('pws.progress_encrypting'));
+        pwSetProgress.textContent = translated;
+      });
       sessionPassword = pw;
       sessionUnlocked = true;
-      pwSetProgress.textContent = 'データを暗号化中...';
+      pwSetProgress.textContent = window.i18n.t('pws.progress_encrypting');
       await CryptoEngine.encryptPages(pages, pw, function(msg) { pwSetProgress.textContent = msg; });
       closePanel('pwSetModal');
-      queueToast('パスワードロックを設定しました', 3000);
+      queueToast(window.i18n.t('toast.pwlock_set'), 3000);
       if (BiometricEngine.isSupported()) {
         setTimeout(function() { openPanel('bioPromptModal'); }, 400);
       }
     } catch(e) {
-      pwSetError.textContent = '設定に失敗しました: ' + e.message;
+      pwSetError.textContent = window.i18n.t('pws.error_failed') + e.message;
       pwSetSaveBtn.disabled = false;
     }
     pwSetProgress.textContent = '';
@@ -2080,11 +2246,11 @@
         }
         localStorage.removeItem('np26_pages_enc');
         sessionPassword = '';
-        queueToast('パスワードロックを解除しました', 3000);
+        queueToast(window.i18n.t('toast.pwlock_removed'), 3000);
       });
     } else {
       localStorage.removeItem('np26_pages_enc');
-      queueToast('パスワードロックを解除しました', 3000);
+      queueToast(window.i18n.t('toast.pwlock_removed'), 3000);
     }
   };
 
@@ -2141,8 +2307,8 @@
       var blob = new Blob([fullText], { type: 'text/plain' });
       var url = URL.createObjectURL(blob);
       a.href = url; a.download = sanitizeFileName(state.curFile); a.click(); URL.revokeObjectURL(url);
-      queueToast('保存しました：' + state.curFile, 2500);
-    } catch(e) { queueToast('保存に失敗しました。'); }
+      queueToast(window.i18n.t('toast.saved_prefix') + state.curFile, 2500);
+    } catch(e) { queueToast(window.i18n.t('toast.save_failed')); }
   }
 
   function openSaveMetaModal() {
@@ -2263,7 +2429,7 @@
           /* フォルダパネルが開いていれば閉じる */
           if (window.closeFolderPanel) window.closeFolderPanel();
         } catch(e) {
-          if (e.name !== 'AbortError') queueToast('ファイルを開けませんでした', 2500);
+          if (e.name !== 'AbortError') queueToast(window.i18n.t('toast.open_file_failed'), 2500);
         }
       } else {
         /* フォールバック */
@@ -2277,7 +2443,7 @@
       if (window.folderOpenDirectory) {
         window.folderOpenDirectory();
       } else {
-        queueToast('フォルダ選択は対応していません（Chrome/Edge推奨）', 3000);
+        queueToast(window.i18n.t('toast.folder_not_supported'), 3000);
       }
     };
 
@@ -2317,7 +2483,7 @@
             if (window.closeFolderPanel) window.closeFolderPanel();
            
           } catch(e) {
-            if (e.name !== 'AbortError') queueToast('ファイルを開けませんでした', 2500);
+            if (e.name !== 'AbortError') queueToast(window.i18n.t('toast.open_file_failed'), 2500);
           }
         })();
       } else {
@@ -2346,11 +2512,11 @@
       else { state.isOptionsOpen = true; state.isModalOpen = false; hideContextMenu(); closePanel('translatePanel'); openPanel('options'); }
     },
     share: function() {
-      if (!navigator.share) { queueToast('この環境では共有できません', 2000); return; }
+      if (!navigator.share) { queueToast(window.i18n.t('toast.share_not_supported'), 2000); return; }
       var title = (pages && pages[curPageIdx]) ? pages[curPageIdx].title : state.curFile;
       var text  = $('edit').value;
       navigator.share({ title: title, text: text })
-        .catch(function(e) { if (e.name !== 'AbortError') queueToast('共有に失敗しました', 2000); });
+        .catch(function(e) { if (e.name !== 'AbortError') queueToast(window.i18n.t('toast.share_failed'), 2000); });
     },
     toggleSearch: function() {
       state.isSearchOpen = !state.isSearchOpen;
@@ -2434,7 +2600,7 @@
     void contextMenu.offsetWidth; contextMenu.classList.add('animating');
   }
   function copyToClipboard(text, onDone) { localStorage.setItem(CLIP_KEY, text); if (onDone) onDone(); }
-  window.ctxCopyText  = function() { if (!selectedText) { hideContextMenu(); return; } var t = selectedText; hideContextMenu(); copyToClipboard(t, function() { queueToast('コピーしました', 1000); }); };
+  window.ctxCopyText  = function() { if (!selectedText) { hideContextMenu(); return; } var t = selectedText; hideContextMenu(); copyToClipboard(t, function() { queueToast(window.i18n.t('toast.copied'), 1000); }); };
   window.ctxOpenSearch = function() {
     hideContextMenu();
     if (!state.isSearchOpen) { state.isSearchOpen = true; openPanel('searchPanel'); doSearch(0); }
@@ -2444,14 +2610,14 @@
     var text = selectedText;
     hideContextMenu();
     if (!text) return;
-    if (!navigator.share) { copyToClipboard(text, function() { queueToast('共有不可のためコピーしました', 2000); }); return; }
+    if (!navigator.share) { copyToClipboard(text, function() { queueToast(window.i18n.t('toast.share_copied'), 2000); }); return; }
     navigator.share({ text: text })
-      .catch(function(e) { if (e.name !== 'AbortError') queueToast('共有に失敗しました', 2000); });
+      .catch(function(e) { if (e.name !== 'AbortError') queueToast(window.i18n.t('toast.share_failed'), 2000); });
   };
   window.ctxCutText   = function() {
     if (!selectedText) { hideContextMenu(); return; }
     var edit = $('edit'), s = edit.selectionStart, e = edit.selectionEnd, t = selectedText; hideContextMenu();
-    copyToClipboard(t, function() { edit.setRangeText('', s, e, 'start'); ActionHandlers.updateText(edit.value); scheduleAutoSave(); render(); selectedText = ''; queueToast('切り取りました', 1000); });
+    copyToClipboard(t, function() { edit.setRangeText('', s, e, 'start'); ActionHandlers.updateText(edit.value); scheduleAutoSave(); render(); selectedText = ''; queueToast(window.i18n.t('toast.cut_done'), 1000); });
   };
   window.ctxPasteText = function() {
     var text = localStorage.getItem(CLIP_KEY) || ''; if (!text) { hideContextMenu(); return; }
@@ -2740,91 +2906,97 @@
     }
 
     (function() {
-      var leftBtn = $('headerLeftBtn'), rightBtn = $('headerRightBtn');
-      var hdr = document.querySelector('header');
-      if (!leftBtn || !rightBtn || !hdr) return;
-      function snapIfNeeded() {
-        if (!hdr.dataset.dragged) {
-          var r = hdr.getBoundingClientRect();
-          hdr.style.transition = 'none';
-          hdr.style.left = r.left + 'px';
-          hdr.style.top  = r.top  + 'px';
-          hdr.style.transform = 'none';
-          void hdr.offsetWidth;
-          hdr.style.transition = '';
-          hdr.dataset.dragged = '1';
-        }
-      }
-      function moveHeader(dx) {
-        snapIfNeeded();
-        var cur = parseFloat(hdr.style.left) || 0;
-        var max = window.innerWidth - hdr.offsetWidth - 8;
-        hdr.style.left = Math.max(8, Math.min(max, cur + dx)) + 'px';
-      }
-      leftBtn.onclick  = function(e) { e.stopPropagation(); moveHeader(-40); };
-      rightBtn.onclick = function(e) { e.stopPropagation(); moveHeader(+40); };
-    })();
-
-    (function() {
       var hdr = document.querySelector('header');
       var topBar = $('headerTopBar');
       var yellowBtn = $('headerYellowBtn');
-      if (!hdr || !topBar) return;
-      var isDragging = false, hasMoved = false;
-      var startX, startY, startLeft, startTop;
+      if (!hdr) return;
 
-      function snapHeader() {
-        var r = hdr.getBoundingClientRect();
-        hdr.style.transition = 'none';
-        hdr.style.left = r.left + 'px';
-        hdr.style.top  = r.top  + 'px';
-        hdr.style.transform = 'none';
-        void hdr.offsetWidth;
-        hdr.style.transition = '';
-      }
+      var isDragging = false, didMove = false;
+      /* 掴んだ瞬間のカーソルとヘッダー左上のオフセット差を記録 */
+      var grabOffsetX = 0, grabOffsetY = 0;
+      var hdrW = 0, hdrH = 0;
+
       function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
       function tabBarMinTop() {
-        if (document.body.classList.contains('tab-bar-mode')) return 56 + 16;
-        return 8;
+        return document.body.classList.contains('tab-bar-mode') ? 56 + 16 : 8;
+      }
+
+      /* transition を一時停止してピクセル座標に固定 */
+      function freezeHeader() {
+        var r = hdr.getBoundingClientRect();
+        hdr.style.transition = 'none';
+        hdr.style.transform  = 'none';
+        hdr.style.left = r.left + 'px';
+        hdr.style.top  = r.top  + 'px';
+        hdr.dataset.dragged = '1';
       }
 
       function onStart(cx, cy) {
-        if (!hdr.dataset.dragged) { snapHeader(); hdr.dataset.dragged = '1'; }
-        isDragging = true; hasMoved = false;
-        startX = cx; startY = cy;
-        startLeft = parseFloat(hdr.style.left) || 0;
-        startTop  = parseFloat(hdr.style.top)  || 0;
+        if (hdr.classList.contains('no-move')) return;
+        /* 掴む瞬間に一度だけ座標を確定（リフローを最小化） */
+        freezeHeader();
+        hdrW = hdr.offsetWidth;
+        hdrH = hdr.offsetHeight;
+        grabOffsetX = cx - parseFloat(hdr.style.left);
+        grabOffsetY = cy - parseFloat(hdr.style.top);
+        isDragging = true;
+        didMove    = false;
         hdr.classList.add('header-expanded');
-        topBar.style.cursor = 'grabbing';
+        hdr.style.cursor = 'grabbing';
+        hdr.style.userSelect = 'none';
       }
+
       function onMove(cx, cy) {
         if (!isDragging) return;
-        var dx = cx - startX, dy = cy - startY;
-        if (!hasMoved && Math.abs(dx) + Math.abs(dy) > 3) hasMoved = true;
-        if (!hasMoved) return;
-        hdr.style.left = clamp(startLeft + dx, 8, window.innerWidth  - hdr.offsetWidth  - 8) + 'px';
-        hdr.style.top  = clamp(startTop  + dy, tabBarMinTop(), window.innerHeight - hdr.offsetHeight - 8) + 'px';
+        didMove = true;
+        /* 計算のみ・リフロー不要 */
+        var newLeft = clamp(cx - grabOffsetX, 8, window.innerWidth  - hdrW - 8);
+        var newTop  = clamp(cy - grabOffsetY, tabBarMinTop(), window.innerHeight - hdrH - 8);
+        hdr.style.left = newLeft + 'px';
+        hdr.style.top  = newTop  + 'px';
       }
+
       function onEnd() {
         if (!isDragging) return;
         isDragging = false;
         hdr.classList.remove('header-expanded');
-        topBar.style.cursor = '';
+        hdr.style.transition = '';
+        hdr.style.cursor = 'grab';
+        hdr.style.userSelect = '';
+        /* ドラッグ後の誤クリックをキャンセル */
+        if (didMove) {
+          document.addEventListener('click', function cancelClick(e) {
+            e.stopPropagation(); e.preventDefault();
+            document.removeEventListener('click', cancelClick, true);
+          }, true);
+        }
       }
-      topBar.addEventListener('mousedown', function(e) {
-        if (e.button !== 0 || e.target === yellowBtn) return;
-        if (hdr.classList.contains('no-move')) return;
-        e.preventDefault(); onStart(e.clientX, e.clientY);
+
+      /* ボタン等のインタラクティブ要素を除外 */
+      function isInteractive(el) {
+        while (el && el !== hdr) {
+          var tag = el.tagName;
+          if (tag === 'BUTTON' || tag === 'INPUT' || tag === 'SELECT' || tag === 'A') return true;
+          el = el.parentElement;
+        }
+        return false;
+      }
+
+      hdr.style.cursor = 'grab';
+      hdr.addEventListener('mousedown', function(e) {
+        if (e.button !== 0 || isInteractive(e.target)) return;
+        e.preventDefault();
+        onStart(e.clientX, e.clientY);
       });
       document.addEventListener('mousemove', function(e) { onMove(e.clientX, e.clientY); });
       document.addEventListener('mouseup', onEnd);
-      topBar.addEventListener('touchstart', function(e) {
-        if (e.target === yellowBtn) return;
-        if (hdr.classList.contains('no-move')) return;
+      hdr.addEventListener('touchstart', function(e) {
+        if (isInteractive(e.target)) return;
         onStart(e.touches[0].clientX, e.touches[0].clientY);
       }, { passive: true });
       document.addEventListener('touchmove', function(e) {
-        if (!isDragging) return; e.preventDefault();
+        if (!isDragging) return;
+        e.preventDefault();
         onMove(e.touches[0].clientX, e.touches[0].clientY);
       }, { passive: false });
       document.addEventListener('touchend', onEnd);
@@ -2839,7 +3011,8 @@
           hdr.style.transform = 'none';
           void hdr.offsetWidth;
           hdr.classList.add('returning');
-          hdr.style.left = '50%'; hdr.style.top = '12px';
+          var defaultTop = document.body.classList.contains('tab-bar-mode') ? '68px' : '12px';
+          hdr.style.left = '50%'; hdr.style.top = defaultTop;
           hdr.style.transform = 'translateX(-50%)';
           delete hdr.dataset.dragged;
           hdr.addEventListener('transitionend', function cleanup(e) {
@@ -2926,7 +3099,8 @@
     localStorage.setItem('autosave_size', $('sSel') ? $('sSel').value : '18');
     /* PBKDF2暗号化保存も自動保存と同タイミングで実施 */
     saveCurrentPage();
-    queueToast('自動保存済み ' + new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}), 2000);
+    var locale = (window.i18n.lang() === 'en') ? 'en-US' : 'ja-JP';
+    queueToast(window.i18n.t('toast.autosave_prefix') + new Date().toLocaleTimeString(locale,{hour:'2-digit',minute:'2-digit'}), 2000);
   }
   function scheduleAutoSave() {
     if (!state.autoSave) return; clearAutoSaveTimer(); autoSaveIsInterval = false;
@@ -2985,7 +3159,7 @@
     if (idx === curPageIdx) return;
     /* 仮ページ（ファイルエディタ）への直接移動は禁止 */
     if (pages[idx] && pages[idx]._fileEditor) return;
-    if (window.folderFileActive) { queueToast('ファイルエディタ起動中はページを使用できません', 2200); return; }
+    if (window.folderFileActive) { queueToast(window.i18n.t('toast.page_blocked_fileeditor'), 2200); return; }
     var edit = $('edit'), dir = idx > curPageIdx ? 'right' : 'left';
     var fromId = pages[curPageIdx] ? pages[curPageIdx].id : null;
     var penSlideIn = window.penPageSwitch ? window.penPageSwitch(fromId, pages[idx].id, dir) : null;
@@ -3000,15 +3174,15 @@
     if (penSlideIn) penSlideIn();
   }
   window.addPage = function() {
-    if (window.folderFileActive) { queueToast('ファイルエディタ中はページを追加できません', 2000); return; }
+    if (window.folderFileActive) { queueToast(window.i18n.t('toast.page_add_blocked_fileeditor'), 2000); return; }
     var realCount = pages.filter(function(p){return !p._fileEditor;}).length;
-    if (realCount >= MAX_PAGES) { queueToast('ページは最大' + MAX_PAGES + '枚までです', 2000); return; }
+    if (realCount >= MAX_PAGES) { queueToast(window.i18n.t('toast.page_max_prefix') + MAX_PAGES + window.i18n.t('toast.page_max_suffix'), 2000); return; }
     var edit = $('edit');
     var fromId = pages[curPageIdx] ? pages[curPageIdx].id : null;
     var newId  = genPageId();
     var penSlideIn = window.penPageSwitch ? window.penPageSwitch(fromId, newId, 'right') : null;
     saveCurrentPage();
-    var np = { id: newId, title: 'ページ ' + (pages.length + 1), text: '', font: $('fSel').value || 'Arial', size: parseInt($('sSel').value) || 18, titleLocked: false };
+    var np = { id: newId, title: window.i18n.t('page.default') + (pages.length + 1), text: '', font: $('fSel').value || 'Arial', size: parseInt($('sSel').value) || 18, titleLocked: false };
     pages.push(np); curPageIdx = pages.length - 1; localStorage.setItem(PAGES_CUR, np.id);
     edit.value = ''; ActionHandlers.updateText(''); savePages(); render(); renderPageList();
     requestAnimationFrame(function() { updatePageIndicator(true); });
@@ -3020,7 +3194,7 @@
   if (pages[idx] && pages[idx]._fileEditor) return;
   var realCount = pages.filter(function(p){ return !p._fileEditor; }).length;
   if (realCount <= 1) {
-    queueToast('最後のページは削除できません', 2000);
+    queueToast(window.i18n.t('toast.page_last_delete_blocked'), 2000);
     return;
   }
 
@@ -3118,7 +3292,7 @@
     if (titleEditMode) { closeTitleEdit(false); return; }
     titleEditMode = true;
     var list = $('pageList'), inputs = list.querySelectorAll('.page-title-edit-input');
-    inputs.forEach(function(inp, i) { inp.value = pages[i].title || ('ページ ' + (i + 1)); });
+    inputs.forEach(function(inp, i) { inp.value = pages[i].title || (window.i18n.t('page.default') + (i + 1)); });
     list.classList.add('editing');
     var btn = document.querySelector('.pph-edit');
     if (btn) { btn.textContent = '✕'; btn.style.transform = ''; btn.style.background = 'rgba(229,57,53,0.18)'; btn.style.color = '#e57373'; }
@@ -3133,7 +3307,7 @@
     var list = $('pageList'), inputs = list.querySelectorAll('.page-title-edit-input');
     inputs.forEach(function(inp, i) {
       var edited = inp.value.trim().slice(0, 20);
-      pages[i].title       = edited || ('ページ ' + (i + 1));
+      pages[i].title       = edited || (window.i18n.t('page.default') + (i + 1));
       pages[i].titleLocked = edited.length > 0; /* 入力があればロック */
     });
     savePages(); titleEditMode = false; list.classList.remove('editing'); resetEditBtn(); render();
@@ -3159,14 +3333,14 @@
       card.onclick = function() { switchPage(i); };
       var num = document.createElement('div'); num.className = 'page-num'; num.textContent = String(displayNum);
       var info = document.createElement('div'); info.className = 'page-info';
-      var titleEl = document.createElement('div'); titleEl.className = 'page-title-text'; titleEl.textContent = p.title || ('ページ ' + (i+1));
+      var titleEl = document.createElement('div'); titleEl.className = 'page-title-text'; titleEl.textContent = p.title || (window.i18n.t('page.default') + (i+1));
       var preview = document.createElement('div'); preview.className = 'page-preview';
-      preview.textContent = (p.text || '').replace(/\n/g,' ').trim().slice(0,40) || '空のページ';
+      preview.textContent = (p.text || '').replace(/\n/g,' ').trim().slice(0,40) || window.i18n.t('pp.empty');
       info.appendChild(titleEl); info.appendChild(preview);
       var del = document.createElement('button'); del.className = 'page-del'; del.textContent = '✕';
       del.onclick = function(e) { deletePage(i, e); };
       var inp = document.createElement('input'); inp.type = 'text'; inp.className = 'page-title-edit-input'; inp.maxLength = 20;
-      inp.value = p.title || ('ページ ' + (i+1)); inp.placeholder = 'ページ名...';
+      inp.value = p.title || (window.i18n.t('page.default') + (i+1)); inp.placeholder = window.i18n.t('page.placeholder');
       inp.onclick = function(e) { e.stopPropagation(); };
       (function(pageIdx, inputEl) {
         inputEl.addEventListener('keydown', function(e) {
@@ -3179,7 +3353,7 @@
       list.appendChild(card);
     });
     var realCount = pages.filter(function(p){return !p._fileEditor;}).length;
-    var msg = $('pageMaxMsg'); if (msg) msg.textContent = realCount >= MAX_PAGES ? '最大' + MAX_PAGES + 'ページに達しました' : '';
+    var msg = $('pageMaxMsg'); if (msg) msg.textContent = realCount >= MAX_PAGES ? window.i18n.t('pagemax.msg').replace('MAX', MAX_PAGES) : '';
     updatePageIndicator(false);
     /* タブバーモード時はタブも更新 */
     if (window.renderPageTabs) window.renderPageTabs();
@@ -3219,7 +3393,7 @@
 
       var nameSpan = document.createElement('span');
       nameSpan.className = 'page-tab-name';
-      nameSpan.textContent = (p.title || ('ページ ' + (i + 1))).slice(0, 18);
+      nameSpan.textContent = (p.title || (window.i18n.t('page.default') + (i + 1))).slice(0, 18);
 
       var closeBtn = document.createElement('button');
       closeBtn.className = 'page-tab-close';
@@ -3306,8 +3480,6 @@
     };
   })();
 
-
-
   /* ===== タブ名ポップアップ編集 ===== */
   (function() {
     var popup   = $('tabNamePopup');
@@ -3328,7 +3500,7 @@
       popup.style.left = Math.max(8, left) + 'px';
       popup.style.top  = (rect.bottom + 6) + 'px';
 
-      input.value = (pages[pageIdx] && pages[pageIdx].title) || ('ページ ' + (pageIdx + 1));
+      input.value = (pages[pageIdx] && pages[pageIdx].title) || (window.i18n.t('page.default') + (pageIdx + 1));
       popup.classList.add('open');
       /* animation restart */
       popup.style.animation = 'none';
@@ -3348,7 +3520,7 @@
       if (!_popupOpen) return;
       var val = input.value.trim().slice(0, 20);
       if (_targetIdx >= 0 && pages[_targetIdx]) {
-        pages[_targetIdx].title       = val || ('ページ ' + (_targetIdx + 1));
+        pages[_targetIdx].title       = val || (window.i18n.t('page.default') + (_targetIdx + 1));
         pages[_targetIdx].titleLocked = val.length > 0;
         savePages();
         /* タブ名を即更新 */
@@ -3401,7 +3573,7 @@
     window._syncTabName = function(idx) {
       var bar = $('pageTabBar'); if (!bar) return;
       var nameEl = bar.querySelector('[data-page-idx="' + idx + '"] .page-tab-name');
-      if (nameEl && pages[idx]) nameEl.textContent = (pages[idx].title || ('ページ ' + (idx + 1))).slice(0, 18);
+      if (nameEl && pages[idx]) nameEl.textContent = (pages[idx].title || (window.i18n.t('page.default') + (idx + 1))).slice(0, 18);
     };
   })();
 
@@ -3472,7 +3644,7 @@
   function openPagePanel() {
     if (pagePanelOpen) return;
     /* ファイルエディタ中はページウィンドウを開かない（全ルート共通ガード） */
-    if (window.folderFileActive) { queueToast('ファイルエディタ起動中はページを使用できません', 2200); return; }
+    if (window.folderFileActive) { queueToast(window.i18n.t('toast.page_blocked_fileeditor'), 2200); return; }
     pagePanelOpen = true;
     renderPageList(); $('pagePanel').classList.add('open'); $('pageOverlay').classList.add('open');
     var tab = $('pagePullTab'); if (tab) { tab.classList.remove('visible'); tab.classList.add('panel-open'); }
@@ -3580,6 +3752,8 @@
       var tab = $('folderPullTab'); if (tab) { tab.classList.remove('panel-open'); }
       panel.classList.remove('open');
       overlay.classList.remove('open');
+      /* フォルダ名ロック解除してデフォルトタイトルに戻す */
+      if (titleEl) { delete titleEl.dataset.i18nLocked; titleEl.textContent = window.i18n.t('folder.title'); }
     };
 
     /* --- ファイルサイズ整形 --- */
@@ -3609,10 +3783,10 @@
     /* --- ステータスバー更新（アニメーション付き） --- */
     function updateWriteStatus() {
       var newClass = isWritable ? 'writable' : '';
-      var newText  = isWritable ? '書き込み可能' : '読み取り専用';
+      var newText  = isWritable ? window.i18n.t('folder.writable') : window.i18n.t('folder.readonly');
       if (writeStatus.className === newClass && writeText.textContent === newText) return;
 
-      var prevWritable = writeText.textContent === '書き込み可能';
+      var prevWritable = writeStatus.classList.contains('writable');
       var becomingWritable = isWritable && !prevWritable;
 
       /* テキストをスライドインさせる */
@@ -3643,7 +3817,7 @@
     /* --- ファイルリスト描画 --- */
     function renderFileList() {
       if (!fileHandles.length) {
-        fileList.innerHTML = '<div class="folder-empty">対応ファイルが見つかりません</div>';
+        fileList.innerHTML = '<div class="folder-empty">' + window.i18n.t('folder.no_files') + '</div>';
         return;
       }
       fileList.innerHTML = '';
@@ -3670,7 +3844,7 @@
 
         var saveBtn = document.createElement('button');
         saveBtn.className = 'ffi-save-btn' + (hasUnsaved && i === activeIdx ? ' unsaved' : '');
-        saveBtn.title = 'ファイルに上書き保存';
+        saveBtn.title = window.i18n.t('folder.save_overwrite');
         saveBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>';
         saveBtn.onclick = function(e) { e.stopPropagation(); if (isWritable) saveToFile(i); };
 
@@ -3737,6 +3911,12 @@
           localStorage.setItem(PAGES_CUR, pages[curPageIdx].id);
 
           window.folderFileActive = true;
+          /* ファイルエディタ起動中はタブバーを強制で閉じ、設定のページ表示行を非表示にする */
+          if (document.body.classList.contains('tab-bar-mode')) {
+            window.applyPageNavMode('slide');
+          }
+          var navModeRow = $('pageNavModeRow');
+          if (navModeRow) navModeRow.style.display = 'none';
           edit.value = newText;
           ActionHandlers.updateText(newText);
           render();
@@ -3744,15 +3924,15 @@
           f.size = file.size;
           renderFileList();
           if (!wasInFileEditor) {
-            queueToast('ファイルエディタに移行しました ― ' + f.name, 2400);
+            queueToast(window.i18n.t('toast.fileeditor_enter_prefix') + f.name, 2400);
           } else {
-            queueToast(f.name + ' を読み込みました', 1800);
+            queueToast(f.name + window.i18n.t('toast.file_loaded_suffix'), 1800);
           }
          
 
           /* in アニメーション */
           slidePageIn(edit);
-        }).catch(function(e) { queueToast('読み込みに失敗しました: ' + f.name, 2500); });
+        }).catch(function(e) { queueToast(window.i18n.t('toast.load_failed_prefix') + f.name, 2500); });
       }, 160);
     }
 
@@ -3764,14 +3944,14 @@
         await writable.write($('edit').value);
         await writable.close();
         hasUnsaved = false; renderFileList();
-        queueToast(f.name + ' に保存しました', 1800);
-      } catch(e) { queueToast('保存に失敗しました: ' + (e.message || e), 2500); }
+        queueToast(f.name + window.i18n.t('toast.file_saved_suffix'), 1800);
+      } catch(e) { queueToast(window.i18n.t('toast.save_failed_detail_prefix') + (e.message || e), 2500); }
     }
 
     /* --- フォルダを開く --- */
     async function openDirectory() {
       if (!window.showDirectoryPicker) {
-        queueToast('フォルダ選択に未対応ブラウザ', 3500);
+        queueToast(window.i18n.t('toast.folder_picker_unsupported'), 3500);
         return;
       }
       try {
@@ -3789,9 +3969,9 @@
         }
         entries.sort(function(a, b) { return a.name.localeCompare(b.name, 'ja'); });
         fileHandles = entries;
-        titleEl.textContent = handle.name;
+        titleEl.textContent = handle.name; titleEl.dataset.i18nLocked = "1";
         updateWriteStatus(); renderFileList(); openFolderPanel();
-      } catch(e) { if (e.name !== 'AbortError') queueToast('フォルダを開けませんでした', 2500); }
+      } catch(e) { if (e.name !== 'AbortError') queueToast(window.i18n.t('toast.folder_open_failed'), 2500); }
     }
     window.folderOpenDirectory = openDirectory;
 
@@ -3814,8 +3994,8 @@
         fileHandles.sort(function(a, b) { return a.name.localeCompare(b.name, 'ja'); });
         if (prevWritable !== isWritable) updateWriteStatus();
         renderFileList();
-        queueToast('フォルダを再読み込みしました', 1500);
-      } catch(e) { queueToast('再読み込みに失敗しました', 2500); }
+        queueToast(window.i18n.t('toast.folder_refreshed'), 1500);
+      } catch(e) { queueToast(window.i18n.t('toast.folder_refresh_failed'), 2500); }
     }
 
     /* 編集内容が変わったら unsaved フラグ */
@@ -3849,10 +4029,16 @@
         }
         window.folderFileActive = false;
         activeIdx = -1; hasUnsaved = false;
+        /* ファイルエディタ終了時にページ表示行を復元し、タブバーモードを復元 */
+        var navModeRow = $('pageNavModeRow');
+        if (navModeRow) navModeRow.style.display = '';
+        if (localStorage.getItem('pageNavMode') === 'tabbar') {
+          requestAnimationFrame(function() { window.applyPageNavMode('tabbar'); });
+        }
         renderFileList();
 
         var p = pages[returnIdx];
-        if (!p) { window.closeFolderPanel(); queueToast('メモ帳に戻りました', 1500); return; }
+        if (!p) { window.closeFolderPanel(); queueToast(window.i18n.t('toast.memo_returned'), 1500); return; }
 
         var edit = $('edit'), fSel = $('fSel'), sSel = $('sSel');
         edit.value = p.text || '';
@@ -3866,7 +4052,7 @@
         requestAnimationFrame(function() { updatePageIndicator(true); });
         slidePageIn(edit);
         window.closeFolderPanel();
-        queueToast('メモ帳に戻りました', 1500);
+        queueToast(window.i18n.t('toast.memo_returned'), 1500);
       };
     }
 
@@ -3933,7 +4119,6 @@
     })();
   })();
 
-
   var ftNumTimer   = null;
   var ftLastNum    = null;
   var ftLabelTimer = null;
@@ -3990,13 +4175,13 @@
   function render() {
     var edit = $('edit'), isAnyOpen = state.isOptionsOpen || state.isModalOpen;
     if (isAnyOpen) { clearTimeout(state.hideTimer); state.isFooterHidden = false; }
-    var pageTitle = (pages && pages[curPageIdx]) ? pages[curPageIdx].title.slice(0, 20) : state.curFile.slice(0, 20);
+    var pageTitle = (pages && pages[curPageIdx])
+      ? (pages[curPageIdx].title || (window.i18n.t('page.default') + (curPageIdx + 1))).slice(0, 20)
+      : state.curFile.slice(0, 20);
     var charCount = edit.value.length;
 
     $('b-info').textContent = state.browser + '_' + state.device;
 
-    var unitEl = $('f-info-unit');
-    if (unitEl) unitEl.textContent = ' 文字';
     updateFtLabel(pageTitle + ' · ');
     updateFtNum(charCount);
 
@@ -4068,7 +4253,7 @@
         if (savedSize && $('sSel')) $('sSel').value = savedSize;
         applyStyles();
         edit.value = saved;
-        ActionHandlers.updateText(edit.value); queueToast('自動保存データを復元しました', 3000);
+        ActionHandlers.updateText(edit.value); queueToast(window.i18n.t('toast.autosave_restored'), 3000);
       }
     }
     autoSaveToggle.onchange = function() {
@@ -4078,7 +4263,7 @@
     $('clearAutoSaveBtn').onclick = function() {
       localStorage.removeItem('autosave_text'); localStorage.removeItem('autosave_file');
       localStorage.removeItem('autosave_font'); localStorage.removeItem('autosave_size');
-      queueToast('自動保存データを消去しました', 2000);
+      queueToast(window.i18n.t('toast.autosave_cleared'), 2000);
     };
 
     var saveMetaToggle = $('saveMetaToggle');
@@ -4128,17 +4313,17 @@
         if (bioToggle.checked) {
           bioToggle.disabled = true;
           try {
-            if (!sessionPassword) { queueToast('先にパスワードを登録してください', 2500); bioToggle.checked = false; bioToggle.disabled = false; return; }
+            if (!sessionPassword) { queueToast(window.i18n.t('toast.passkey_require_password'), 2500); bioToggle.checked = false; bioToggle.disabled = false; return; }
             await BiometricEngine.register(sessionPassword);
-            queueToast('パスキーを登録しました', 2000);
+            queueToast(window.i18n.t('toast.passkey_registered'), 2000);
           } catch(e) {
-            queueToast('登録失敗: ' + (e.message || 'キャンセルされました'), 3000);
+            queueToast(window.i18n.t('toast.register_failed') + (e.message || window.i18n.t('toast.register_failed_cancel')), 3000);
             bioToggle.checked = false;
           }
           bioToggle.disabled = false;
         } else {
           BiometricEngine.clear();
-          queueToast('パスキー認証の連携を解除しました', 2000);
+          queueToast(window.i18n.t('toast.passkey_unlinked'), 2000);
           updateBioUI();
         }
       });
@@ -4221,7 +4406,7 @@
       var cur = parseInt(sSel.value, 10) || 18, nz = normalizeSize(cur + (e.deltaY < 0 ? 2 : -2));
       if (nz !== cur) {
         sSel.value = String(nz); applyStyles();
-        clearTimeout(sizeToastTimer); sizeToastTimer = setTimeout(function() { queueToast('フォントサイズ: ' + nz + 'px', 1000); }, 600);
+        clearTimeout(sizeToastTimer); sizeToastTimer = setTimeout(function() { queueToast(window.i18n.t('toast.font_size_prefix') + nz + 'px', 1000); }, 600);
       }
     }, { passive: false });
 
@@ -4278,7 +4463,7 @@
     document.addEventListener('touchstart', handleOutside, { passive: true });
 
     
-    window.addEventListener('offline', function() { if (!hasShownOfflineToast) { hasShownOfflineToast = true; queueToast('エラー: インターネット接続が遮断されました', 5000); } });
+    window.addEventListener('offline', function() { if (!hasShownOfflineToast) { hasShownOfflineToast = true; queueToast(window.i18n.t('toast.offline_error'), 5000); } });
     window.addEventListener('online',  function() { hasShownOfflineToast = false; });
 
     
@@ -4404,12 +4589,18 @@
     var activeStroke = null;
 
     var currentPageId = 'p0';
+    var strokesMap    = {};  /* ページID → ストローク配列 */
 
     window.penPageSwitch = function(fromId, toId, dir) {
+      /* 現在のページのストロークを保存 */
+      strokesMap[fromId] = strokes.slice();
       canvas.classList.remove('page-slide-in-right');
       return function() {
+        /* 切り替え先ページのストロークを復元 */
+        strokes = (strokesMap[toId] || []).slice();
+        currentPageId = toId;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        strokes = []; currentPageId = toId; redrawAll();
+        redrawAll();
         canvas.classList.add('page-slide-in-right');
         setTimeout(function() { canvas.classList.remove('page-slide-in-right'); }, 280);
       };
@@ -4578,8 +4769,8 @@
       if (!drawing || !activeStroke) return;
       drawing = false;
       strokes.push(activeStroke);
+      strokesMap[currentPageId] = strokes.slice();
       activeStroke = null;
-
     }
 
     canvas.addEventListener('mousedown', startDraw);
@@ -4609,11 +4800,13 @@
     undoBtn.addEventListener('click', function() {
       if (!strokes.length) return;
       strokes.pop();
+      strokesMap[currentPageId] = strokes.slice();
       redrawAll();
     });
 
     clearBtn.addEventListener('click', function() {
       strokes = [];
+      strokesMap[currentPageId] = [];
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     });
 
@@ -4622,7 +4815,11 @@
     ctx.lineCap   = 'round';
     ctx.lineJoin  = 'round';
 
-    window.penSetInitialPage = function(pageId) { currentPageId = pageId; };
+    window.penSetInitialPage = function(pageId) {
+      currentPageId = pageId;
+      strokes = (strokesMap[pageId] || []).slice();
+      redrawAll();
+    };
   })();
 
   </script>
@@ -4633,13 +4830,15 @@
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('./sw.js')
           .then(function(reg) {
-            console.log('[SW] 登録完了:', reg.scope);
+            /* console.log('[SW] 登録完了:', reg.scope); */
           })
           .catch(function(err) {
-            console.warn('[SW] 登録失敗:', err);
+            /* console.warn('[SW] 登録失敗:', err); */
           });
       });
     }
   </script>
+
+  <div id="langTransitionOverlay"><span id="langTransitionLabel"></span></div>
 </body>
 </html>
