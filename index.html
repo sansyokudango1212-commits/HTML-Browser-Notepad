@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://translate.googleapis.com https://ja.wikipedia.org https://ja.wiktionary.org; worker-src 'self'; frame-ancestors 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://translate.googleapis.com https://ja.wikipedia.org https://ja.wiktionary.org https://en.wikipedia.org https://en.wiktionary.org; worker-src 'self'; frame-ancestors 'none';">
   <meta http-equiv="X-Frame-Options" content="DENY">
   <link rel="manifest" href="manifest.json">
   <meta name="google-site-verification" content="Z5LCrw2wiWOC0bTQynoScEQ9LTvHoEucbmQwoReCLXE" />
@@ -424,8 +424,8 @@
       from { transform: translateY(110%);  opacity: 0; filter: blur(4px); }
       to   { transform: translateY(0);     opacity: 1; filter: blur(0px); }
     }
-    .ft-slot-inner.slot-out { animation: ftSlotOut 0.14s cubic-bezier(0.4,0,1,1) forwards; }
-    .ft-slot-inner.slot-in  { animation: ftSlotIn  0.20s cubic-bezier(0.34,1.3,0.64,1) forwards; }
+    .ft-slot-inner.slot-out { animation: ftSlotOut 0.08s cubic-bezier(0.4,0,1,1) forwards; }
+    .ft-slot-inner.slot-in  { animation: ftSlotIn  0.14s cubic-bezier(0.34,1.3,0.64,1) forwards; }
 
     #penToggleBtn {
       position: fixed; bottom: 15px; right: 16px;
@@ -1407,8 +1407,8 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 2602281405</span>
-      <span>Version 26.2.5</span>
+      <span>Build 2602281821</span>
+      <span>Version 26.2.5.1</span>
       <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Chat GPT<br>Gemini<br>Cursor<br>Tikuwa</span>
     </div>
   </div>
@@ -1452,18 +1452,18 @@
       <button class="tp-dot" onclick="closePanel('translatePanel')" aria-label="閉じる"></button>
       <div class="tp-lang">
         <select id="tpSrcLang">
-          <option value="auto">自動検出</option>
-          <option value="ja">日本語</option><option value="en">英語</option>
-          <option value="zh-CN">中国語</option><option value="ko">韓国語</option>
-          <option value="fr">フランス語</option><option value="de">ドイツ語</option>
-          <option value="es">スペイン語</option>
+          <option value="auto" data-i18n="tp.lang.auto">自動検出</option>
+          <option value="ja"    data-i18n="tp.lang.ja">日本語</option><option value="en" data-i18n="tp.lang.en">英語</option>
+          <option value="zh-CN" data-i18n="tp.lang.zh">中国語</option><option value="ko" data-i18n="tp.lang.ko">韓国語</option>
+          <option value="fr"    data-i18n="tp.lang.fr">フランス語</option><option value="de" data-i18n="tp.lang.de">ドイツ語</option>
+          <option value="es"    data-i18n="tp.lang.es">スペイン語</option>
         </select>
         <span class="tp-arrow">→</span>
         <select id="tpTgtLang">
-          <option value="ja">日本語</option><option value="en">英語</option>
-          <option value="zh-CN">中国語</option><option value="ko">韓国語</option>
-          <option value="fr">フランス語</option><option value="de">ドイツ語</option>
-          <option value="es">スペイン語</option>
+          <option value="ja"    data-i18n="tp.lang.ja">日本語</option><option value="en" data-i18n="tp.lang.en">英語</option>
+          <option value="zh-CN" data-i18n="tp.lang.zh">中国語</option><option value="ko" data-i18n="tp.lang.ko">韓国語</option>
+          <option value="fr"    data-i18n="tp.lang.fr">フランス語</option><option value="de" data-i18n="tp.lang.de">ドイツ語</option>
+          <option value="es"    data-i18n="tp.lang.es">スペイン語</option>
         </select>
       </div>
     </div>
@@ -1682,6 +1682,20 @@
         'folder.save_overwrite':'ファイルに上書き保存',
         'diff.title':'比較結果','diff.add':'追加','diff.del':'削除','diff.close':'✕ 閉じる',
         'swp.open':'開く',
+        'swp.loading':'検索中...',
+        'swp.notfound_pre':'「','swp.notfound_mid':'」は','swp.notfound_suf':'に見つかりませんでした。',
+        'swp.failed':'取得に失敗しました。',
+        'swp.wiki_read':'Wikipedia で読む →',
+        'swp.wikt_read':'Wiktionary で読む →',
+        'swp.related':'関連語句',
+        'swp.results':'検索結果',
+        'tp.loading':'翻訳中…',
+        'tp.no_result':'翻訳結果が取得できませんでした',
+        'tp.failed':'翻訳に失敗しました。',
+        'tp.lang.auto':'自動検出',
+        'tp.lang.ja':'日本語','tp.lang.en':'英語',
+        'tp.lang.zh':'中国語','tp.lang.ko':'韓国語',
+        'tp.lang.fr':'フランス語','tp.lang.de':'ドイツ語','tp.lang.es':'スペイン語',
         'bio.registering':'登録中...',
         'toast.passkey_registered':'パスキーを登録しました',
         'toast.register_failed':'登録失敗: ',
@@ -1786,6 +1800,20 @@
         'folder.save_overwrite':'Overwrite file',
         'diff.title':'Diff Result','diff.add':'Added','diff.del':'Removed','diff.close':'✕ Close',
         'swp.open':'Open',
+        'swp.loading':'Searching...',
+        'swp.notfound_pre':'"','swp.notfound_mid':'" was not found on ','swp.notfound_suf':'.',
+        'swp.failed':'Failed to retrieve.',
+        'swp.wiki_read':'Read on Wikipedia →',
+        'swp.wikt_read':'Read on Wiktionary →',
+        'swp.related':'Related',
+        'swp.results':'Search results',
+        'tp.loading':'Translating…',
+        'tp.no_result':'No translation result',
+        'tp.failed':'Translation failed.',
+        'tp.lang.auto':'Auto Detect',
+        'tp.lang.ja':'Japanese','tp.lang.en':'English',
+        'tp.lang.zh':'Chinese','tp.lang.ko':'Korean',
+        'tp.lang.fr':'French','tp.lang.de':'German','tp.lang.es':'Spanish',
         'bio.registering':'Registering...',
         'toast.passkey_registered':'Passkey registered',
         'toast.register_failed':'Registration failed: ',
@@ -2626,7 +2654,10 @@
   };
 
   var swpCurrentPageUrl = '';
-  var DICT_CONFIG = { wikipedia: { btnText: 'Wikiで開く' }, wiktionary: { btnText: 'Wiktで開く' } };
+  var DICT_CONFIG = {
+    wikipedia:  { get btnText() { return window.i18n.lang() === 'en' ? 'Open on Wiki' : 'Wikiで開く'; } },
+    wiktionary: { get btnText() { return window.i18n.lang() === 'en' ? 'Open on Wikt' : 'Wiktで開く'; } }
+  };
   function getCurrentDict() { return localStorage.getItem('dictEngine') || 'wikipedia'; }
 
   window.searchWiki = function() {
@@ -2634,7 +2665,7 @@
     hideContextMenu();
     var dict = getCurrentDict(), query = selectedText, body = $('swpBody');
     $('swpWikiBtn').textContent = (DICT_CONFIG[dict] || DICT_CONFIG.wikipedia).btnText;
-    body.innerHTML = '<div class="swp-loading">検索中...</div>';
+    body.innerHTML = '<div class="swp-loading">' + window.i18n.t('swp.loading') + '</div>';
     openPanel('searchWebPanel');
     if (dict === 'wiktionary') searchWiktionary(query); else searchWikipedia(query);
   };
@@ -2669,59 +2700,63 @@
 
   function searchWikipedia(query) {
     var wikiBtn = $('swpWikiBtn');
-    swpCurrentPageUrl = 'https://ja.wikipedia.org/wiki/' + encodeURIComponent(query);
+    var lang = window.i18n.lang();
+    var domain = lang === 'en' ? 'en.wikipedia.org' : 'ja.wikipedia.org';
+    swpCurrentPageUrl = 'https://' + domain + '/wiki/' + encodeURIComponent(query);
     wikiBtn.onclick = function() { window.open(swpCurrentPageUrl, '_blank'); };
-    fetch('https://ja.wikipedia.org/w/api.php?action=query&list=search&srsearch=' + encodeURIComponent(query) + '&srlimit=6&format=json&origin=*')
+    fetch('https://' + domain + '/w/api.php?action=query&list=search&srsearch=' + encodeURIComponent(query) + '&srlimit=6&format=json&origin=*')
       .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
       .then(function(data) {
         var results = data.query && data.query.search;
-        if (!results || !results.length) { animateSearchResults('<div class="swp-empty">「' + escapeHtml(query) + '」はWikipediaに見つかりませんでした。</div>'); return; }
-        swpCurrentPageUrl = 'https://ja.wikipedia.org/wiki/' + encodeURIComponent(results[0].title);
+        if (!results || !results.length) { animateSearchResults('<div class="swp-empty">' + window.i18n.t('swp.notfound_pre') + escapeHtml(query) + window.i18n.t('swp.notfound_mid') + 'Wikipedia' + window.i18n.t('swp.notfound_suf') + '</div>'); return; }
+        swpCurrentPageUrl = 'https://' + domain + '/wiki/' + encodeURIComponent(results[0].title);
         wikiBtn.onclick = function() { window.open(swpCurrentPageUrl, '_blank'); };
-        fetch('https://ja.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(results[0].title))
+        fetch('https://' + domain + '/api/rest_v1/page/summary/' + encodeURIComponent(results[0].title))
           .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
           .then(function(s) {
             var html = '';
             if (s && s.title) {
-              var url = s.content_urls && s.content_urls.desktop ? s.content_urls.desktop.page : 'https://ja.wikipedia.org/wiki/' + encodeURIComponent(s.title);
+              var url = s.content_urls && s.content_urls.desktop ? s.content_urls.desktop.page : 'https://' + domain + '/wiki/' + encodeURIComponent(s.title);
               html += '<div class="swp-abstract"><div class="swp-abstract-heading">' + escapeHtml(s.title) + '</div>';
-              if (s.description && s.description.indexOf('曖昧さ回避') === -1) html += '<div class="swp-abstract-desc">' + escapeHtml(s.description) + '</div>';
+              if (s.description && s.description.indexOf('曖昧さ回避') === -1 && s.description !== 'Topics referred to by the same term') html += '<div class="swp-abstract-desc">' + escapeHtml(s.description) + '</div>';
               if (s.extract) html += '<div class="swp-abstract-text">' + escapeHtml(s.extract.slice(0, 400) + (s.extract.length > 400 ? '…' : '')) + '</div>';
-              html += '<div class="swp-abstract-src"><a href="' + escapeHtml(url) + '" target="_blank" rel="noopener">Wikipedia で読む →</a></div></div>';
+              html += '<div class="swp-abstract-src"><a href="' + escapeHtml(url) + '" target="_blank" rel="noopener">' + window.i18n.t('swp.wiki_read') + '</a></div></div>';
             }
             results.slice(1).forEach(function(item) {
-              var u = 'https://ja.wikipedia.org/wiki/' + encodeURIComponent(item.title);
+              var u = 'https://' + domain + '/wiki/' + encodeURIComponent(item.title);
               var snip = item.snippet ? item.snippet.replace(/<[^>]+>/g,'') : '';
               html += '<a class="swp-result-item" href="' + escapeHtml(u) + '" target="_blank" rel="noopener"><div class="swp-result-title">' + escapeHtml(item.title) + '</div>';
               if (snip) html += '<div class="swp-result-desc">' + escapeHtml(snip) + '</div>';
               html += '<div class="swp-result-url">' + escapeHtml(u) + '</div></a>';
             });
-            animateSearchResults(html || '<div class="swp-empty">見つかりませんでした。</div>');
+            animateSearchResults(html || '<div class="swp-empty">' + window.i18n.t('swp.failed') + '</div>');
           });
       })
-      .catch(function() { animateSearchResults('<div class="swp-empty">取得に失敗しました。</div>'); });
+      .catch(function() { animateSearchResults('<div class="swp-empty">' + window.i18n.t('swp.failed') + '</div>'); });
   }
 
   function searchWiktionary(query) {
     var wikiBtn = $('swpWikiBtn');
-    swpCurrentPageUrl = 'https://ja.wiktionary.org/wiki/' + encodeURIComponent(query);
+    var lang = window.i18n.lang();
+    var domain = lang === 'en' ? 'en.wiktionary.org' : 'ja.wiktionary.org';
+    swpCurrentPageUrl = 'https://' + domain + '/wiki/' + encodeURIComponent(query);
     wikiBtn.onclick = function() { window.open(swpCurrentPageUrl, '_blank'); };
-    fetch('https://ja.wiktionary.org/api/rest_v1/page/summary/' + encodeURIComponent(query))
+    fetch('https://' + domain + '/api/rest_v1/page/summary/' + encodeURIComponent(query))
       .then(function(r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function(data) {
         var html = '<div class="swp-abstract"><div class="swp-abstract-heading">' + escapeHtml(data.title || query) + '</div>';
-        if (data.description && data.description.indexOf('曖昧さ回避') === -1) html += '<div class="swp-abstract-desc">' + escapeHtml(data.description) + '</div>';
+        if (data.description && data.description.indexOf('曖昧さ回避') === -1 && data.description !== 'Topics referred to by the same term') html += '<div class="swp-abstract-desc">' + escapeHtml(data.description) + '</div>';
         if (data.extract) html += '<div class="swp-abstract-text">' + escapeHtml(data.extract.slice(0,500) + (data.extract.length > 500 ? '…' : '')) + '</div>';
         var pUrl = data.content_urls && data.content_urls.desktop ? data.content_urls.desktop.page : swpCurrentPageUrl;
-        html += '<div class="swp-abstract-src"><a href="' + escapeHtml(pUrl) + '" target="_blank" rel="noopener">Wiktionary で読む →</a></div></div>';
-        fetch('https://ja.wiktionary.org/w/api.php?action=query&list=search&srsearch=' + encodeURIComponent(query) + '&srlimit=5&format=json&origin=*')
+        html += '<div class="swp-abstract-src"><a href="' + escapeHtml(pUrl) + '" target="_blank" rel="noopener">' + window.i18n.t('swp.wikt_read') + '</a></div></div>';
+        fetch('https://' + domain + '/w/api.php?action=query&list=search&srsearch=' + encodeURIComponent(query) + '&srlimit=5&format=json&origin=*')
           .then(function(r) { return r.ok ? r.json() : { query: { search: [] } }; })
           .then(function(d) {
             var rels = (d.query && d.query.search) ? d.query.search.slice(1) : [];
             if (rels.length) {
-              html += '<div class="swp-results-label">関連語句</div>';
+              html += '<div class="swp-results-label">' + window.i18n.t('swp.related') + '</div>';
               rels.forEach(function(item) {
-                var u = 'https://ja.wiktionary.org/wiki/' + encodeURIComponent(item.title);
+                var u = 'https://' + domain + '/wiki/' + encodeURIComponent(item.title);
                 var snip = item.snippet ? item.snippet.replace(/<[^>]+>/g,'') : '';
                 html += '<a class="swp-result-item" href="' + escapeHtml(u) + '" target="_blank" rel="noopener"><div class="swp-result-title">' + escapeHtml(item.title) + '</div>';
                 if (snip) html += '<div class="swp-result-desc">' + escapeHtml(snip) + '</div></a>';
@@ -2731,21 +2766,21 @@
           });
       })
       .catch(function() {
-        fetch('https://ja.wiktionary.org/w/api.php?action=query&list=search&srsearch=' + encodeURIComponent(query) + '&srlimit=6&format=json&origin=*')
+        fetch('https://' + domain + '/w/api.php?action=query&list=search&srsearch=' + encodeURIComponent(query) + '&srlimit=6&format=json&origin=*')
           .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
           .then(function(d) {
             var results = d.query && d.query.search;
-            if (!results || !results.length) { animateSearchResults('<div class="swp-empty">見つかりませんでした。</div>'); return; }
-            var html = '<div class="swp-results-label">検索結果</div>';
+            if (!results || !results.length) { animateSearchResults('<div class="swp-empty">' + window.i18n.t('swp.failed') + '</div>'); return; }
+            var html = '<div class="swp-results-label">' + window.i18n.t('swp.results') + '</div>';
             results.forEach(function(item) {
-              var u = 'https://ja.wiktionary.org/wiki/' + encodeURIComponent(item.title);
+              var u = 'https://' + domain + '/wiki/' + encodeURIComponent(item.title);
               var snip = item.snippet ? item.snippet.replace(/<[^>]+>/g,'') : '';
               html += '<a class="swp-result-item" href="' + escapeHtml(u) + '" target="_blank" rel="noopener"><div class="swp-result-title">' + escapeHtml(item.title) + '</div>';
               if (snip) html += '<div class="swp-result-desc">' + escapeHtml(snip) + '</div></a>';
             });
             animateSearchResults(html);
           })
-          .catch(function() { animateSearchResults('<div class="swp-empty">取得に失敗しました。</div>'); });
+          .catch(function() { animateSearchResults('<div class="swp-empty">' + window.i18n.t('swp.failed') + '</div>'); });
       });
   }
 
@@ -2759,15 +2794,15 @@
       var engine = localStorage.getItem('translateEngine') || 'google';
       $('tpPowered').textContent = engine === 'bing' ? 'Powered by Bing translation' : 'Powered by Google translation';
       var url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=' + $('tpSrcLang').value + '&tl=' + $('tpTgtLang').value + '&dt=t&q=' + encodeURIComponent(src);
-      tpResult.innerHTML = '<div class="tp-loading">翻訳中…</div>';
+      tpResult.innerHTML = '<div class="tp-loading">' + window.i18n.t('tp.loading') + '</div>';
       fetch(url)
         .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
         .then(function(data) {
           var result = '';
           if (data && data[0]) data[0].forEach(function(seg) { if (seg && seg[0]) result += seg[0]; });
-          animateResults(tpResult, '<p class="tp-result-text">' + escapeHtml(result || '翻訳結果が取得できませんでした') + '</p>', false);
+          animateResults(tpResult, '<p class="tp-result-text">' + escapeHtml(result || window.i18n.t('tp.no_result')) + '</p>', false);
         })
-        .catch(function() { animateResults(tpResult, '<div class="tp-error">翻訳に失敗しました。</div>', false); });
+        .catch(function() { animateResults(tpResult, '<div class="tp-error">' + window.i18n.t('tp.failed') + '</div>', false); });
     };
     $('tpSrcLang').onchange = doFetch; $('tpTgtLang').onchange = doFetch; doFetch();
   };
@@ -3531,6 +3566,8 @@
         }
         /* ページパネルのリストも同期 */
         renderPageList();
+        /* フッターバー（下部バー）も即時更新 */
+        render();
       }
       closePopup();
     }
@@ -4135,15 +4172,29 @@
       return;
     }
     clearTimeout(ftLabelTimer);
-    wrap.style.width = wrap.offsetWidth + 'px';
+    var oldWidth = wrap.offsetWidth;
+    wrap.style.transition = 'none';
+    wrap.style.width = oldWidth + 'px';
     inner.classList.remove('slot-in');
     inner.classList.add('slot-out');
     ftLabelTimer = setTimeout(function() {
+      // テキストを更新して自然幅を測定（inner は invisible なので flash なし）
       inner.textContent = newLabel;
+      wrap.style.width = '';
+      var newWidth = wrap.offsetWidth;
+      // 旧幅に戻してから transition 付きで新幅へ
+      wrap.style.width = oldWidth + 'px';
+      wrap.style.transition = 'none';
+      wrap.offsetWidth; /* reflow */
+      wrap.style.transition = 'width 0.32s cubic-bezier(0.45, 0, 0.55, 1)';
+      wrap.style.width = newWidth + 'px';
       inner.classList.remove('slot-out');
-      wrap.style.width  = '';
       inner.classList.add('slot-in');
-      setTimeout(function() { inner.classList.remove('slot-in'); }, 300);
+      setTimeout(function() {
+        inner.classList.remove('slot-in');
+        wrap.style.transition = '';
+        wrap.style.width = '';
+      }, 340);
     }, 120);
   }
 
@@ -4542,8 +4593,8 @@
       else                    {             html += '<span style="opacity:0.7;display:block;">　' + safe + '</span>'; }
     });
     diffContent.innerHTML = html;
-    $('diffLegendAdd').innerHTML = '<span class="diff-legend-dot add"></span>追加 ' + addCount + '行';
-    $('diffLegendDel').innerHTML = '<span class="diff-legend-dot del"></span>削除 ' + delCount + '行';
+    $('diffLegendAdd').innerHTML = '<span class="diff-legend-dot add"></span>' + window.i18n.t('diff.add') + ' ' + addCount + (window.i18n.lang() === 'en' ? ' line' + (addCount !== 1 ? 's' : '') : '行');
+    $('diffLegendDel').innerHTML = '<span class="diff-legend-dot del"></span>' + window.i18n.t('diff.del') + ' ' + delCount + (window.i18n.lang() === 'en' ? ' line' + (delCount !== 1 ? 's' : '') : '行');
     $('diffOverlay').style.display = 'block';
     var mainHeader = document.querySelector('header');
     mainHeader.classList.remove('diff-restore');
