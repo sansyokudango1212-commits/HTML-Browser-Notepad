@@ -151,7 +151,7 @@
       padding: 4px; padding-top: 4px; display: flex; gap: 4px; align-items: center;
       width: fit-content; max-width: 95vw; justify-content: center;
       z-index: 9998; border-radius: var(--radius);
-      overflow: visible;
+      overflow: hidden;
       transition: opacity 0.22s cubic-bezier(0.4,0,0.2,1), transform 0.22s cubic-bezier(0.4,0,0.2,1), border-radius 0.18s, padding-top 0.18s, top 0.38s cubic-bezier(0.4,0,0.2,1);
     }
     header:hover,
@@ -283,6 +283,7 @@
       background: radial-gradient(circle at 30% 30%, #ff6b6b, #e53935);
       border: 1px solid rgba(0,0,0,0.25); box-shadow: 0 2px 6px rgba(0,0,0,0.25);
       cursor: pointer; padding: 0; display: inline-block;
+      z-index: 10;
       transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), filter 0.15s;
     }
     .close-dot:hover  { transform: scale(1.2); filter: brightness(1.1); }
@@ -296,6 +297,7 @@
       display: inline-flex; align-items: center; justify-content: center;
       font-size: 9px; font-weight: bold; color: var(--text);
       font-style: italic; font-family: Georgia, serif; line-height: 1;
+      z-index: 10;
       transition: transform 0.15s;
     }
     .info-dot:hover  { transform: scale(1.1); }
@@ -553,6 +555,91 @@
     #eraserCursor.visible { display: block; }
     #backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0); z-index: 9; display: none; pointer-events: none; transition: background 0.22s cubic-bezier(0.4,0,0.2,1); }
     #backdrop.show { display: block; pointer-events: auto; background: rgba(0,0,0,0.55); }
+
+    /* Google Fonts Manager */
+    #fontMgrBtn {
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.13);
+      border-radius: 8px; cursor: pointer; padding: 0 7px; height: 30px; margin-left: 4px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 13px; color: var(--dim); flex-shrink: 0;
+      transition: background 0.15s, color 0.15s, transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #fontMgrBtn:hover  { background: rgba(255,255,255,0.13); color: var(--text); }
+    #fontMgrBtn:active { transform: scale(0.88); }
+
+    #fontMgrModal {
+      width: min(380px, calc(100vw - 32px));
+      height: 500px; max-height: 85vh; display: flex; flex-direction: column;
+      padding: 24px 20px 20px;
+      border-radius: 22px; z-index: 200; box-shadow: 0 16px 50px rgba(0,0,0,0.35);
+    }
+    #fontMgrModal .fmgr-title {
+      font-size: 14px; font-weight: 200; text-align: center;
+      margin-bottom: 16px; color: var(--text);
+    }
+    .fmgr-url-row {
+      display: flex; gap: 6px; align-items: center; margin-bottom: 14px;
+    }
+    .fmgr-url-input {
+      flex: 1; background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15); border-radius: 12px;
+      padding: 8px 12px; font-size: 12px; color: var(--text); font-family: inherit;
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+      min-width: 0;
+    }
+    .fmgr-url-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.15);
+    }
+    .fmgr-url-input::placeholder { color: var(--dim); font-size: 11px; }
+    .fmgr-add-btn {
+      background: rgba(var(--accent-rgb), 0.18); border: 1px solid rgba(var(--accent-rgb), 0.4);
+      border-radius: 10px; cursor: pointer; padding: 0 12px; height: 34px; flex-shrink: 0;
+      font-size: 12px; font-family: inherit; color: var(--accent);
+      transition: background 0.15s, transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .fmgr-add-btn:hover  { background: rgba(var(--accent-rgb), 0.28); }
+    .fmgr-add-btn:active { transform: scale(0.92); }
+    .fmgr-error { font-size: 11px; color: #e57373; text-align: center; min-height: 14px; margin-bottom: 8px; }
+    .fmgr-section-label {
+      font-size: 10px; color: var(--dim); letter-spacing: 0.5px; text-transform: uppercase;
+      margin-bottom: 6px; padding-left: 2px;
+    }
+    .fmgr-list {
+      flex: 1; overflow-y: auto; margin-bottom: 12px; min-height: 0;
+    }
+    .fmgr-list::-webkit-scrollbar { width: 4px; }
+    .fmgr-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    .fmgr-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 10px; border-radius: 10px;
+      transition: background 0.12s;
+    }
+    .fmgr-item:hover { background: rgba(255,255,255,0.05); }
+    .fmgr-item-name { flex: 1; font-size: 13px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .fmgr-item-tag {
+      font-size: 9px; padding: 2px 6px; border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .fmgr-item-tag.builtin {
+      background: rgba(255,255,255,0.08); color: var(--dim);
+    }
+    .fmgr-item-tag.custom {
+      background: rgba(var(--accent-rgb), 0.15); color: var(--accent);
+    }
+    .fmgr-del-btn {
+      width: 22px; height: 22px; border-radius: 6px; border: none;
+      background: rgba(229,57,53,0.12); color: #e57373; cursor: pointer;
+      font-size: 13px; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.12s, transform 0.1s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .fmgr-del-btn:hover  { background: rgba(229,57,53,0.25); }
+    .fmgr-del-btn:active { transform: scale(0.86); }
+    .fmgr-hint {
+      font-size: 10px; color: var(--dim); text-align: center; line-height: 1.6;
+      border-top: 1px solid rgba(128,128,128,0.1); padding-top: 10px; margin-top: 4px;
+    }
 
     .toast {
       position: fixed; right: 16px; bottom: 62px;
@@ -1063,7 +1150,10 @@
       position: fixed; top: 0; left: 0; right: 0;
       height: 56px;
       z-index: 200; display: none;
-      background: transparent;
+      background: rgba(18, 18, 18, 0.72);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
       align-items: center;
       padding: 8px 56px 8px 12px; gap: 6px;
@@ -1339,7 +1429,7 @@
     <div id="optionsDragHandle" class="drag-handle" style="position:absolute;top:0;left:0;right:0;height:36px;border-radius:18px 18px 0 0;"></div>
     <button class="close-dot" onclick="act('toggle')" aria-label="閉じる"></button>
     <button class="info-dot" onclick="showDevMessage()" aria-label="開発者メッセージ">i</button>
-    <div><span class="label" data-i18n="opt.font">フォント</span><select id="fSel"></select></div>
+    <div><span class="label" data-i18n="opt.font">フォント</span><select id="fSel"></select><button id="fontMgrBtn" title="フォント管理" onclick="openFontMgr()">＋</button></div>
     <div><span class="label" data-i18n="opt.size">サイズ</span><select id="sSel"></select></div>
     <div><span class="label" data-i18n="opt.search">検索</span>
       <select id="dictSel">
@@ -1407,9 +1497,9 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 2602282345</span>
-      <span>Version 26.2.5.2</span>
-      <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Chat GPT<br>Gemini<br>Cursor<br>Tikuwa</span>
+      <span>Build 2603001425_Fast</span>
+      <span>Version 26.2.6</span>
+      <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_Gemini2.5Pro<br>Trae_Chat GPT5.2beta<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Tikuwa_Nerimono1</span>
     </div>
   </div>
 
@@ -1485,16 +1575,39 @@
   <div id="devMessageModal" class="glass panel-modal">
     <div class="dev-title-main">Information</div>
     <div class="dev-body">アプリを使っている人へ
-このアプリのベースのバージョンはBuild2602281858です
+このアプリのベースのバージョンはBuild2603010956(privateBETA2)です
 26.2.5への互換性や後方互換性などの確認は行っていますがもし不具合があれば再度保存し直してもらえると幸いです
 またそれより以前のバージョンをお使いの方は"--- DON'T EDIT BELOW ---"などのテキストが表示される場合がありますが、旧バージョンの仕様であり、気になる場合は該当テキストを削除してから保存し直すと消えるかと思います
 これからもこのアプリをよろしくお願いします]
 
 追記:今のところユーザー数0(2026/2/28)
 もしかしたら使ってる人がいるかもの精神で開発中
+機能を増やしていくぞい
 
  - Tikuwa - </div>
     <button class="dev-close" onclick="hideDevMessage()" data-i18n="common.close">閉じる</button>
+  </div>
+
+  <!-- Google Fonts Manager Modal -->
+  <div id="fontMgrModal" class="glass panel-modal">
+    <button class="close-dot" onclick="closeFontMgr()" aria-label="閉じる"></button>
+    <div class="fmgr-title">フォント管理</div>
+    <div class="fmgr-url-row">
+      <input type="text" id="fontMgrUrl" class="fmgr-url-input"
+        placeholder="フォントの URL を貼り付け"
+        onkeydown="if(event.key==='Enter')addCustomFont()">
+      <button class="fmgr-add-btn" onclick="addCustomFont()">追加</button>
+    </div>
+    <div class="fmgr-error" id="fontMgrError"></div>
+    <div class="fmgr-section-label">フォント一覧</div>
+    <div class="fmgr-list" id="fontMgrList"></div>
+    <div class="fmgr-hint">
+      <a href="https://fonts.google.com" target="_blank" rel="noopener"
+         style="color:var(--accent);text-decoration:none;">fonts.google.com</a>
+         フォント以外のフォントURLは受け付けません。<br>
+         以下の形式でテキストボックスにURLを入力してください。<br>
+      （例: fonts.google.com/specimen/DotGothic16）<br>
+    </div>
   </div>
 
   <div id="backdrop" onclick="act('closeOverlays')"></div>
@@ -1998,7 +2111,7 @@
 
   var BiometricEngine = (function() {
     var CRED_KEY  = 'np26_bio_credId';
-    var PWENC_KEY = 'np26_bio_pw_enc'; 
+    var PWENC_KEY = 'np26_bio_pw_enc';
     var RP_ID     = location.hostname || 'localhost';
     var RP_NAME   = 'Notepad26';
 
@@ -2086,7 +2199,7 @@
   })();
 
   var sessionUnlocked = false;
-  var sessionPassword = '';  // メモリのみ、外部送信なし
+  var sessionPassword = '';
 
   var lockScreen    = document.getElementById('lockScreen');
   var lockPwInput   = document.getElementById('lockPwInput');
@@ -2111,7 +2224,7 @@
         lockScreen.classList.add('hidden');
       }, 650);
       loadEncryptedPages(pw);
-      return; /* 解除成功: ボタンのリセットは不要 */
+      return;
     }
     showLockError(window.i18n.t('lock.invalid'));
     lockPwInput.classList.add('error');
@@ -2236,7 +2349,6 @@
     pwSetProgress.textContent = window.i18n.t('pws.progress_deriving');
     try {
       await CryptoEngine.savePasswordToken(pw, function(msg) {
-        /* CryptoEngine内部のハードコード日本語を翻訳してから表示 */
         var translated = msg
           .replace('鍵導出中... (600,000回)', window.i18n.t('pws.progress_deriving'))
           .replace('暗号化中...', window.i18n.t('pws.progress_encrypting'));
@@ -2393,6 +2505,171 @@
     footerAlways: localStorage.getItem('footerAlways') === 'true'
   };
   var supportedFonts = ['Arial','Noto Sans JP','Noto Serif JP','Zen Maru Gothic','Dela Gothic One','Kosugi Maru'];
+
+  /* ---- Google Fonts カスタムフォント管理 ---- */
+  var BUILTIN_FONTS = supportedFonts.slice();
+
+  function loadCustomFontsFromStorage() {
+    try {
+      var saved = JSON.parse(localStorage.getItem('customFonts') || '[]');
+      saved.forEach(function(item) {
+        injectFontLink(item.url);
+        if (supportedFonts.indexOf(item.name) === -1) supportedFonts.push(item.name);
+      });
+    } catch(e) {}
+  }
+
+  function saveCustomFontsToStorage() {
+    try {
+      var saved = JSON.parse(localStorage.getItem('customFonts') || '[]');
+      localStorage.setItem('customFonts', JSON.stringify(saved));
+    } catch(e) {}
+  }
+
+  function getCustomFonts() {
+    try { return JSON.parse(localStorage.getItem('customFonts') || '[]'); } catch(e) { return []; }
+  }
+
+  function setCustomFonts(arr) {
+    localStorage.setItem('customFonts', JSON.stringify(arr));
+  }
+
+  function injectFontLink(url) {
+    if (document.querySelector('link[data-custom-font][href="' + url + '"]')) return;
+    var link = document.createElement('link');
+    link.rel = 'stylesheet'; link.href = url;
+    link.dataset.customFont = '1';
+    document.head.appendChild(link);
+  }
+
+  function parseFontNameFromUrl(url) {
+    var m = url.match(/[?&]family=([^&:]+)/);
+    if (!m) return null;
+    var firstFamily = m[1].split('|')[0].split(';')[0];
+    return decodeURIComponent(firstFamily.replace(/\+/g, ' ')).trim();
+  }
+
+  /* fonts.google.com/specimen/FontName → googleapis CSS URL に自動変換 */
+  function specimenUrlToApiUrl(url) {
+    var m = url.match(/fonts\.google\.com\/specimen\/([^?#/]+)/);
+    if (!m) return null;
+    var fontName = decodeURIComponent(m[1]).replace(/_/g, ' ').trim();
+    return 'https://fonts.googleapis.com/css2?family=' + fontName.replace(/ /g, '+') + '&display=swap';
+  }
+
+  function rebuildFontSelect() {
+    var fSel = $('fSel');
+    if (!fSel) return;
+    var cur = fSel.value;
+    fSel.innerHTML = '';
+    supportedFonts.forEach(function(f) { fSel.add(new Option(f, f)); });
+    fSel.value = (supportedFonts.indexOf(cur) !== -1) ? cur : supportedFonts[0];
+  }
+
+  function openFontMgr() {
+    renderFontMgrList();
+    $('fontMgrError').textContent = '';
+    $('fontMgrUrl').value = '';
+    openPanel('fontMgrModal');
+  }
+
+  function closeFontMgr() { closePanel('fontMgrModal'); }
+
+  function renderFontMgrList() {
+    var list = $('fontMgrList');
+    list.innerHTML = '';
+    var customs = getCustomFonts();
+    var customNames = customs.map(function(c) { return c.name; });
+
+    supportedFonts.forEach(function(name) {
+      var isCustom = customNames.indexOf(name) !== -1;
+      var item = document.createElement('div'); item.className = 'fmgr-item';
+
+      var nameEl = document.createElement('div'); nameEl.className = 'fmgr-item-name';
+      nameEl.textContent = name; nameEl.style.fontFamily = name;
+
+      var tag = document.createElement('span');
+      tag.className = 'fmgr-item-tag ' + (isCustom ? 'custom' : 'builtin');
+      tag.textContent = isCustom ? 'カスタム' : '標準';
+
+      item.appendChild(nameEl); item.appendChild(tag);
+
+      if (isCustom) {
+        var del = document.createElement('button'); del.className = 'fmgr-del-btn';
+        del.textContent = '×'; del.title = '削除';
+        del.onclick = (function(n) { return function() { removeCustomFont(n); }; })(name);
+        item.appendChild(del);
+      }
+
+      list.appendChild(item);
+    });
+  }
+
+  function addCustomFont() {
+    var raw = ($('fontMgrUrl').value || '').trim();
+    var errEl = $('fontMgrError');
+    errEl.textContent = '';
+
+    if (!raw) { errEl.textContent = 'URLを入力してください'; return; }
+
+    /* specimen URL を自動変換 (例: fonts.google.com/specimen/DotGothic16) */
+    var url = raw;
+    if (url.indexOf('fonts.google.com/specimen/') !== -1) {
+      var converted = specimenUrlToApiUrl(url);
+      if (!converted) { errEl.textContent = 'フォント名を取得できませんでした'; return; }
+      url = converted;
+    }
+
+    if (url.indexOf('fonts.googleapis.com') === -1) {
+      errEl.textContent = 'Google Fonts の specimen URL か CSS URL を入力してください'; return;
+    }
+
+    var name = parseFontNameFromUrl(url);
+    if (!name) { errEl.textContent = 'フォント名を取得できませんでした'; return; }
+
+    if (supportedFonts.indexOf(name) !== -1) {
+      errEl.textContent = '「' + name + '」はすでに追加されています'; return;
+    }
+
+    var cleanUrl = url;
+    if (cleanUrl.indexOf('display=') === -1) {
+      cleanUrl += (cleanUrl.indexOf('?') === -1 ? '?' : '&') + 'display=swap';
+    }
+
+    injectFontLink(cleanUrl);
+    supportedFonts.push(name);
+
+    var customs = getCustomFonts();
+    customs.push({ name: name, url: cleanUrl });
+    setCustomFonts(customs);
+
+    rebuildFontSelect();
+    $('fontMgrUrl').value = '';
+    renderFontMgrList();
+    queueToast('「' + name + '」を追加しました');
+  }
+
+  function removeCustomFont(name) {
+    var customs = getCustomFonts();
+    var item = null;
+    customs = customs.filter(function(c) { if (c.name === name) { item = c; return false; } return true; });
+    setCustomFonts(customs);
+
+    /* link タグを除去 */
+    if (item) {
+      var el = document.querySelector('link[data-custom-font][href="' + item.url + '"]');
+      if (el) el.parentNode.removeChild(el);
+    }
+
+    var idx = supportedFonts.indexOf(name);
+    if (idx !== -1) supportedFonts.splice(idx, 1);
+
+    rebuildFontSelect();
+    renderFontMgrList();
+    queueToast('「' + name + '」を削除しました');
+  }
+
+  loadCustomFontsFromStorage();
 
   var toastQueue = [], isToastShowing = false, sizeToastTimer = null, hasShownOfflineToast = false;
   function queueToast(message, duration) {
@@ -2810,6 +3087,8 @@
 
   function adjustOptionsScale() {
     var el = $('options'); if (!el || !el.classList.contains('show')) return;
+    /* ドラッグ中はtransformを書き換えない（位置がズレるバグを防ぐ） */
+    if (el.dataset.dragged) return;
     el.style.transform = 'translate(-50%, -50%) scale(1)';
     requestAnimationFrame(function() {
       var r = el.getBoundingClientRect();
@@ -2957,7 +3236,6 @@
         return document.body.classList.contains('tab-bar-mode') ? 56 + 16 : 8;
       }
 
-      /* transition を一時停止してピクセル座標に固定 */
       function freezeHeader() {
         var r = hdr.getBoundingClientRect();
         hdr.style.transition = 'none';
@@ -2969,7 +3247,6 @@
 
       function onStart(cx, cy) {
         if (hdr.classList.contains('no-move')) return;
-        /* 掴む瞬間に一度だけ座標を確定（リフローを最小化） */
         freezeHeader();
         hdrW = hdr.offsetWidth;
         hdrH = hdr.offsetHeight;
@@ -2985,7 +3262,6 @@
       function onMove(cx, cy) {
         if (!isDragging) return;
         didMove = true;
-        /* 計算のみ・リフロー不要 */
         var newLeft = clamp(cx - grabOffsetX, 8, window.innerWidth  - hdrW - 8);
         var newTop  = clamp(cy - grabOffsetY, tabBarMinTop(), window.innerHeight - hdrH - 8);
         hdr.style.left = newLeft + 'px';
@@ -2999,7 +3275,6 @@
         hdr.style.transition = '';
         hdr.style.cursor = 'grab';
         hdr.style.userSelect = '';
-        /* ドラッグ後の誤クリックをキャンセル */
         if (didMove) {
           document.addEventListener('click', function cancelClick(e) {
             e.stopPropagation(); e.preventDefault();
@@ -3008,7 +3283,6 @@
         }
       }
 
-      /* ボタン等のインタラクティブ要素を除外 */
       function isInteractive(el) {
         while (el && el !== hdr) {
           var tag = el.tagName;
@@ -3119,21 +3393,18 @@
   function clearSearchHighlight() { searchMatches = []; searchIndex = 0; var m = $('searchHighlightMirror'); if (m) m.innerHTML = ''; }
 
   var autoSaveTimer = null, autoSaveIsInterval = false;
-  var AUTO_SAVE_INTERVAL = 2 * 60 * 1000;
-  function clearAutoSaveTimer() {
+  var AUTO_SAVE_INTERVAL = 2 * 60 * 1000;  function clearAutoSaveTimer() {
     if (autoSaveTimer === null) return;
     if (autoSaveIsInterval) clearInterval(autoSaveTimer); else clearTimeout(autoSaveTimer);
     autoSaveTimer = null; autoSaveIsInterval = false;
   }
   function doAutoSave() {
     if (!state.autoSave) return;
-    /* ファイルエディタ中は自動保存をスキップ（仮ページを永続化しない） */
     if (window.folderFileActive) return;
     localStorage.setItem('autosave_text', $('edit').value);
     localStorage.setItem('autosave_file', state.curFile);
     localStorage.setItem('autosave_font', $('fSel') ? $('fSel').value : 'Arial');
     localStorage.setItem('autosave_size', $('sSel') ? $('sSel').value : '18');
-    /* PBKDF2暗号化保存も自動保存と同タイミングで実施 */
     saveCurrentPage();
     var locale = (window.i18n.lang() === 'en') ? 'en-US' : 'ja-JP';
     queueToast(window.i18n.t('toast.autosave_prefix') + new Date().toLocaleTimeString(locale,{hour:'2-digit',minute:'2-digit'}), 2000);
@@ -3186,14 +3457,12 @@
     pages[curPageIdx].text = edit ? edit.value : '';
     pages[curPageIdx].font = fSel ? fSel.value : 'Arial';
     pages[curPageIdx].size = sSel ? parseInt(sSel.value) : 18;
-    /* 仮ページ（ファイルエディタ用）は localStorage に保存しない */
     if (pages[curPageIdx]._fileEditor) return;
     savePages();
   }
   function switchPage(idx) {
     if (titleEditMode) commitTitleEdit();
     if (idx === curPageIdx) return;
-    /* 仮ページ（ファイルエディタ）への直接移動は禁止 */
     if (pages[idx] && pages[idx]._fileEditor) return;
     if (window.folderFileActive) { queueToast(window.i18n.t('toast.page_blocked_fileeditor'), 2200); return; }
     var edit = $('edit'), dir = idx > curPageIdx ? 'right' : 'left';
@@ -3226,102 +3495,101 @@
     if (penSlideIn) penSlideIn();
   };
   window.deletePage = function(idx, e) {
-  e.stopPropagation();
-  if (pages[idx] && pages[idx]._fileEditor) return;
-  var realCount = pages.filter(function(p){ return !p._fileEditor; }).length;
-  if (realCount <= 1) {
-    queueToast(window.i18n.t('toast.page_last_delete_blocked'), 2000);
-    return;
-  }
+    e.stopPropagation();
+    if (pages[idx] && pages[idx]._fileEditor) return;
+    var realCount = pages.filter(function(p) { return !p._fileEditor; }).length;
+    if (realCount <= 1) {
+      queueToast(window.i18n.t('toast.page_last_delete_blocked'), 2000);
+      return;
+    }
 
-  // --- Animate Tab Bar ---
-  var tabBar = document.getElementById('pageTabBar');
-  var tabs = Array.from(tabBar.children);
-  var tabToRemove = tabs[idx];
-  var firstRects = tabs.map(tab => tab.getBoundingClientRect());
+    var ANIM_DUR = 0.32;
+    var ANIM_EASE = 'cubic-bezier(0.45, 0, 0.55, 1)';
+    var transitionVal = 'opacity ' + ANIM_DUR + 's ' + ANIM_EASE + ', transform ' + ANIM_DUR + 's ' + ANIM_EASE + ', max-width ' + ANIM_DUR + 's ' + ANIM_EASE + ', padding ' + ANIM_DUR + 's ' + ANIM_EASE + ', border ' + ANIM_DUR + 's ' + ANIM_EASE;
 
-  var animDuration = 0.32; // Close duration
-  var animEase = 'cubic-bezier(0.45, 0, 0.55, 1)'; // slow→fast→slow
+    /* タブバーのアニメーション */
+    var bar = $('pageTabBar');
+    var tabs = bar ? Array.prototype.slice.call(bar.children) : [];
+    var tabToRemove = tabs[idx];
+    var firstRects = tabs.map(function(tab) { return tab.getBoundingClientRect(); });
 
-  tabToRemove.style.transition = `opacity ${animDuration}s ${animEase}, transform ${animDuration}s ${animEase}, max-width ${animDuration}s ${animEase}, padding ${animDuration}s ${animEase}, border ${animDuration}s ${animEase}`;
-  tabToRemove.style.opacity = '0';
-  tabToRemove.style.transform = 'scale(0.8)';
-  tabToRemove.style.maxWidth = '0px';
-  tabToRemove.style.paddingLeft = '0';
-  tabToRemove.style.paddingRight = '0';
-  tabToRemove.style.border = 'none';
+    if (tabToRemove) {
+      tabToRemove.style.transition = transitionVal;
+      tabToRemove.style.opacity    = '0';
+      tabToRemove.style.transform  = 'scale(0.8)';
+      tabToRemove.style.maxWidth   = '0px';
+      tabToRemove.style.paddingLeft  = '0';
+      tabToRemove.style.paddingRight = '0';
+      tabToRemove.style.border = 'none';
+    }
 
-  // --- Animate Side Panel List Item ---
-  var pageList = document.getElementById('pageList');
-  var cardToRemove = pageList.children[idx];
-  if (cardToRemove) {
-      cardToRemove.style.transition = `opacity ${animDuration}s ${animEase}, transform ${animDuration}s ${animEase}, max-height ${animDuration}s ${animEase}, margin ${animDuration}s ${animEase}, padding ${animDuration}s ${animEase}, border ${animDuration}s ${animEase}`;
-      cardToRemove.style.opacity = '0';
+    /* ページリストのアニメーション */
+    var pageList = $('pageList');
+    var cardToRemove = pageList ? pageList.children[idx] : null;
+    if (cardToRemove) {
+      cardToRemove.style.transition = 'opacity ' + ANIM_DUR + 's ' + ANIM_EASE + ', transform ' + ANIM_DUR + 's ' + ANIM_EASE + ', max-height ' + ANIM_DUR + 's ' + ANIM_EASE + ', margin ' + ANIM_DUR + 's ' + ANIM_EASE + ', padding ' + ANIM_DUR + 's ' + ANIM_EASE + ', border ' + ANIM_DUR + 's ' + ANIM_EASE;
+      cardToRemove.style.opacity   = '0';
       cardToRemove.style.transform = 'scale(0.8)';
       cardToRemove.style.maxHeight = '0px';
-      cardToRemove.style.margin = '0';
-      cardToRemove.style.padding = '0';
-      cardToRemove.style.border = 'none';
-  }
+      cardToRemove.style.margin    = '0';
+      cardToRemove.style.padding   = '0';
+      cardToRemove.style.border    = 'none';
+    }
 
-  requestAnimationFrame(() => {
-    // Update data model and re-render
-    var deletedId = pages[idx].id;
-    var wasCurrentPage = (idx === curPageIdx);
-    var fromId = wasCurrentPage ? deletedId : null;
+    requestAnimationFrame(function() {
+      var deletedId      = pages[idx].id;
+      var wasCurrentPage = (idx === curPageIdx);
+      var fromId         = wasCurrentPage ? deletedId : null;
 
-    pages.splice(idx, 1);
-    if (idx < curPageIdx) curPageIdx--;
-    if (curPageIdx >= pages.length) curPageIdx = pages.length - 1;
-    localStorage.setItem(PAGES_CUR, pages[curPageIdx].id);
+      pages.splice(idx, 1);
+      if (idx < curPageIdx) curPageIdx--;
+      if (curPageIdx >= pages.length) curPageIdx = pages.length - 1;
+      localStorage.setItem(PAGES_CUR, pages[curPageIdx].id);
 
-    var p = pages[curPageIdx], edit = $('edit');
-    var penSlideIn = (wasCurrentPage && window.penPageSwitch)
-      ? window.penPageSwitch(fromId, pages[curPageIdx].id, 'left')
-      : null;
+      var p = pages[curPageIdx], edit = $('edit');
+      var penSlideIn = (wasCurrentPage && window.penPageSwitch)
+        ? window.penPageSwitch(fromId, pages[curPageIdx].id, 'left')
+        : null;
 
-    edit.value = p.text || '';
-    $('fSel').value = p.font || 'Arial';
-    $('sSel').value = String(p.size || 18);
+      edit.value         = p.text || '';
+      $('fSel').value    = p.font || 'Arial';
+      $('sSel').value    = String(p.size || 18);
 
-    applyStyles();
-    ActionHandlers.updateText(edit.value);
-    savePages();
-    render(); // This re-renders the tabBar
-    renderPageList();
-    if (penSlideIn) penSlideIn();
+      applyStyles();
+      ActionHandlers.updateText(edit.value);
+      savePages();
+      render();
+      renderPageList();
+      if (penSlideIn) penSlideIn();
 
-    // --- Animate remaining tabs (FLIP) ---
-    var newTabs = Array.from(document.getElementById('pageTabBar').children);
-    var lastRects = newTabs.map(tab => tab.getBoundingClientRect());
+      /* 残りタブをFLIPアニメーション */
+      var newBar  = $('pageTabBar');
+      var newTabs = newBar ? Array.prototype.slice.call(newBar.children) : [];
+      var lastRects = newTabs.map(function(tab) { return tab.getBoundingClientRect(); });
 
-    newTabs.forEach((tab, i) => {
-      var firstIdx = i < idx ? i : i + 1;
-      var firstRect = firstRects[firstIdx];
-      var lastRect = lastRects[i];
-
-      var deltaX = firstRect.left - lastRect.left;
-      var deltaY = firstRect.top - lastRect.top;
-
-      if (deltaX !== 0 || deltaY !== 0) {
+      newTabs.forEach(function(tab, i) {
+        var firstIdx = i < idx ? i : i + 1;
+        var fRect = firstRects[firstIdx];
+        var lRect = lastRects[i];
+        if (!fRect || !lRect) return;
+        var deltaX = fRect.left - lRect.left;
+        var deltaY = fRect.top  - lRect.top;
+        if (deltaX === 0 && deltaY === 0) return;
         tab.style.transition = 'none';
-        tab.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-        tab.getBoundingClientRect(); // Reflow
-        tab.style.transition = `transform ${animDuration}s ${animEase}`;
-        tab.style.transform = 'translate(0, 0)';
-      }
-    });
-
-    // Clean up styles
-    setTimeout(() => {
-      newTabs.forEach(tab => {
-        tab.style.transition = '';
-        tab.style.transform = '';
+        tab.style.transform  = 'translate(' + deltaX + 'px, ' + deltaY + 'px)';
+        tab.getBoundingClientRect();
+        tab.style.transition = 'transform ' + ANIM_DUR + 's ' + ANIM_EASE;
+        tab.style.transform  = 'translate(0, 0)';
       });
-    }, animDuration * 1000);
 
-  });
-};
+      setTimeout(function() {
+        newTabs.forEach(function(tab) {
+          tab.style.transition = '';
+          tab.style.transform  = '';
+        });
+      }, ANIM_DUR * 1000);
+    });
+  };
 
   var titleEditMode = false;
   function openTitleEdit() {
@@ -3359,7 +3627,6 @@
   function renderPageList() {
     var list = $('pageList'); if (!list) return;
     list.innerHTML = '';
-    /* 仮ページ（ファイルエディタ用）はページ一覧から除外して表示 */
     var displayNum = 0;
     pages.forEach(function(p, i) {
       if (p._fileEditor) return;
@@ -3405,12 +3672,9 @@
   }
 
   /* ===== ページタブバー描画 ===== */
-  /* ===== タブバー アニメーション付き描画 ===== */
   var _tabAddPending = false;
 
-  /* ===== タブバー描画（ラッパー方式）===== */
   window.renderPageTabs = function() {
-    /* ファイルエディタ起動中はファイルタブを表示 */
     if (window.folderFileActive && window.renderFolderTabs) {
       window.renderFolderTabs();
       return;
@@ -3494,18 +3758,15 @@
   window.animateTabSwitch = function(renderFn) {
     var bar = $('pageTabBar');
     if (!bar || !bar.classList.contains('active')) { if (renderFn) renderFn(); return; }
-    /* フェーズ1: 現タブを上へスライドアウト */
     bar.style.transition = 'transform 0.18s cubic-bezier(0.55,0,1,0.45), opacity 0.14s ease';
     bar.style.transform  = 'translateY(-100%)';
     bar.style.opacity    = '0';
     setTimeout(function() {
-      /* フェーズ2: 新コンテンツを描画（まだ上に隠れた状態） */
       if (renderFn) renderFn();
       bar.style.transition = 'none';
       bar.style.transform  = 'translateY(-100%)';
       bar.style.opacity    = '0';
-      bar.offsetWidth; /* reflow */
-      /* フェーズ3: 上から下へスライドイン */
+      bar.offsetWidth;
       bar.style.transition = 'transform 0.40s cubic-bezier(0.34,1.28,0.64,1), opacity 0.28s ease';
       bar.style.transform  = 'translateY(0)';
       bar.style.opacity    = '1';
@@ -3517,30 +3778,23 @@
     }, 210);
   };
 
-  /* addPage ラッパー：+ボタンを先にアニメしてからタブ追加 */
+  /* addPage ラッパー：+ボタンアニメーション後にタブ追加 */
   (function() {
     var origAdd = window.addPage;
     window.addPage = function() {
       var bar = $('pageTabBar');
-      if (!bar || !bar.classList.contains('active')) {
-        /* タブバーモードでなければ即実行 */
-        origAdd();
-        return;
-      }
+      if (!bar || !bar.classList.contains('active')) { origAdd(); return; }
       var existingAddBtn = bar.querySelector('#pageTabAddBtn');
       if (!existingAddBtn) { origAdd(); return; }
 
-      /* タブ1枚分の幅を推定（min-width 90px + gap 6px） */
-      var ANIM_DUR = 320; /* ms */
+      var ANIM_DUR = 320;
       var SLIDE_PX = 96;
 
-      /* +ボタンを右へスライド */
       existingAddBtn.style.transition = 'none';
       existingAddBtn.getBoundingClientRect();
       existingAddBtn.style.transition = 'transform ' + ANIM_DUR + 'ms cubic-bezier(0.45,0,0.55,1)';
       existingAddBtn.style.transform  = 'translateX(' + SLIDE_PX + 'px)';
 
-      /* アニメ完了後にタブを追加 */
       setTimeout(function() {
         _tabAddPending = true;
         origAdd();
@@ -3561,7 +3815,6 @@
       _targetIdx = pageIdx;
       _popupOpen = true;
 
-      /* ポップアップ位置：タブの真下 */
       var rect = tabEl.getBoundingClientRect();
       var popW = 210;
       var left = Math.min(rect.left, window.innerWidth - popW - 12);
@@ -3570,13 +3823,11 @@
 
       input.value = (pages[pageIdx] && pages[pageIdx].title) || (window.i18n.t('page.default') + (pageIdx + 1));
       popup.classList.add('open');
-      /* animation restart */
       popup.style.animation = 'none';
       popup.getBoundingClientRect();
       popup.style.animation = '';
       setTimeout(function() { input.focus(); input.select(); }, 20);
 
-      /* ✎→✕ */
       if (editBtn) {
         editBtn.textContent = '✕';
         editBtn.style.transform = '';
@@ -3591,15 +3842,12 @@
         pages[_targetIdx].title       = val || (window.i18n.t('page.default') + (_targetIdx + 1));
         pages[_targetIdx].titleLocked = val.length > 0;
         savePages();
-        /* タブ名を即更新 */
         var bar = $('pageTabBar');
         if (bar) {
           var nameEl = bar.querySelector('[data-page-idx="' + _targetIdx + '"] .page-tab-name');
           if (nameEl) nameEl.textContent = pages[_targetIdx].title.slice(0, 18);
         }
-        /* ページパネルのリストも同期 */
         renderPageList();
-        /* フッターバー（下部バー）も即時更新 */
         render();
       }
       closePopup();
@@ -3623,10 +3871,8 @@
         if (e.key === 'Escape') { e.preventDefault(); closePopup(); }
         e.stopPropagation();
       });
-      /* blur では閉じない：Enter / Escape / 鉛筆ボタンのみで終了 */
     }
 
-    /* 編集ボタン：ポップアップのトグル */
     if (editBtn) {
       editBtn.addEventListener('click', function() {
         if (_popupOpen) { commitPopup(); return; }
@@ -3637,9 +3883,6 @@
       });
     }
 
-    /* 外クリックでは閉じない：Enter / Escape / 鉛筆ボタンのみで終了 */
-
-    /* 外部から名前更新されたらタブも更新（ページパネル側の編集対応） */
     window._syncTabName = function(idx) {
       var bar = $('pageTabBar'); if (!bar) return;
       var nameEl = bar.querySelector('[data-page-idx="' + idx + '"] .page-tab-name');
@@ -3713,7 +3956,6 @@
   var pagePanelOpen = false;
   function openPagePanel() {
     if (pagePanelOpen) return;
-    /* ファイルエディタ中はページウィンドウを開かない（全ルート共通ガード） */
     if (window.folderFileActive) { queueToast(window.i18n.t('toast.page_blocked_fileeditor'), 2200); return; }
     pagePanelOpen = true;
     renderPageList(); $('pagePanel').classList.add('open'); $('pageOverlay').classList.add('open');
@@ -3724,7 +3966,6 @@
     $('pagePanel').classList.remove('open'); $('pageOverlay').classList.remove('open');
     var tab = $('pagePullTab'); if (tab) { tab.classList.remove('panel-open'); }
   };
-  /* ページパネル: ウィンドウ外にマウスが行っても閉じない (mouseleave廃止) */
 
   (function initSwipe() {
     var panel = $('pagePanel'), overlay = $('pageOverlay');
@@ -3783,11 +4024,7 @@
     }
   })();
 
-  /* ========================================================
-     フォルダパネル機能（ページパネルと同等の動作）
-     File System Access API (showDirectoryPicker) を使用
-     Chrome / Edge 対応。Firefox / Safari は非対応。
-  ======================================================== */
+  /* ===== フォルダパネル (File System Access API) ===== */
   (function initFolderPanel() {
     var SUPPORTED_EXTS = ['txt','html','htm','json','md','css','js','xml','csv'];
     var folderPanelOpen = false;
@@ -3797,7 +4034,6 @@
     var isWritable  = false;
     var hasUnsaved  = false;
 
-    /* ファイル表示中かどうかをグローバルに公開（switchPage の被り防止に使用） */
     window.folderFileActive = false;
 
     var panel      = $('folderPanel');
@@ -3952,22 +4188,18 @@
       var dir = (!wasInFileEditor || activeIdx < 0 || idx > activeIdx) ? 'right' : 'left';
       var edit = $('edit');
 
-      /* ① out アニメーション開始（同期・即座に） */
       edit.classList.remove('page-slide-in-right');
-      void edit.offsetWidth; /* reflow で確実に前クラスをリセット */
+      void edit.offsetWidth;
 
-      /* ② out アニメーション中（160ms）にファイルを非同期読み込み */
       var loadPromise = f.handle.getFile().then(function(file) {
         return file.text().then(function(text) { return { file: file, text: text }; });
       });
 
-      /* ③ 160ms 後にコンテンツ差し替え → in アニメーション */
       setTimeout(function() {
         loadPromise.then(function(result) {
           var newText = result.text;
           var file    = result.file;
 
-          /* 仮ページが存在しなければ作成 */
           var fpIdx = pages.findIndex(function(p) { return p._fileEditor; });
           if (fpIdx === -1) {
             saveCurrentPage();
@@ -3990,7 +4222,6 @@
           localStorage.setItem(PAGES_CUR, pages[curPageIdx].id);
 
           window.folderFileActive = true;
-          /* タブバーモードでない場合のみ設定行を非表示にする */
           if (!document.body.classList.contains('tab-bar-mode')) {
             var navModeRow = $('pageNavModeRow');
             if (navModeRow) navModeRow.style.display = 'none';
@@ -4015,9 +4246,6 @@
           } else {
             queueToast(f.name + window.i18n.t('toast.file_loaded_suffix'), 1800);
           }
-         
-
-          /* in アニメーション */
           slidePageIn(edit);
         }).catch(function(e) { queueToast(window.i18n.t('toast.load_failed_prefix') + f.name, 2500); });
       }, 160);
@@ -4066,7 +4294,6 @@
     async function refreshDirectory() {
       if (!dirHandle) { openDirectory(); return; }
       try {
-        /* 書き込み権限を再チェック（権限状態が変わっている可能性がある） */
         var prevWritable = isWritable;
         isWritable = await checkWritable(dirHandle);
         fileHandles = [];
@@ -4085,7 +4312,6 @@
       } catch(e) { queueToast(window.i18n.t('toast.folder_refresh_failed'), 2500); }
     }
 
-    /* 編集内容が変わったら unsaved フラグ */
     $('edit').addEventListener('input', function() {
       if (activeIdx >= 0 && isWritable) {
         hasUnsaved = true;
@@ -4139,28 +4365,23 @@
     var exitBtn = $('folderExitBtn');
     if (exitBtn) {
       exitBtn.onclick = function() {
-        /* 仮ページを削除して元のページに戻る */
         var fpIdx = pages.findIndex(function(p) { return p._fileEditor; });
         var returnIdx = 0;
         if (fpIdx !== -1) {
           pages.splice(fpIdx, 1);
-          /* 削除後のインデックス補正 */
           if (curPageIdx >= pages.length) curPageIdx = pages.length - 1;
           if (curPageIdx < 0) curPageIdx = 0;
           returnIdx = curPageIdx;
         }
         window.folderFileActive = false;
         activeIdx = -1; hasUnsaved = false;
-        /* ファイルエディタ終了時にページ表示行を復元し、タブバーを復元 */
         var navModeRow = $('pageNavModeRow');
         if (navModeRow) navModeRow.style.display = '';
         if (document.body.classList.contains('tab-bar-mode')) {
-          /* タブバーモードのまま → ファイルタブ→ページタブ（アニメーション付き） */
           if (window.animateTabSwitch && window.renderPageTabs) {
             requestAnimationFrame(function() { window.animateTabSwitch(window.renderPageTabs); });
           }
         } else if (localStorage.getItem('pageNavMode') === 'tabbar') {
-          /* スライドモード中だったが設定はタブ → タブバーを復元 */
           requestAnimationFrame(function() { window.applyPageNavMode('tabbar'); });
         }
         renderFileList();
@@ -4238,7 +4459,6 @@
           if (tab && !tab.matches(':hover')) tab.classList.remove('visible');
         });
       }
-      /* タブ自体からmouseleaveしたら非表示 */
       var pullTab = $('folderPullTab');
       if (pullTab) {
         pullTab.addEventListener('click', function() { openFolderPanel(); });
@@ -4337,7 +4557,7 @@
     }
   }
 
-  /* 低スペック検出（モバイルは除外） */
+  /* 低スペック端末検出（モバイルは除外） */
   (function() {
     if (state.device === 'Mobile') return;
     var WARMUP = 4000, MEASURE = 8000, DROP_THRESH = 80, DROP_LIMIT = 60;
@@ -4360,7 +4580,7 @@
   (function init() {
     var fSel = $('fSel'), sSel = $('sSel'), edit = $('edit');
 
-    supportedFonts.forEach(function(f) { fSel.add(new Option(f, f)); });
+    rebuildFontSelect();
     for (var j = 12; j <= 80; j += 2) sSel.add(new Option(j + 'px', j));
     sSel.value = 18;
 
@@ -4574,7 +4794,6 @@
       e.preventDefault();
       var text = window.getSelection().toString().trim();
       selectedText = text;
-      /* 選択テキストがある場合のみ右クリックメニューを表示 */
       if (!text) return;
       ctxJustOpened = true;
       showContextMenu(e.clientX, e.clientY, true);
@@ -4587,7 +4806,6 @@
       }, 20);
     });
 
-    
     function handleOutside(e) {
       if (ctxJustOpened) return;
       if (contextMenu && contextMenu.style.display !== 'none') { if (!contextMenu.contains(e.target)) hideContextMenu(); return; }
@@ -4604,14 +4822,11 @@
     document.addEventListener('mousedown',  handleOutside);
     document.addEventListener('touchstart', handleOutside, { passive: true });
 
-    
     window.addEventListener('offline', function() { if (!hasShownOfflineToast) { hasShownOfflineToast = true; queueToast(window.i18n.t('toast.offline_error'), 5000); } });
     window.addEventListener('online',  function() { hasShownOfflineToast = false; });
 
-    
     var p = pages[curPageIdx];
     if (p && !edit.value && p.text) {
-      /* スタイルを先に適用してからテキストをセット（逆順だとリレイアウト時にフラッシュが出る） */
       for (var i = 0; i < fSel.options.length; i++) { if (fSel.options[i].value === p.font) { fSel.selectedIndex = i; break; } }
       sSel.value = String(p.size || 18);
       applyStyles();
@@ -4624,11 +4839,8 @@
       var shareBtn = $('headerShareBtn');
       if (shareBtn) {
         shareBtn.classList.add('visible');
-        /* transitionは次フレーム以降に有効化してロード時アニメーションを防ぐ */
         requestAnimationFrame(function() {
-          requestAnimationFrame(function() {
-            shareBtn.classList.add('animated');
-          });
+          requestAnimationFrame(function() { shareBtn.classList.add('animated'); });
         });
       }
     }
@@ -4731,14 +4943,12 @@
     var activeStroke = null;
 
     var currentPageId = 'p0';
-    var strokesMap    = {};  /* ページID → ストローク配列 */
+    var strokesMap    = {};
 
     window.penPageSwitch = function(fromId, toId, dir) {
-      /* 現在のページのストロークを保存 */
       strokesMap[fromId] = strokes.slice();
       canvas.classList.remove('page-slide-in-right');
       return function() {
-        /* 切り替え先ページのストロークを復元 */
         strokes = (strokesMap[toId] || []).slice();
         currentPageId = toId;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
