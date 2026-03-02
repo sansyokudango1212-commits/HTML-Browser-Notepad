@@ -600,7 +600,7 @@
     }
     .fmgr-add-btn:hover  { background: rgba(var(--accent-rgb), 0.28); }
     .fmgr-add-btn:active { transform: scale(0.92); }
-    .fmgr-error { font-size: 11px; color: #e57373; text-align: center; min-height: 14px; margin-bottom: 8px; }
+    .fmgr-error { font-size: 11px; color: #e57373; text-align: center; min-height: 16px; line-height: 1.45; margin-bottom: 8px; }
     .fmgr-section-label {
       font-size: 10px; color: var(--dim); letter-spacing: 0.5px; text-transform: uppercase;
       margin-bottom: 6px; padding-left: 2px;
@@ -656,6 +656,16 @@
     }
     .toast .count { position: absolute; left: 0; bottom: 0; height: 3px; background: var(--accent); width: 100%; transition: width linear; }
     .toast .msg   { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Adult content warning card (in search results) */
+    .swp-adult-warn {
+      border: 1px solid rgba(229,57,53,0.28);
+      border-radius: 14px; padding: 16px 18px;
+      text-align: center; background: rgba(229,57,53,0.06);
+    }
+    .swp-adult-icon  { font-size: 26px; margin-bottom: 6px; line-height: 1; }
+    .swp-adult-title { font-size: 13px; font-weight: bold; color: #e57373; margin-bottom: 6px; }
+    .swp-adult-desc  { font-size: 11px; color: var(--dim); line-height: 1.65; margin-bottom: 10px; }
     @media (max-width: 480px) {
       textarea, #searchHighlightMirror { padding: 72px 16px 90px; font-size: 16px; }
       #contextMenu { max-width: calc(100vw - 24px); }
@@ -1429,7 +1439,7 @@
     <div id="optionsDragHandle" class="drag-handle" style="position:absolute;top:0;left:0;right:0;height:36px;border-radius:18px 18px 0 0;"></div>
     <button class="close-dot" onclick="act('toggle')" aria-label="閉じる"></button>
     <button class="info-dot" onclick="showDevMessage()" aria-label="開発者メッセージ">i</button>
-    <div><span class="label" data-i18n="opt.font">フォント</span><select id="fSel"></select><button id="fontMgrBtn" title="フォント管理" onclick="openFontMgr()">＋</button></div>
+    <div><span class="label" data-i18n="opt.font">フォント</span><select id="fSel"></select><button id="fontMgrBtn" data-i18n="fmgr.title" data-i18n-attr="title" title="フォント管理" onclick="openFontMgr()">＋</button></div>
     <div><span class="label" data-i18n="opt.size">サイズ</span><select id="sSel"></select></div>
     <div><span class="label" data-i18n="opt.search">検索</span>
       <select id="dictSel">
@@ -1497,8 +1507,8 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 2603001425_Fast</span>
-      <span>Version 26.2.6</span>
+      <span>Build 2603022152</span>
+      <span>Version 26.2.7</span>
       <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_Gemini2.5Pro<br>Trae_Chat GPT5.2beta<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Tikuwa_Nerimono1</span>
     </div>
   </div>
@@ -1591,22 +1601,21 @@
   <!-- Google Fonts Manager Modal -->
   <div id="fontMgrModal" class="glass panel-modal">
     <button class="close-dot" onclick="closeFontMgr()" aria-label="閉じる"></button>
-    <div class="fmgr-title">フォント管理</div>
+    <div class="fmgr-title" data-i18n="fmgr.title">フォント管理</div>
     <div class="fmgr-url-row">
       <input type="text" id="fontMgrUrl" class="fmgr-url-input"
         placeholder="フォントの URL を貼り付け"
+        data-i18n="fmgr.placeholder" data-i18n-attr="placeholder"
         onkeydown="if(event.key==='Enter')addCustomFont()">
-      <button class="fmgr-add-btn" onclick="addCustomFont()">追加</button>
+      <button class="fmgr-add-btn" onclick="addCustomFont()" data-i18n="fmgr.add">追加</button>
     </div>
     <div class="fmgr-error" id="fontMgrError"></div>
-    <div class="fmgr-section-label">フォント一覧</div>
+    <div class="fmgr-section-label" data-i18n="fmgr.list">フォント一覧</div>
     <div class="fmgr-list" id="fontMgrList"></div>
     <div class="fmgr-hint">
       <a href="https://fonts.google.com" target="_blank" rel="noopener"
          style="color:var(--accent);text-decoration:none;">fonts.google.com</a>
-         フォント以外のフォントURLは受け付けません。<br>
-         以下の形式でテキストボックスにURLを入力してください。<br>
-      （例: fonts.google.com/specimen/DotGothic16）<br>
+         <span id="fontMgrHint"></span>
     </div>
   </div>
 
@@ -1862,7 +1871,23 @@
         'page.placeholder':'ページ名...',
         'footer.unit':' 文字',
         'pp.empty':'空のページ',
-        'folder.title':'フォルダ'
+        'folder.title':'フォルダ',
+        'fmgr.title':'フォント管理',
+        'fmgr.placeholder':'フォントの URL を貼り付け',
+        'fmgr.add':'追加',
+        'fmgr.list':'フォント一覧',
+        'fmgr.tag.builtin':'標準',
+        'fmgr.tag.custom':'カスタム',
+        'fmgr.del.title':'削除',
+        'fmgr.err.empty':'URLを入力してください',
+        'fmgr.err.noname':'フォント名を取得できませんでした',
+        'fmgr.err.notgoogle':'Google Fonts の specimen URL か CSS URL を入力してください',
+        'fmgr.err.exists':'はすでに追加されています',
+        'fmgr.hint.suffix':'フォント以外のフォントURLは受け付けません。<br>以下の形式でテキストボックスにURLを入力してください。<br>（例: fonts.google.com/specimen/DotGothic16）',
+        'fmgr.toast.added':'を追加しました',
+        'fmgr.toast.removed':'を削除しました',
+        'swp.adult_title':'成人向けコンテンツ',
+        'swp.adult_desc':'このページは成人向けカテゴリに分類されています'
       },
       en: {
         'hdr.new':'New','hdr.open':'Open','hdr.save':'Save',
@@ -1980,7 +2005,23 @@
         'page.placeholder':'Page name...',
         'footer.unit':' chars',
         'pp.empty':'Empty page',
-        'folder.title':'Folder'
+        'folder.title':'Folder',
+        'fmgr.title':'Font Manager',
+        'fmgr.placeholder':'Paste font URL here',
+        'fmgr.add':'Add',
+        'fmgr.list':'Font List',
+        'fmgr.tag.builtin':'Built-in',
+        'fmgr.tag.custom':'Custom',
+        'fmgr.del.title':'Remove',
+        'fmgr.err.empty':'Please enter a URL',
+        'fmgr.err.noname':'Could not retrieve font name',
+        'fmgr.err.notgoogle':'Please enter a Google Fonts specimen or CSS URL',
+        'fmgr.err.exists':' is already added',
+        'fmgr.hint.suffix':'Only Google Fonts URLs are accepted.<br>Enter the URL in the format below.<br>(e.g. fonts.google.com/specimen/DotGothic16)',
+        'fmgr.toast.added':' added',
+        'fmgr.toast.removed':' removed',
+        'swp.adult_title':'Adult Content',
+        'swp.adult_desc':'This page is categorized as adult content on Wikipedia'
       }
     };
 
@@ -1993,6 +2034,10 @@
         var val  = (dict[_lang] && dict[_lang][key]) || dict['ja'][key] || key;
         if (attr) { el[attr] = val; } else { el.textContent = val; }
       });
+      /* フォントマネージャーのヒントテキスト更新 */
+      var hintEl = document.getElementById('fontMgrHint');
+      if (hintEl) { hintEl.innerHTML = (dict[_lang] && dict[_lang]['fmgr.hint.suffix']) || dict['ja']['fmgr.hint.suffix'] || ''; }
+
       var jaBtn = document.getElementById('langJaBtn');
       var enBtn = document.getElementById('langEnBtn');
       if (jaBtn) jaBtn.classList.toggle('active', _lang === 'ja');
@@ -2497,7 +2542,7 @@
 
   var state = {
     curFile: 'memo.txt', browser: getBrowser(), device: getDevice(),
-    text: '', isOptionsOpen: false, isModalOpen: false, isSearchOpen: false,
+    text: '', isOptionsOpen: false, isModalOpen: false, isSearchOpen: false, isFontMgrOpen: false,
     modalType: 'new', isFooterHidden: false, hideTimer: null,
     accentColor: localStorage.getItem('accentColor') || '#c9a181',
     autoSave: localStorage.getItem('autoSave') === 'true',
@@ -2570,10 +2615,11 @@
     renderFontMgrList();
     $('fontMgrError').textContent = '';
     $('fontMgrUrl').value = '';
+    state.isFontMgrOpen = true;
     openPanel('fontMgrModal');
   }
 
-  function closeFontMgr() { closePanel('fontMgrModal'); }
+  function closeFontMgr() { state.isFontMgrOpen = false; closePanel('fontMgrModal'); }
 
   function renderFontMgrList() {
     var list = $('fontMgrList');
@@ -2590,13 +2636,13 @@
 
       var tag = document.createElement('span');
       tag.className = 'fmgr-item-tag ' + (isCustom ? 'custom' : 'builtin');
-      tag.textContent = isCustom ? 'カスタム' : '標準';
+      tag.textContent = isCustom ? window.i18n.t('fmgr.tag.custom') : window.i18n.t('fmgr.tag.builtin');
 
       item.appendChild(nameEl); item.appendChild(tag);
 
       if (isCustom) {
         var del = document.createElement('button'); del.className = 'fmgr-del-btn';
-        del.textContent = '×'; del.title = '削除';
+        del.textContent = '×'; del.title = window.i18n.t('fmgr.del.title');
         del.onclick = (function(n) { return function() { removeCustomFont(n); }; })(name);
         item.appendChild(del);
       }
@@ -2610,25 +2656,26 @@
     var errEl = $('fontMgrError');
     errEl.textContent = '';
 
-    if (!raw) { errEl.textContent = 'URLを入力してください'; return; }
+    if (!raw) { errEl.textContent = window.i18n.t('fmgr.err.empty'); return; }
 
     /* specimen URL を自動変換 (例: fonts.google.com/specimen/DotGothic16) */
     var url = raw;
     if (url.indexOf('fonts.google.com/specimen/') !== -1) {
       var converted = specimenUrlToApiUrl(url);
-      if (!converted) { errEl.textContent = 'フォント名を取得できませんでした'; return; }
+      if (!converted) { errEl.textContent = window.i18n.t('fmgr.err.noname'); return; }
       url = converted;
     }
 
     if (url.indexOf('fonts.googleapis.com') === -1) {
-      errEl.textContent = 'Google Fonts の specimen URL か CSS URL を入力してください'; return;
+      errEl.textContent = window.i18n.t('fmgr.err.notgoogle'); return;
     }
 
     var name = parseFontNameFromUrl(url);
-    if (!name) { errEl.textContent = 'フォント名を取得できませんでした'; return; }
+    if (!name) { errEl.textContent = window.i18n.t('fmgr.err.noname'); return; }
 
     if (supportedFonts.indexOf(name) !== -1) {
-      errEl.textContent = '「' + name + '」はすでに追加されています'; return;
+      var _qe = window.i18n.lang() === 'en' ? ['"','"'] : ['「','」'];
+      errEl.textContent = _qe[0] + name + _qe[1] + window.i18n.t('fmgr.err.exists'); return;
     }
 
     var cleanUrl = url;
@@ -2646,7 +2693,8 @@
     rebuildFontSelect();
     $('fontMgrUrl').value = '';
     renderFontMgrList();
-    queueToast('「' + name + '」を追加しました');
+    var _q = window.i18n.lang() === 'en' ? ['"','"'] : ['「','」'];
+    queueToast(_q[0] + name + _q[1] + window.i18n.t('fmgr.toast.added'));
   }
 
   function removeCustomFont(name) {
@@ -2666,7 +2714,8 @@
 
     rebuildFontSelect();
     renderFontMgrList();
-    queueToast('「' + name + '」を削除しました');
+    var _q2 = window.i18n.lang() === 'en' ? ['"','"'] : ['「','」'];
+    queueToast(_q2[0] + name + _q2[1] + window.i18n.t('fmgr.toast.removed'));
   }
 
   loadCustomFontsFromStorage();
@@ -2842,6 +2891,7 @@
     closeOverlays: function() {
       if (state.isOptionsOpen) { state.isOptionsOpen = false; closePanel('options'); }
       if (state.isModalOpen)   { state.isModalOpen   = false; closePanel('confirmModal'); }
+      if (state.isFontMgrOpen) { state.isFontMgrOpen = false; closePanel('fontMgrModal'); }
       closePanel('translatePanel'); closePanel('searchWebPanel'); closeSaveMetaModal();
     },
     updateText: function(val) {
@@ -2938,10 +2988,86 @@
   };
   function getCurrentDict() { return localStorage.getItem('dictEngine') || 'wikipedia'; }
 
+  /* ---- Wikipedia カテゴリベースのコンテンツフィルタ ---- */
+
+  /* 成人向けカテゴリのキーワード（日本語・英語） */
+  /* ---- 成人向けコンテンツフィルタ ---- */
+
+  /* カテゴリ名マッチ用キーワード（日本語・英語 Wikipedia） */
+  var ADULT_CAT_KEYWORDS = [
+    /* 日本語カテゴリ名に含まれる語 */
+    '性的','性行為','性交','人間の性','セクシュアリティ','ポルノグラフィ',
+    'アダルトビデオ','成人向け','18禁','猥褻','わいせつ','売春','買春',
+    '性暴力','性犯罪','レイプ','強姦','痴漢','性器','陰茎','陰部','陰核',
+    '性描写','性産業','風俗','援助交際','自慰','オナニー','性欲','エロ',
+    '射精','勃起','フェラ','クンニ','肛門性交','獣姦','近親相姦',
+    /* 英語カテゴリ名に含まれる語 */
+    'pornograph','adult film','adult video','sexually explicit','sex work',
+    'prostitut','erotic','human sexual','masturbat','bdsm','fetish',
+    'rape','sexual violence','genital','sex industry','adult entertainment',
+    'nudity','sexual act','sexuality','intercourse','orgasm'
+  ];
+
+  /* 本文・スニペット・description チェック用キーワード（カテゴリ取得失敗時の保険） */
+  var ADULT_TEXT_KEYWORDS = [
+    /* 日本語 */
+    '自慰','オナニー','マスターベーション','性交','セックス','性器',
+    '陰茎','陰部','射精','勃起','フェラチオ','クンニリングス','性的興奮',
+    '性的刺激','性的快感','性欲','ポルノ','アダルト','強姦','レイプ',
+    '売春','買春','風俗嬢','性行為','性描写','わいせつ','猥褻',
+    /* English */
+    'masturbat','penis','vagina','vulva','genital','ejaculat','erect',
+    'pornograph','erotic','prostitut','sexual intercourse','sex act',
+    'nude','naked body','orgasm','sexual arousal'
+  ];
+
+  function isAdultByCategories(categories) {
+    if (!categories || !categories.length) return false;
+    return categories.some(function(cat) {
+      var name = (cat.title || '').toLowerCase();
+      return ADULT_CAT_KEYWORDS.some(function(kw) { return name.indexOf(kw) !== -1; });
+    });
+  }
+
+  function isAdultByText(text) {
+    if (!text) return false;
+    var t = text.toLowerCase();
+    return ADULT_TEXT_KEYWORDS.some(function(kw) { return t.indexOf(kw.toLowerCase()) !== -1; });
+  }
+
+  function isAdult(categories, textSources) {
+    if (isAdultByCategories(categories)) return true;
+    for (var i = 0; i < textSources.length; i++) {
+      if (isAdultByText(textSources[i])) return true;
+    }
+    return false;
+  }
+
+  /* 複数タイトルのカテゴリをまとめて取得（1回のAPIコール、隠しカテゴリも含む）*/
+  function fetchWikiCategoriesBatch(domain, titles) {
+    var titlesParam = titles.map(function(t) { return encodeURIComponent(t); }).join('|');
+    return fetch('https://' + domain + '/w/api.php?action=query&titles=' + titlesParam
+        + '&prop=categories&cllimit=100&format=json&origin=*')
+      .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
+      .then(function(data) {
+        var pages = data.query && data.query.pages;
+        var catMap = {};
+        if (pages) {
+          Object.keys(pages).forEach(function(id) {
+            var page = pages[id];
+            catMap[page.title] = page.categories || [];
+          });
+        }
+        return catMap;
+      })
+      .catch(function() { return {}; });
+  }
+
   window.searchWiki = function() {
     if (!selectedText) { hideContextMenu(); return; }
     hideContextMenu();
-    var dict = getCurrentDict(), query = selectedText, body = $('swpBody');
+    var dict = getCurrentDict(), query = selectedText;
+    var body = $('swpBody');
     $('swpWikiBtn').textContent = (DICT_CONFIG[dict] || DICT_CONFIG.wikipedia).btnText;
     body.innerHTML = '<div class="swp-loading">' + window.i18n.t('swp.loading') + '</div>';
     openPanel('searchWebPanel');
@@ -2982,33 +3108,83 @@
     var domain = lang === 'en' ? 'en.wikipedia.org' : 'ja.wikipedia.org';
     swpCurrentPageUrl = 'https://' + domain + '/wiki/' + encodeURIComponent(query);
     wikiBtn.onclick = function() { window.open(swpCurrentPageUrl, '_blank'); };
-    fetch('https://' + domain + '/w/api.php?action=query&list=search&srsearch=' + encodeURIComponent(query) + '&srlimit=6&format=json&origin=*')
+
+    fetch('https://' + domain + '/w/api.php?action=query&list=search&srsearch='
+        + encodeURIComponent(query) + '&srlimit=6&format=json&origin=*')
       .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
       .then(function(data) {
         var results = data.query && data.query.search;
-        if (!results || !results.length) { animateSearchResults('<div class="swp-empty">' + window.i18n.t('swp.notfound_pre') + escapeHtml(query) + window.i18n.t('swp.notfound_mid') + 'Wikipedia' + window.i18n.t('swp.notfound_suf') + '</div>'); return; }
+        if (!results || !results.length) {
+          animateSearchResults('<div class="swp-empty">'
+            + window.i18n.t('swp.notfound_pre') + escapeHtml(query)
+            + window.i18n.t('swp.notfound_mid') + 'Wikipedia'
+            + window.i18n.t('swp.notfound_suf') + '</div>');
+          return;
+        }
         swpCurrentPageUrl = 'https://' + domain + '/wiki/' + encodeURIComponent(results[0].title);
         wikiBtn.onclick = function() { window.open(swpCurrentPageUrl, '_blank'); };
-        fetch('https://' + domain + '/api/rest_v1/page/summary/' + encodeURIComponent(results[0].title))
-          .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
-          .then(function(s) {
-            var html = '';
-            if (s && s.title) {
-              var url = s.content_urls && s.content_urls.desktop ? s.content_urls.desktop.page : 'https://' + domain + '/wiki/' + encodeURIComponent(s.title);
-              html += '<div class="swp-abstract"><div class="swp-abstract-heading">' + escapeHtml(s.title) + '</div>';
-              if (s.description && s.description.indexOf('曖昧さ回避') === -1 && s.description !== 'Topics referred to by the same term') html += '<div class="swp-abstract-desc">' + escapeHtml(s.description) + '</div>';
-              if (s.extract) html += '<div class="swp-abstract-text">' + escapeHtml(s.extract.slice(0, 400) + (s.extract.length > 400 ? '…' : '')) + '</div>';
-              html += '<div class="swp-abstract-src"><a href="' + escapeHtml(url) + '" target="_blank" rel="noopener">' + window.i18n.t('swp.wiki_read') + '</a></div></div>';
-            }
-            results.slice(1).forEach(function(item) {
-              var u = 'https://' + domain + '/wiki/' + encodeURIComponent(item.title);
-              var snip = item.snippet ? item.snippet.replace(/<[^>]+>/g,'') : '';
-              html += '<a class="swp-result-item" href="' + escapeHtml(u) + '" target="_blank" rel="noopener"><div class="swp-result-title">' + escapeHtml(item.title) + '</div>';
-              if (snip) html += '<div class="swp-result-desc">' + escapeHtml(snip) + '</div>';
-              html += '<div class="swp-result-url">' + escapeHtml(u) + '</div></a>';
-            });
-            animateSearchResults(html || '<div class="swp-empty">' + window.i18n.t('swp.failed') + '</div>');
+
+        var allTitles = results.map(function(r) { return r.title; });
+
+        /* サマリーとカテゴリを並列取得 */
+        Promise.all([
+          fetch('https://' + domain + '/api/rest_v1/page/summary/' + encodeURIComponent(results[0].title))
+            .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
+            .catch(function() { return null; }),
+          fetchWikiCategoriesBatch(domain, allTitles)
+        ]).then(function(arr) {
+          var s      = arr[0];
+          var catMap = arr[1];
+          var html   = '';
+
+          /* メイン結果（abstract）― カテゴリ + テキスト多層チェック */
+          var mainCats = catMap[results[0].title] || [];
+          var mainTexts = [
+            results[0].title,
+            results[0].snippet || '',
+            s ? (s.description || '') : '',
+            s ? (s.extract || '').slice(0, 300) : ''
+          ];
+          if (isAdult(mainCats, mainTexts)) {
+            var warnUrl = 'https://' + domain + '/wiki/' + encodeURIComponent(results[0].title);
+            html += '<div class="swp-abstract swp-adult-warn">'
+              + '<div class="swp-adult-icon">🔞</div>'
+              + '<div class="swp-adult-title">' + window.i18n.t('swp.adult_title') + '</div>'
+              + '<div class="swp-adult-desc">'  + window.i18n.t('swp.adult_desc')  + '</div>'
+              + '<div class="swp-abstract-src"><a href="' + escapeHtml(warnUrl)
+              + '" target="_blank" rel="noopener">' + window.i18n.t('swp.wiki_read') + '</a></div>'
+              + '</div>';
+          } else if (s && s.title) {
+            var url = s.content_urls && s.content_urls.desktop
+              ? s.content_urls.desktop.page
+              : 'https://' + domain + '/wiki/' + encodeURIComponent(s.title);
+            html += '<div class="swp-abstract"><div class="swp-abstract-heading">' + escapeHtml(s.title) + '</div>';
+            if (s.description && s.description.indexOf('曖昧さ回避') === -1 && s.description !== 'Topics referred to by the same term')
+              html += '<div class="swp-abstract-desc">' + escapeHtml(s.description) + '</div>';
+            if (s.extract)
+              html += '<div class="swp-abstract-text">'
+                + escapeHtml(s.extract.slice(0, 400) + (s.extract.length > 400 ? '…' : ''))
+                + '</div>';
+            html += '<div class="swp-abstract-src"><a href="' + escapeHtml(url)
+              + '" target="_blank" rel="noopener">' + window.i18n.t('swp.wiki_read') + '</a></div></div>';
+          }
+
+          /* 関連結果リスト（成人向けはフィルタ除外） */
+          results.slice(1).forEach(function(item) {
+            var itemCats  = catMap[item.title] || [];
+            var itemTexts = [item.title, item.snippet || ''];
+            if (isAdult(itemCats, itemTexts)) return; /* skip */
+            var u    = 'https://' + domain + '/wiki/' + encodeURIComponent(item.title);
+            var snip = item.snippet ? item.snippet.replace(/<[^>]+>/g, '') : '';
+            html += '<a class="swp-result-item" href="' + escapeHtml(u)
+              + '" target="_blank" rel="noopener"><div class="swp-result-title">'
+              + escapeHtml(item.title) + '</div>';
+            if (snip) html += '<div class="swp-result-desc">' + escapeHtml(snip) + '</div>';
+            html += '<div class="swp-result-url">' + escapeHtml(u) + '</div></a>';
           });
+
+          animateSearchResults(html || '<div class="swp-empty">' + window.i18n.t('swp.failed') + '</div>');
+        });
       })
       .catch(function() { animateSearchResults('<div class="swp-empty">' + window.i18n.t('swp.failed') + '</div>'); });
   }
@@ -4783,6 +4959,7 @@
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         if (pagePanelOpen) { closePagePanel(); return; }
+        if (state.isFontMgrOpen) { closeFontMgr(); return; }
         if (state.isOptionsOpen || state.isModalOpen) { ActionHandlers.closeOverlays(); render(); }
         hideDevMessage();
       }
@@ -4813,6 +4990,7 @@
         var devModal = $('devMessageModal'); if (devModal && devModal.classList.contains('show')) return;
         var hBtns = document.querySelectorAll('header button');
         for (var bi = 0; bi < hBtns.length; bi++) { if (hBtns[bi] === e.target || hBtns[bi].contains(e.target)) return; }
+        var fmEl = $('fontMgrModal'); if (fmEl && fmEl.contains(e.target)) return;
         var optEl = $('options'); if (optEl && !optEl.contains(e.target)) { ActionHandlers.closeOverlays(); render(); }
         return;
       }
