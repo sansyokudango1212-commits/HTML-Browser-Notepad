@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://translate.googleapis.com https://ja.wikipedia.org https://ja.wiktionary.org https://en.wikipedia.org https://en.wiktionary.org; worker-src 'self'; frame-ancestors 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.mymemory.translated.net https://ja.wikipedia.org https://ja.wiktionary.org https://en.wikipedia.org https://en.wiktionary.org; worker-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests;">
   <meta http-equiv="X-Frame-Options" content="DENY">
   <link rel="manifest" href="manifest.json">
   <meta name="google-site-verification" content="Z5LCrw2wiWOC0bTQynoScEQ9LTvHoEucbmQwoReCLXE" />
@@ -1447,12 +1447,6 @@
         <option value="wiktionary">Wiktionary_JP</option>
       </select>
     </div>
-    <div><span class="label" data-i18n="opt.translate">翻訳</span>
-      <select id="translateSel">
-        <option value="google">Google 翻訳</option>
-        <option value="bing">Bing 翻訳</option>
-      </select>
-    </div>
     <div><span class="label" data-i18n="opt.theme">テーマ</span><div class="color-swatches" id="colorSwatches"></div></div>
     <div>
       <span class="label" data-i18n="opt.autosave">自動保存</span>
@@ -1507,8 +1501,8 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 2603022152</span>
-      <span>Version 26.2.7</span>
+      <span>Build 26030021250</span>
+      <span>Version 26.2.8</span>
       <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_Gemini2.5Pro<br>Trae_Chat GPT5.2beta<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Tikuwa_Nerimono1</span>
     </div>
   </div>
@@ -1552,7 +1546,6 @@
       <button class="tp-dot" onclick="closePanel('translatePanel')" aria-label="閉じる"></button>
       <div class="tp-lang">
         <select id="tpSrcLang">
-          <option value="auto" data-i18n="tp.lang.auto">自動検出</option>
           <option value="ja"    data-i18n="tp.lang.ja">日本語</option><option value="en" data-i18n="tp.lang.en">英語</option>
           <option value="zh-CN" data-i18n="tp.lang.zh">中国語</option><option value="ko" data-i18n="tp.lang.ko">韓国語</option>
           <option value="fr"    data-i18n="tp.lang.fr">フランス語</option><option value="de" data-i18n="tp.lang.de">ドイツ語</option>
@@ -1560,7 +1553,7 @@
         </select>
         <span class="tp-arrow">→</span>
         <select id="tpTgtLang">
-          <option value="ja"    data-i18n="tp.lang.ja">日本語</option><option value="en" data-i18n="tp.lang.en">英語</option>
+          <option value="en"    data-i18n="tp.lang.en">英語</option><option value="ja" data-i18n="tp.lang.ja">日本語</option>
           <option value="zh-CN" data-i18n="tp.lang.zh">中国語</option><option value="ko" data-i18n="tp.lang.ko">韓国語</option>
           <option value="fr"    data-i18n="tp.lang.fr">フランス語</option><option value="de" data-i18n="tp.lang.de">ドイツ語</option>
           <option value="es"    data-i18n="tp.lang.es">スペイン語</option>
@@ -1571,7 +1564,7 @@
       <div class="tp-src" id="tpSrc"></div>
       <div class="tp-result" id="tpResult"></div>
     </div>
-    <div class="tp-powered" id="tpPowered">Powered by Google translation</div>
+    <div class="tp-powered" id="tpPowered">Powered by MyMemory (mymemory.translated.net)</div>
   </div>
 
   <div id="searchWebPanel" class="glass">
@@ -1585,14 +1578,16 @@
   <div id="devMessageModal" class="glass panel-modal">
     <div class="dev-title-main">Information</div>
     <div class="dev-body">アプリを使っている人へ
-このアプリのベースのバージョンはBuild2603010956(privateBETA2)です
-26.2.5への互換性や後方互換性などの確認は行っていますがもし不具合があれば再度保存し直してもらえると幸いです
-またそれより以前のバージョンをお使いの方は"--- DON'T EDIT BELOW ---"などのテキストが表示される場合がありますが、旧バージョンの仕様であり、気になる場合は該当テキストを削除してから保存し直すと消えるかと思います
-これからもこのアプリをよろしくお願いします]
+タブバーのバグ3件
+セキュリティ強化
+Bing翻訳の偽実装を削除 → MyMemory実装
+設定画面の翻訳項目を整理
 
-追記:今のところユーザー数0(2026/2/28)
-もしかしたら使ってる人がいるかもの精神で開発中
-機能を増やしていくぞい
+本当にすみませんBETA版(未公開)の残骸が翻訳機能に残ってたのと元々の翻訳が非公式Google翻訳APIを使ってたのをちゃんとしたMyMemory APIに置き換えました。
+シンプル真っ黒だったのでできるだけクリーンになるよう修正しました
+Bing表記はBETAの頃にazuraのを検討したことがありその残骸です
+
+できるだけこのアプリをクリーンでよりよいwebアプリにしたいと考えていますので今後ともどうぞよろしくお願いいたします。
 
  - Tikuwa - </div>
     <button class="dev-close" onclick="hideDevMessage()" data-i18n="common.close">閉じる</button>
@@ -2157,36 +2152,44 @@
   var BiometricEngine = (function() {
     var CRED_KEY  = 'np26_bio_credId';
     var PWENC_KEY = 'np26_bio_pw_enc';
+    var BIO_ITER  = 100000; /* 固定1000回 → 100000回に強化 */
     var RP_ID     = location.hostname || 'localhost';
     var RP_NAME   = 'Notepad26';
 
     function buf2b64(buf) { return btoa(String.fromCharCode.apply(null, new Uint8Array(buf))); }
     function b642buf(b64) { var s = atob(b64); var a = new Uint8Array(s.length); for (var i=0;i<s.length;i++) a[i]=s.charCodeAt(i); return a.buffer; }
 
-    /* パスワードをデバイス固有キー(固定salt+AES-GCM)で暗号化して保存 */
-    async function storePassword(password) {
-      var salt = new TextEncoder().encode('np26_bio_salt_v1');
-      var keyMat = await crypto.subtle.importKey('raw', salt, 'PBKDF2', false, ['deriveKey']);
-      var key = await crypto.subtle.deriveKey(
-        { name: 'PBKDF2', salt: new TextEncoder().encode(RP_ID), iterations: 1000, hash: 'SHA-256' },
+    /* パスワードをデバイス固有キー(ランダムsalt+AES-GCM)で暗号化して保存
+       キーマテリアル: credentialId（デバイス生成のランダム値）+ RP_ID
+       フォーマット: [salt(32byte)][iv(12byte)][ciphertext] */
+    async function storePassword(password, credIdBytes) {
+      var salt      = crypto.getRandomValues(new Uint8Array(32)); /* 固定saltを廃止→ランダム生成 */
+      /* credentialId をキーマテリアルに使用（固定文字列ではなくデバイス固有のランダム値） */
+      var keyInput  = new Uint8Array(credIdBytes.length + new TextEncoder().encode(RP_ID).length);
+      keyInput.set(credIdBytes, 0); keyInput.set(new TextEncoder().encode(RP_ID), credIdBytes.length);
+      var keyMat = await crypto.subtle.importKey('raw', keyInput, 'PBKDF2', false, ['deriveKey']);
+      var key    = await crypto.subtle.deriveKey(
+        { name: 'PBKDF2', salt: salt, iterations: BIO_ITER, hash: 'SHA-256' },
         keyMat, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
       );
       var iv  = crypto.getRandomValues(new Uint8Array(12));
       var enc = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, key, new TextEncoder().encode(password));
-      var combined = new Uint8Array(12 + enc.byteLength);
-      combined.set(iv); combined.set(new Uint8Array(enc), 12);
+      var combined = new Uint8Array(32 + 12 + enc.byteLength);
+      combined.set(salt, 0); combined.set(iv, 32); combined.set(new Uint8Array(enc), 44);
       localStorage.setItem(PWENC_KEY, buf2b64(combined.buffer));
     }
-    async function retrievePassword() {
+    async function retrievePassword(credIdBytes) {
       var stored = localStorage.getItem(PWENC_KEY); if (!stored) return null;
       try {
         var combined = new Uint8Array(b642buf(stored));
-        var iv   = combined.slice(0, 12);
-        var data = combined.slice(12);
-        var salt = new TextEncoder().encode('np26_bio_salt_v1');
-        var keyMat = await crypto.subtle.importKey('raw', salt, 'PBKDF2', false, ['deriveKey']);
-        var key = await crypto.subtle.deriveKey(
-          { name: 'PBKDF2', salt: new TextEncoder().encode(RP_ID), iterations: 1000, hash: 'SHA-256' },
+        var salt = combined.slice(0, 32);
+        var iv   = combined.slice(32, 44);
+        var data = combined.slice(44);
+        var keyInput = new Uint8Array(credIdBytes.length + new TextEncoder().encode(RP_ID).length);
+        keyInput.set(credIdBytes, 0); keyInput.set(new TextEncoder().encode(RP_ID), credIdBytes.length);
+        var keyMat = await crypto.subtle.importKey('raw', keyInput, 'PBKDF2', false, ['deriveKey']);
+        var key    = await crypto.subtle.deriveKey(
+          { name: 'PBKDF2', salt: salt, iterations: BIO_ITER, hash: 'SHA-256' },
           keyMat, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
         );
         var dec = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv }, key, data);
@@ -2216,7 +2219,7 @@
           }
         });
         localStorage.setItem(CRED_KEY, buf2b64(cred.rawId));
-        await storePassword(password);
+        await storePassword(password, new Uint8Array(cred.rawId));
         return true;
       },
 
@@ -2233,7 +2236,8 @@
           }
         });
         if (!cred) return null;
-        return await retrievePassword();
+        /* credentialId（デバイス固有のランダム値）をキーマテリアルに使用 */
+        return await retrievePassword(new Uint8Array(credId));
       },
 
       clear: function() {
@@ -2471,7 +2475,7 @@
   }
 
   function escapeHtml(str) {
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
   }
   function normalizeSize(size) {
     size = Math.round(size);
@@ -3245,16 +3249,20 @@
     $('tpSrc').textContent = src.length > 120 ? src.slice(0,120) + '…' : src;
     openPanel('translatePanel');
     var doFetch = function() {
-      var engine = localStorage.getItem('translateEngine') || 'google';
-      $('tpPowered').textContent = engine === 'bing' ? 'Powered by Bing translation' : 'Powered by Google translation';
-      var url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=' + $('tpSrcLang').value + '&tl=' + $('tpTgtLang').value + '&dt=t&q=' + encodeURIComponent(src);
+      var sl = $('tpSrcLang').value, tl = $('tpTgtLang').value;
+      if (sl === tl) {
+        animateResults(tpResult, '<div class="tp-error">' + (window.i18n.lang() === 'en' ? 'Please select two different languages.' : '翻訳元と翻訳先に同じ言語は選択できません。') + '</div>', false);
+        return;
+      }
       tpResult.innerHTML = '<div class="tp-loading">' + window.i18n.t('tp.loading') + '</div>';
+      $('tpPowered').textContent = 'Powered by MyMemory (mymemory.translated.net)';
+      var url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(src) + '&langpair=' + encodeURIComponent(sl + '|' + tl);
       fetch(url)
         .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
         .then(function(data) {
-          var result = '';
-          if (data && data[0]) data[0].forEach(function(seg) { if (seg && seg[0]) result += seg[0]; });
-          animateResults(tpResult, '<p class="tp-result-text">' + escapeHtml(result || window.i18n.t('tp.no_result')) + '</p>', false);
+          var result = data && data.responseData && data.responseData.translatedText;
+          if (!result || result.toUpperCase().indexOf('INVALID') !== -1 || result.toUpperCase().indexOf('QUERY LENGTH') !== -1) throw new Error();
+          animateResults(tpResult, '<p class="tp-result-text">' + escapeHtml(result) + '</p>', false);
         })
         .catch(function() { animateResults(tpResult, '<div class="tp-error">' + window.i18n.t('tp.failed') + '</div>', false); });
     };
@@ -3963,6 +3971,10 @@
       var existingAddBtn = bar.querySelector('#pageTabAddBtn');
       if (!existingAddBtn) { origAdd(); return; }
 
+      /* アニメーション開始前に追加可否を確認し、不可ならアニメなしで origAdd() に委譲 */
+      var realCount = pages.filter(function(p){ return !p._fileEditor; }).length;
+      if (window.folderFileActive || realCount >= MAX_PAGES) { origAdd(); return; }
+
       var ANIM_DUR = 320;
       var SLIDE_PX = 96;
 
@@ -4086,6 +4098,7 @@
   })();
 
   /* ===== ページナビモード適用 ===== */
+  var _tabBarHideListener = null; /* スライドアウト中の transitionend リスナーを追跡 */
   window.applyPageNavMode = function(mode) {
     var tabBar     = $('pageTabBar');
     var pullTab    = $('pagePullTab');
@@ -4093,6 +4106,13 @@
     var hdrPageBtn = $('headerPageBtn');
     var slideBtn   = $('pageNavSlideBtn');
     var tabBtn     = $('pageNavTabBtn');
+
+    /* 切り替え前に残っているスライドアウトリスナーを必ずキャンセル */
+    if (_tabBarHideListener) {
+      tabBar.removeEventListener('transitionend', _tabBarHideListener);
+      _tabBarHideListener = null;
+    }
+
     if (mode === 'tabbar') {
       tabBar.classList.add('active');
       window.renderPageTabs();
@@ -4116,8 +4136,10 @@
       document.body.classList.remove('tab-bar-mode');
       var onEnd = function() {
         tabBar.removeEventListener('transitionend', onEnd);
+        _tabBarHideListener = null;
         tabBar.classList.remove('active');
       };
+      _tabBarHideListener = onEnd;
       tabBar.addEventListener('transitionend', onEnd);
       if (pullTab)   { pullTab.style.display = ''; }
       if (swipeTrig) swipeTrig.style.display = '';
@@ -4760,12 +4782,6 @@
     for (var j = 12; j <= 80; j += 2) sSel.add(new Option(j + 'px', j));
     sSel.value = 18;
 
-    var translateSel = $('translateSel');
-    translateSel.value = localStorage.getItem('translateEngine') || 'google';
-    translateSel.onchange = function() {
-      localStorage.setItem('translateEngine', translateSel.value);
-      $('tpPowered').textContent = translateSel.value === 'bing' ? 'Powered by Bing translation' : 'Powered by Google translation';
-    };
 
     var dictSel = $('dictSel');
     dictSel.value = localStorage.getItem('dictEngine') || 'wikipedia';
@@ -5074,8 +5090,19 @@
       else                    {             html += '<span style="opacity:0.7;display:block;">　' + safe + '</span>'; }
     });
     diffContent.innerHTML = html;
-    $('diffLegendAdd').innerHTML = '<span class="diff-legend-dot add"></span>' + window.i18n.t('diff.add') + ' ' + addCount + (window.i18n.lang() === 'en' ? ' line' + (addCount !== 1 ? 's' : '') : '行');
-    $('diffLegendDel').innerHTML = '<span class="diff-legend-dot del"></span>' + window.i18n.t('diff.del') + ' ' + delCount + (window.i18n.lang() === 'en' ? ' line' + (delCount !== 1 ? 's' : '') : '行');
+    var legendAdd = $('diffLegendAdd'); var legendDel = $('diffLegendDel');
+    if (legendAdd) {
+      legendAdd.textContent = '';
+      var dotA = document.createElement('span'); dotA.className = 'diff-legend-dot add';
+      var lblA = document.createTextNode(' ' + window.i18n.t('diff.add') + ' ' + addCount + (window.i18n.lang() === 'en' ? ' line' + (addCount !== 1 ? 's' : '') : '行'));
+      legendAdd.appendChild(dotA); legendAdd.appendChild(lblA);
+    }
+    if (legendDel) {
+      legendDel.textContent = '';
+      var dotD = document.createElement('span'); dotD.className = 'diff-legend-dot del';
+      var lblD = document.createTextNode(' ' + window.i18n.t('diff.del') + ' ' + delCount + (window.i18n.lang() === 'en' ? ' line' + (delCount !== 1 ? 's' : '') : '行'));
+      legendDel.appendChild(dotD); legendDel.appendChild(lblD);
+    }
     $('diffOverlay').style.display = 'block';
     var mainHeader = document.querySelector('header');
     mainHeader.classList.remove('diff-restore');
