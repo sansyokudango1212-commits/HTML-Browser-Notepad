@@ -303,6 +303,39 @@
     .info-dot:hover  { transform: scale(1.1); }
     .info-dot:active { transform: scale(0.9); }
     .info-dot:focus  { outline: none; }
+    .oss-dot {
+      position: absolute; top: 12px; right: 32px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: rgba(255,255,255,0.18); border: 1px solid #494949;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25); cursor: pointer; padding: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: bold; color: var(--text);
+      font-style: italic; font-family: Georgia, serif; line-height: 1;
+      z-index: 10;
+      transition: transform 0.15s;
+    }
+    .oss-dot:hover  { transform: scale(1.1); }
+    .oss-dot:active { transform: scale(0.9); }
+    .oss-dot:focus  { outline: none; }
+
+    /* OSS モーダル */
+    #ossModal { width: min(340px,92vw); padding: 28px 24px 22px; border-radius: 20px; z-index: 210; box-shadow: 0 12px 40px rgba(0,0,0,0.22); }
+    #ossModal .oss-title { font-size: 14px; font-weight: bold; text-align: center; margin-bottom: 16px; }
+    #ossModal .oss-list { font-size: 12px; line-height: 2; }
+    #ossModal .oss-list a { color: var(--accent); text-decoration: none; }
+    #ossModal .oss-list a:hover { text-decoration: underline; }
+    #ossModal .oss-item { border-bottom: 1px solid rgba(128,128,128,0.1); padding: 6px 0; display: flex; flex-direction: column; gap: 2px; }
+    #ossModal .oss-item:last-child { border-bottom: none; }
+    #ossModal .oss-name { font-size: 12px; color: var(--text); font-weight: bold; }
+    #ossModal .oss-license { font-size: 10px; color: var(--dim); }
+    #ossModal .oss-close {
+      margin-top: 18px; display: block; width: 100%; padding: 9px 0;
+      border-radius: 12px; border: none; background: var(--accent); color: #fff;
+      font-family: inherit; font-size: 13px; cursor: pointer;
+      transition: filter 0.18s, transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #ossModal .oss-close:hover  { filter: brightness(1.15); }
+    #ossModal .oss-close:active { transform: scale(0.95); filter: brightness(0.9); }
 
     /* 共通モーダルパネル */
     .panel-modal {
@@ -431,7 +464,7 @@
 
     #penToggleBtn {
       position: fixed; bottom: 15px; right: 16px;
-      width: 38px; height: 38px; border-radius: 50%; border: none;
+      width: 38px; height: 38px; border-radius: 50%;
       background: var(--ui-bg);
       backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255,255,255,0.2);
@@ -489,7 +522,7 @@
     }
 
     .pen-tool-btn {
-      width: 36px; height: 36px; border-radius: 50%; border: none;
+      width: 36px; height: 36px; border-radius: 50%;
       background: var(--ui-bg);
       backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255,255,255,0.2);
@@ -697,9 +730,8 @@
     #searchHighlightMirror mark.current { opacity: 0.38; }
 
     #searchCount {
-      position: absolute; top: 0; right: 0; height: 36px;
-      display: flex; align-items: center; padding-right: 14px;
-      font-size: 11px; pointer-events: none;
+      font-size: 11px; color: var(--dim); white-space: nowrap;
+      min-width: 44px; text-align: right; pointer-events: none;
     }
 
     #searchPanel {
@@ -729,7 +761,6 @@
       font-size: 14px; color: var(--text); font-family: inherit;
       padding: 7px 12px; border-radius: 10px;
     }
-    #searchCount { font-size: 11px; color: var(--dim); white-space: nowrap; min-width: 44px; text-align: right; }
     .sp-btn {
       background: transparent; border: none; cursor: pointer; font-size: 13px;
       color: var(--dim); padding: 4px 10px; border-radius: 8px; font-family: inherit;
@@ -1438,6 +1469,7 @@
   <div id="options" class="glass">
     <div id="optionsDragHandle" class="drag-handle" style="position:absolute;top:0;left:0;right:0;height:36px;border-radius:18px 18px 0 0;"></div>
     <button class="close-dot" onclick="act('toggle')" aria-label="閉じる"></button>
+    <button class="oss-dot"  onclick="showOssModal()"  aria-label="オープンソース情報">o</button>
     <button class="info-dot" onclick="showDevMessage()" aria-label="開発者メッセージ">i</button>
     <div><span class="label" data-i18n="opt.font">フォント</span><select id="fSel"></select><button id="fontMgrBtn" data-i18n="fmgr.title" data-i18n-attr="title" title="フォント管理" onclick="openFontMgr()">＋</button></div>
     <div><span class="label" data-i18n="opt.size">サイズ</span><select id="sSel"></select></div>
@@ -1501,8 +1533,8 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 26030021250</span>
-      <span>Version 26.2.8</span>
+      <span>Build 2603031816_K</span>
+      <span>Version 26.2.10</span>
       <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_Gemini2.5Pro<br>Trae_Chat GPT5.2beta<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Tikuwa_Nerimono1</span>
     </div>
   </div>
@@ -1575,11 +1607,33 @@
     <div class="swp-body" id="swpBody"></div>
   </div>
 
+  <div id="ossModal" class="glass panel-modal">
+    <button class="close-dot" onclick="hideOssModal()" aria-label="閉じる"></button>
+    <div class="oss-title">Open Source</div>
+    <div class="oss-list">
+      <div class="oss-item">
+        <span class="oss-name">Google Fonts</span>
+        <span class="oss-license">SIL Open Font License 1.1 &nbsp;·&nbsp; <a href="https://fonts.google.com" target="_blank" rel="noopener">fonts.google.com</a></span>
+      </div>
+      <div class="oss-item">
+        <span class="oss-name">MyMemory Translation API</span>
+        <span class="oss-license">Free API &nbsp;·&nbsp; <a href="https://mymemory.translated.net" target="_blank" rel="noopener">mymemory.translated.net</a></span>
+      </div>
+      <div class="oss-item">
+        <span class="oss-name">Wikipedia / Wiktionary API</span>
+        <span class="oss-license">CC BY-SA 4.0 &nbsp;·&nbsp; <a href="https://www.mediawiki.org/wiki/API:Main_page" target="_blank" rel="noopener">Wikimedia Foundation</a></span>
+      </div>
+    </div>
+    <button class="oss-close" onclick="hideOssModal()">Close</button>
+  </div>
+
   <div id="devMessageModal" class="glass panel-modal">
     <div class="dev-title-main">Information</div>
     <div class="dev-body">アプリを使っている人へ
+VERUP_緊急アップデートを複数回実施
 修正:表記_"aPowered by MyMemory (mymemory.translated.net)"内の"(mymemory.translated.net)"を削除
 できるだけこのアプリをクリーンでよりよいwebアプリにしたいと考えていますので今後ともどうぞよろしくお願いいたします。
+追加:表記_オープンソースについての情報を追加
 
  - Tikuwa - </div>
     <button class="dev-close" onclick="hideDevMessage()" data-i18n="common.close">閉じる</button>
@@ -1688,12 +1742,14 @@
     <div class="oc-title" data-i18n="oc.title">開く方法を選択</div>
     <div class="oc-btns">
       <button class="oc-btn" id="ocFileBtn">
+        <span class="oc-icon">📄</span>
         <span class="oc-label">
           <strong data-i18n="oc.file.title">ファイルを開く</strong>
           <span data-i18n="oc.file.desc">.txt .html .json など</span>
         </span>
       </button>
       <button class="oc-btn" id="ocFolderBtn">
+        <span class="oc-icon">📁</span>
         <span class="oc-label">
           <strong data-i18n="oc.folder.title">フォルダを開く</strong>
           <span data-i18n="oc.folder.desc">サイドバーにファイル一覧を表示</span>
@@ -1770,6 +1826,8 @@
         'lock.checking':'確認中...',
         'lock.bio.checking':'認証中...',
         'lock.bio':'🔑 パスキーでロック解除',
+        'lock.bio.failed':'認証に失敗しました',
+        'lock.bio.cancelled':'パスキー認証がキャンセルされました',
         'pwu.title':'パスワードロック解除',
         'pwu.desc':'ロックを解除すると、このサイトに保存しているデータが無条件で他人に見られる可能性があります。',
         'pwu.confirm':'解除する',
@@ -1904,6 +1962,8 @@
         'lock.checking':'Checking...',
         'lock.bio.checking':'Authenticating...',
         'lock.bio':'🔑 Unlock with Passkey',
+        'lock.bio.failed':'Authentication failed',
+        'lock.bio.cancelled':'Passkey authentication was cancelled',
         'pwu.title':'Remove Password Lock',
         'pwu.desc':'Removing the lock means anyone with access to this site could view your saved data.',
         'pwu.confirm':'Remove Lock',
@@ -2322,12 +2382,12 @@
             return;
           }
         }
-        showLockError('認証に失敗しました');
+        showLockError(window.i18n.t('lock.bio.failed'));
       } catch(e) {
-        showLockError('パスキーでの認証がキャンセルされました');
+        showLockError(window.i18n.t('lock.bio.cancelled'));
       }
       lockBioBtn.disabled = false;
-      lockBioBtn.textContent = 'パスキーでロック解除';
+      lockBioBtn.textContent = window.i18n.t('lock.bio');
     });
     setTimeout(function() { lockBioBtn.click(); }, 400);
   }
@@ -2557,13 +2617,6 @@
         injectFontLink(item.url);
         if (supportedFonts.indexOf(item.name) === -1) supportedFonts.push(item.name);
       });
-    } catch(e) {}
-  }
-
-  function saveCustomFontsToStorage() {
-    try {
-      var saved = JSON.parse(localStorage.getItem('customFonts') || '[]');
-      localStorage.setItem('customFonts', JSON.stringify(saved));
     } catch(e) {}
   }
 
@@ -3604,7 +3657,7 @@
         }
       }
     } catch(e) {}
-    return [{ id: genPageId(), title: 'ページ 1', text: '', font: 'Arial', size: 18, titleLocked: false }];
+    return [{ id: genPageId(), title: (window.i18n ? window.i18n.t('page.default') : 'ページ ') + '1', text: '', font: 'Arial', size: 18, titleLocked: false }];
   }
   function savePages() {
     try {
@@ -4766,6 +4819,8 @@
 
   function showDevMessage() { openPanel('devMessageModal'); }
   function hideDevMessage() { closePanel('devMessageModal'); }
+  function showOssModal()   { openPanel('ossModal'); }
+  function hideOssModal()   { closePanel('ossModal'); }
 
   (function init() {
     var fSel = $('fSel'), sSel = $('sSel'), edit = $('edit');
@@ -4795,8 +4850,8 @@
       var savedFont = localStorage.getItem('autosave_font'), savedSize = localStorage.getItem('autosave_size');
       if (saved && saved.length > 0 && !edit.value) {
         if (savedFile) state.curFile = savedFile;
-        if (savedFont && $('fSel')) $('fSel').value = savedFont;
-        if (savedSize && $('sSel')) $('sSel').value = savedSize;
+        if (savedFont) updateSelectValue('fSel', savedFont);
+        if (savedSize) updateSelectValue('sSel', normalizeSize(parseInt(savedSize) || 18));
         applyStyles();
         edit.value = saved;
         ActionHandlers.updateText(edit.value); queueToast(window.i18n.t('toast.autosave_restored'), 3000);
@@ -4970,6 +5025,7 @@
         if (state.isFontMgrOpen) { closeFontMgr(); return; }
         if (state.isOptionsOpen || state.isModalOpen) { ActionHandlers.closeOverlays(); render(); }
         hideDevMessage();
+        hideOssModal();
       }
       if ((e.ctrlKey || e.metaKey) && e.key === 'f') { e.preventDefault(); ActionHandlers.toggleSearch(); render(); }
     });
@@ -4996,6 +5052,7 @@
       if (contextMenu && contextMenu.style.display !== 'none') { if (!contextMenu.contains(e.target)) hideContextMenu(); return; }
       if (state.isOptionsOpen) {
         var devModal = $('devMessageModal'); if (devModal && devModal.classList.contains('show')) return;
+        var ossModalEl = $('ossModal'); if (ossModalEl && ossModalEl.classList.contains('show')) return;
         var hBtns = document.querySelectorAll('header button');
         for (var bi = 0; bi < hBtns.length; bi++) { if (hBtns[bi] === e.target || hBtns[bi].contains(e.target)) return; }
         var fmEl = $('fontMgrModal'); if (fmEl && fmEl.contains(e.target)) return;
