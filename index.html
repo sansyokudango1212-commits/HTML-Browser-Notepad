@@ -3247,7 +3247,7 @@
         return;
       }
       tpResult.innerHTML = '<div class="tp-loading">' + window.i18n.t('tp.loading') + '</div>';
-      $('tpPowered').textContent = 'Powered by MyMemory (mymemory.translated.net)';
+      $('tpPowered').textContent = 'Powered by MyMemory';
       var url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(src) + '&langpair=' + encodeURIComponent(sl + '|' + tl);
       fetch(url)
         .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
@@ -5391,5 +5391,6 @@
   <div id="langTransitionOverlay"><span id="langTransitionLabel"></span></div>
 </body>
 </html>
+
 
 
