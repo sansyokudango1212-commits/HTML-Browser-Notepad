@@ -2,9 +2,8 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.mymemory.translated.net https://ja.wikipedia.org https://ja.wiktionary.org https://en.wikipedia.org https://en.wiktionary.org; worker-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests;">
-  <meta http-equiv="X-Frame-Options" content="DENY">
-  <link rel="manifest" href="manifest.json">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.mymemory.translated.net https://ja.wikipedia.org https://ja.wiktionary.org https://en.wikipedia.org https://en.wiktionary.org; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests;">
+  <link rel="manifest" href="manifest.json" crossorigin="use-credentials">
   <meta name="google-site-verification" content="Z5LCrw2wiWOC0bTQynoScEQ9LTvHoEucbmQwoReCLXE" />
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
@@ -318,7 +317,7 @@
     .oss-dot:active { transform: scale(0.9); }
     .oss-dot:focus  { outline: none; }
 
-    /* OSS モーダル */
+    /* OSS Modal */
     #ossModal { width: min(340px,92vw); padding: 28px 24px 22px; border-radius: 20px; z-index: 210; box-shadow: 0 12px 40px rgba(0,0,0,0.22); }
     #ossModal .oss-title { font-size: 14px; font-weight: bold; text-align: center; margin-bottom: 16px; }
     #ossModal .oss-list { font-size: 12px; line-height: 2; }
@@ -337,7 +336,7 @@
     #ossModal .oss-close:hover  { filter: brightness(1.15); }
     #ossModal .oss-close:active { transform: scale(0.95); filter: brightness(0.9); }
 
-    /* 共通モーダルパネル */
+    /* Common Modal Panel */
     .panel-modal {
       position: fixed; top: 50%; left: 50%;
       transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
@@ -491,7 +490,7 @@
       position: fixed; bottom: 15px; right: 16px;
       display: flex; flex-direction: column-reverse; align-items: center; gap: 8px;
       z-index: 121; pointer-events: none;
-      padding-bottom: 46px; /* penToggleBtn(38px) + gap */
+      padding-bottom: 46px;
     }
 
     .pen-toolbar-item {
@@ -690,7 +689,36 @@
     .toast .count { position: absolute; left: 0; bottom: 0; height: 3px; background: var(--accent); width: 100%; transition: width linear; }
     .toast .msg   { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* Adult content warning card (in search results) */
+    /* --- 計算提案ポップアップ --- */
+    #calcPopup {
+      position: fixed;
+      z-index: 450;
+      padding: 5px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      pointer-events: auto;
+      opacity: 0;
+      transform: translateY(8px) scale(0.9);
+      transition: opacity 0.18s cubic-bezier(0.34,1.2,0.64,1),
+                  transform 0.2s cubic-bezier(0.34,1.4,0.64,1),
+                  filter 0.15s;
+      white-space: nowrap;
+      color: var(--accent);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.22);
+      font-family: inherit;
+      font-weight: 200;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    #calcPopup.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    #calcPopup:hover  { filter: brightness(1.2); }
+    #calcPopup:active { transform: scale(0.94); }
+
+    /* Adult Content Warning Card */
     .swp-adult-warn {
       border: 1px solid rgba(229,57,53,0.28);
       border-radius: 14px; padding: 16px 18px;
@@ -934,7 +962,7 @@
 
     #pageSwipeTrigger   { position: fixed; right: 0; top: 0; width: 24px; height: 100%; z-index: 300; }
 
-    /* 右側ページパネルのプルタブ */
+    /* Right Page Panel Pull-Tab */
     #pagePullTab {
       position: fixed;
       right: 0; top: 50%; transform: translateY(-50%) translateX(100%);
@@ -965,7 +993,7 @@
     #pagePullTab svg { opacity: 0.7; }
     #folderSwipeTrigger { position: fixed; left: 0; top: 0; width: 24px; height: 100%; z-index: 300; }
 
-    /* サイドバーを開くプルタブ */
+    /* Sidebar Pull-Tab */
     #folderPullTab {
       position: fixed;
       left: 0; top: 50%; transform: translateY(-50%) translateX(-100%);
@@ -1035,7 +1063,7 @@
     #pageList.editing .page-title-edit-input { opacity: 1; pointer-events: auto; }
     #pagePanel.dragging, #pageOverlay.dragging { transition: none; }
 
-    /* ===== フォルダパネル（ページパネルと同等・左スライド） ===== */
+    /* Folder Panel (left slide) */
     #folderOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0); z-index: 310; pointer-events: none; transition: background 0.28s cubic-bezier(0.4,0,0.2,1); }
     #folderOverlay.open { background: rgba(0,0,0,0.38); pointer-events: auto; }
     #folderPanel {
@@ -1156,7 +1184,7 @@
     .fph-btn.fph-exit:hover  { background: rgba(229,57,53,0.28); color: #ef9a9a; }
     #folderPanel.dragging, #folderOverlay.dragging { transition: none; }
 
-    /* ファイル/フォルダ選択チューザー */
+    /* File/Folder Chooser */
     #openChooserModal {
       width: min(280px, 88vw); padding: 28px 22px 20px; border-radius: 22px; z-index: 220;
       box-shadow: 0 16px 50px rgba(0,0,0,0.3);
@@ -1186,7 +1214,7 @@
     }
     .oc-cancel:hover { color: var(--text); }
 
-    /* ===== フローティング丸タブバー (PC専用・VSCodeスタイル) ===== */
+    /* Floating Tab Bar (PC only - VSCode style) */
     #pageTabBar {
       position: fixed; top: 0; left: 0; right: 0;
       height: 56px;
@@ -1207,7 +1235,7 @@
     }
     #pageTabBar::-webkit-scrollbar { display: none; }
     #pageTabBar.active  { display: flex; }
-    /* 開くアニメ：iOS風スプリング（.tab-slide-in 付与時のtransitionで適用） */
+    /* Open animation: iOS-style spring */
     #pageTabBar.tab-slide-in {
       transform: translateY(0);
       opacity: 1;
@@ -1230,7 +1258,7 @@
       position: relative; overflow: hidden;
       -webkit-user-select: none; user-select: none;
     }
-    /* 下端アクセントライン */
+    /* Bottom Accent Line */
     .page-tab::after {
       content: ''; position: absolute;
       bottom: 0; left: 14%; right: 14%; height: 2px;
@@ -1239,7 +1267,7 @@
     }
     /* 削除中：インジケーター非表示（再描画後にフェードイン） */
     #pageTabBar.hide-indicators .page-tab::after { opacity: 0 !important; transition: none !important; }
-    /* 追加アニメ：上からスライドイン（速い→遅い） */
+    /* Add animation: slide in from top */
     .page-tab-wrap.tab-add-enter .page-tab {
       transform: translateY(-14px);
       transition: none;
@@ -1320,13 +1348,13 @@
     }
     #pageTabEditBtn:hover { background: rgba(255,255,255,0.09); color: rgba(255,255,255,0.75); transform: scale(1.08); }
 
-    /* ===== タブラッパー（幅アニメ専用） ===== */
+    /* Tab Wrapper */
     .page-tab-wrap {
       display: flex; align-items: center; flex-shrink: 0;
       position: relative; z-index: 1;
       /* overflow は削除アニメ中のみ inline で付与 */
     }
-    /* ===== タブ名編集ポップアップ ===== */
+    /* Tab Name Edit Popup */
     #tabNamePopup {
       position: fixed; z-index: 300;
       background: rgba(30,30,30,0.96); backdrop-filter: blur(18px);
@@ -1366,7 +1394,7 @@
       body.tab-bar-mode #searchHighlightMirror { padding-top: 112px !important; }
     }
 
-    /* ===== 言語切り替えオーバーレイ ===== */
+    /* Language Transition Overlay */
     #langTransitionOverlay {
       position: fixed; inset: 0; z-index: 99999;
       display: flex; align-items: center; justify-content: center;
@@ -1533,8 +1561,8 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 2603031816_K</span>
-      <span>Version 26.2.10</span>
+      <span>Build 2603032132</span>
+      <span>Version 26.2.11</span>
       <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_Gemini2.5Pro<br>Trae_Chat GPT5.2beta<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Tikuwa_Nerimono1</span>
     </div>
   </div>
@@ -1560,7 +1588,7 @@
   </div>
 
   <div id="saveMetaModal" class="glass modal panel-modal save-meta-modal">
-    <button class="close-dot" id="saveMetaCloseBtn" style="left:13px;" aria-label="閉じる"></button>
+    <button class="close-dot" id="saveMetaCloseBtn" style="left:13px;" aria-label="閉じる" onclick="closeSaveMetaModal()"></button>
     <p data-i18n="savemeta.title">ファイルを保存</p>
     <div class="save-meta-desc" data-i18n="savemeta.desc">フォント・サイズ情報をファイルに含めますか？<br><span>含めると次回読み込み時に設定が復元されます</span></div>
     <div class="save-meta-remember">
@@ -1607,35 +1635,61 @@
     <div class="swp-body" id="swpBody"></div>
   </div>
 
-  <div id="ossModal" class="glass panel-modal">
-    <button class="close-dot" onclick="hideOssModal()" aria-label="閉じる"></button>
-    <div class="oss-title">Open Source</div>
-    <div class="oss-list">
-      <div class="oss-item">
-        <span class="oss-name">Google Fonts</span>
-        <span class="oss-license">SIL Open Font License 1.1 &nbsp;·&nbsp; <a href="https://fonts.google.com" target="_blank" rel="noopener">fonts.google.com</a></span>
-      </div>
-      <div class="oss-item">
-        <span class="oss-name">MyMemory Translation API</span>
-        <span class="oss-license">Free API &nbsp;·&nbsp; <a href="https://mymemory.translated.net" target="_blank" rel="noopener">mymemory.translated.net</a></span>
-      </div>
-      <div class="oss-item">
-        <span class="oss-name">Wikipedia / Wiktionary API</span>
-        <span class="oss-license">CC BY-SA 4.0 &nbsp;·&nbsp; <a href="https://www.mediawiki.org/wiki/API:Main_page" target="_blank" rel="noopener">Wikimedia Foundation</a></span>
-      </div>
+<div id="ossModal" class="glass panel-modal">
+  <button class="close-dot" onclick="hideOssModal()" aria-label="閉じる"></button>
+  <div class="oss-title">Source</div>
+  <div class="oss-list">
+
+    <div class="oss-item">
+      <span class="oss-name">Google Fonts</span>
+      <span class="oss-license">
+        Fonts licensed under SIL Open Font License 1.1 (varies by font) &nbsp;·&nbsp;
+        <a href="https://fonts.google.com" target="_blank" rel="noopener">
+          fonts.google.com
+        </a>
+      </span>
     </div>
-    <button class="oss-close" onclick="hideOssModal()">Close</button>
+
+    <div class="oss-item">
+      <span class="oss-name">MyMemory Translation API</span>
+      <span class="oss-license">
+        Service provided under Terms of Service &nbsp;·&nbsp;
+        <a href="https://mymemory.translated.net/doc/spec.php" target="_blank" rel="noopener">
+          mymemory.translated.net
+        </a>
+      </span>
+    </div>
+
+    <div class="oss-item">
+      <span class="oss-name">Wikipedia / Wiktionary (via MediaWiki API)</span>
+      <span class="oss-license">
+        Content licensed under CC BY-SA 4.0 &nbsp;·&nbsp;
+        <a href="https://www.mediawiki.org/wiki/API:Main_page" target="_blank" rel="noopener">
+          Wikimedia Foundation
+        </a>
+      </span>
+    </div>
+
+    <div class="oss-item">
+      <span class="oss-name">Web Authentication API (WebAuthn)</span>
+      <span class="oss-license">
+        W3C Recommendation &nbsp;·&nbsp;
+        <a href="https://www.w3.org/TR/webauthn-2/" target="_blank" rel="noopener">
+          W3C Web Authentication
+        </a>
+      </span>
+    </div>
+
+  </div>
+  <button class="oss-close" onclick="hideOssModal()">Close</button>
+</div>
   </div>
 
   <div id="devMessageModal" class="glass panel-modal">
-    <div class="dev-title-main">Information</div>
-    <div class="dev-body">アプリを使っている人へ
-VERUP_緊急アップデートを複数回実施
-修正:表記_"aPowered by MyMemory (mymemory.translated.net)"内の"(mymemory.translated.net)"を削除
-できるだけこのアプリをクリーンでよりよいwebアプリにしたいと考えていますので今後ともどうぞよろしくお願いいたします。
-追加:表記_オープンソースについての情報を追加
+    <div class="dev-title-main">About This App</div>
+    <div class="dev-body">Notepad26 is a clean, lightweight web notepad with advanced features including multi-page support, password protection, drawing tools, translation, and search capabilities.
 
- - Tikuwa - </div>
+Visit the Open Source section for attribution information.</div>
     <button class="dev-close" onclick="hideDevMessage()" data-i18n="common.close">閉じる</button>
   </div>
 
@@ -1792,7 +1846,7 @@ VERUP_緊急アップデートを複数回実施
   </div>
 
   <script>
-  /* ===== i18n (国際化) ===== */
+  /* Internationalization (i18n) */
   (function() {
     var LANG_KEY = 'np26_lang';
     var _lang = localStorage.getItem(LANG_KEY) || 'ja';
@@ -2159,11 +2213,11 @@ VERUP_緊急アップデートを複数回実施
       );
     }
     async function encrypt(plain, password, onProgress) {
-      if (onProgress) onProgress('鍵導出中... (600,000回)');
+      if (onProgress) onProgress(window.i18n ? window.i18n.t('pws.progress_deriving') : '鍵導出中...');
       var salt = crypto.getRandomValues(new Uint8Array(SALT_LEN));
       var iv   = crypto.getRandomValues(new Uint8Array(IV_LEN));
       var key  = await deriveKey(password, salt);
-      if (onProgress) onProgress('暗号化中...');
+      if (onProgress) onProgress(window.i18n ? window.i18n.t('pws.progress_encrypting') : '暗号化中...');
       var enc = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, key, new TextEncoder().encode(plain));
       return buf2hex(salt) + buf2hex(iv) + buf2hex(enc);
     }
@@ -2204,7 +2258,7 @@ VERUP_緊急アップデートを複数回実施
   var BiometricEngine = (function() {
     var CRED_KEY  = 'np26_bio_credId';
     var PWENC_KEY = 'np26_bio_pw_enc';
-    var BIO_ITER  = 100000; /* 固定1000回 → 100000回に強化 */
+    var BIO_ITER  = 100000; /* パスキー用 PBKDF2 イテレーション */
     var RP_ID     = location.hostname || 'localhost';
     var RP_NAME   = 'Notepad26';
 
@@ -2799,22 +2853,24 @@ VERUP_緊急アップデートを複数回実施
   }
 
   /* ファイル／フォルダ 選択チューザー */
+  var SUPPORTED_EXTS_PICKER = [
+    { description: 'テキストファイル', accept: {
+      'text/plain':       ['.txt'],
+      'text/html':        ['.html', '.htm'],
+      'application/json': ['.json'],
+      'text/markdown':    ['.md'],
+      'text/css':         ['.css'],
+      'text/javascript':  ['.js'],
+      'application/xml':  ['.xml'],
+      'text/csv':         ['.csv'],
+      'text/x-python':    ['.py']
+    }}
+  ];
+
   function openFileOrFolderChooser() {
     openPanel('openChooserModal');
   }
   (function initOpenChooser() {
-    var SUPPORTED_EXTS_PICKER = [
-      { description: 'テキストファイル', accept: {
-        'text/plain':       ['.txt'],
-        'text/html':        ['.html','.htm'],
-        'application/json': ['.json'],
-        'text/markdown':    ['.md'],
-        'text/css':         ['.css'],
-        'text/javascript':  ['.js'],
-        'application/xml':  ['.xml'],
-        'text/csv':         ['.csv']
-      }}
-    ];
 
     document.getElementById('ocFileBtn').onclick = async function() {
       closePanel('openChooserModal');
@@ -2863,19 +2919,7 @@ VERUP_緊急アップデートを複数回実施
       if (window.showOpenFilePicker) {
         (async function() {
           try {
-            var handles = await window.showOpenFilePicker({ multiple: false, types: [{
-              description: 'テキストファイル', accept: {
-                'text/plain':       ['.txt'],
-                'text/html':        ['.html','.htm'],
-                'application/json': ['.json'],
-                'text/markdown':    ['.md'],
-                'text/css':         ['.css'],
-                'text/javascript':  ['.js'],
-                'application/xml':  ['.xml'],
-                'text/csv':         ['.csv'],
-                'text/x-python':    ['.py']
-              }
-            }]});
+            var handles = await window.showOpenFilePicker({ multiple: false, types: SUPPORTED_EXTS_PICKER });
             var handle = handles[0];
             var file = await handle.getFile();
             var text = await file.text();
@@ -2885,7 +2929,6 @@ VERUP_緊急アップデートを複数回実施
             ActionHandlers.updateText(text);
             saveCurrentPage(); render();
             if (window.closeFolderPanel) window.closeFolderPanel();
-           
           } catch(e) {
             if (e.name !== 'AbortError') queueToast(window.i18n.t('toast.open_file_failed'), 2500);
           }
@@ -3037,10 +3080,7 @@ VERUP_緊急アップデートを複数回実施
   };
   function getCurrentDict() { return localStorage.getItem('dictEngine') || 'wikipedia'; }
 
-  /* ---- Wikipedia カテゴリベースのコンテンツフィルタ ---- */
-
-  /* 成人向けカテゴリのキーワード（日本語・英語） */
-  /* ---- 成人向けコンテンツフィルタ ---- */
+  /* ---- 成人向けコンテンツフィルタ（Wikipedia カテゴリ・本文キーワード） ---- */
 
   /* カテゴリ名マッチ用キーワード（日本語・英語 Wikipedia） */
   var ADULT_CAT_KEYWORDS = [
@@ -3622,7 +3662,9 @@ VERUP_緊急アップデートを複数回実施
   function clearSearchHighlight() { searchMatches = []; searchIndex = 0; var m = $('searchHighlightMirror'); if (m) m.innerHTML = ''; }
 
   var autoSaveTimer = null, autoSaveIsInterval = false;
-  var AUTO_SAVE_INTERVAL = 2 * 60 * 1000;  function clearAutoSaveTimer() {
+  var AUTO_SAVE_INTERVAL = 2 * 60 * 1000;
+
+  function clearAutoSaveTimer() {
     if (autoSaveTimer === null) return;
     if (autoSaveIsInterval) clearInterval(autoSaveTimer); else clearTimeout(autoSaveTimer);
     autoSaveTimer = null; autoSaveIsInterval = false;
@@ -3662,7 +3704,7 @@ VERUP_緊急アップデートを複数回実施
   function savePages() {
     try {
       if (CryptoEngine.isEnabled() && sessionPassword) {
-        CryptoEngine.encryptPages(pages, sessionPassword).catch(function(e) { console.error('暗号化保存失敗:', e); });
+        CryptoEngine.encryptPages(pages, sessionPassword).catch(function(e) { /* 暗号化保存失敗 */ });
       } else {
         localStorage.setItem(PAGES_KEY, JSON.stringify(pages));
       }
@@ -3900,7 +3942,7 @@ VERUP_緊急アップデートを複数回実施
     } else { indicator.style.top = top + 'px'; indicator.style.opacity = '1'; }
   }
 
-  /* ===== ページタブバー描画 ===== */
+  /* Page Tab Bar Rendering */
   var _tabAddPending = false;
 
   window.renderPageTabs = function() {
@@ -3983,7 +4025,7 @@ VERUP_緊急アップデートを複数回実施
     });
   };
 
-  /* ===== タブバー切り替えアニメーション (ページ↔ファイル) ===== */
+  /* Tab Bar Animation (Page ↔ File) */
   window.animateTabSwitch = function(renderFn) {
     var bar = $('pageTabBar');
     if (!bar || !bar.classList.contains('active')) { if (renderFn) renderFn(); return; }
@@ -4035,7 +4077,7 @@ VERUP_緊急アップデートを複数回実施
     };
   })();
 
-  /* ===== タブ名ポップアップ編集 ===== */
+  /* Tab Name Edit Popup */
   (function() {
     var popup   = $('tabNamePopup');
     var input   = $('tabNamePopupInput');
@@ -4142,7 +4184,7 @@ VERUP_緊急アップデートを複数回実施
     };
   })();
 
-  /* ===== ページナビモード適用 ===== */
+  /* Home Navigation Application */
   var _tabBarHideListener = null; /* スライドアウト中の transitionend リスナーを追跡 */
   window.applyPageNavMode = function(mode) {
     var tabBar     = $('pageTabBar');
@@ -4267,7 +4309,7 @@ VERUP_緊急アップデートを複数回実施
     }
   })();
 
-  /* ===== フォルダパネル (File System Access API) ===== */
+  /* Folder Panel (File System Access API) */
   (function initFolderPanel() {
     var SUPPORTED_EXTS = ['txt','html','htm','json','md','css','js','xml','csv'];
     var folderPanelOpen = false;
@@ -4648,7 +4690,7 @@ VERUP_緊急アップデートを複数回実施
       };
     }
 
-    /* ===== ページパネルと同等のスワイプ操作（左端から右スワイプで開く） ===== */
+    /* Page Panel Swipe from Left */
     (function initFolderSwipe() {
       var EDGE = 32, THRESH = 60, touching = false;
       var startX = 0, startY = 0, startedFromEdge = false, panelW = 0;
@@ -4828,7 +4870,6 @@ VERUP_緊急アップデートを複数回実施
     rebuildFontSelect();
     for (var j = 12; j <= 80; j += 2) sSel.add(new Option(j + 'px', j));
     sSel.value = 18;
-
 
     var dictSel = $('dictSel');
     dictSel.value = localStorage.getItem('dictEngine') || 'wikipedia';
@@ -5035,9 +5076,8 @@ VERUP_緊急アップデートを複数回実施
       e.preventDefault();
       var text = window.getSelection().toString().trim();
       selectedText = text;
-      if (!text) return;
       ctxJustOpened = true;
-      showContextMenu(e.clientX, e.clientY, true);
+      showContextMenu(e.clientX, e.clientY, !!text);
       setTimeout(function() { ctxJustOpened = false; }, 100);
     });
     edit.addEventListener('mouseup', function(e) {
@@ -5050,9 +5090,20 @@ VERUP_緊急アップデートを複数回実施
     function handleOutside(e) {
       if (ctxJustOpened) return;
       if (contextMenu && contextMenu.style.display !== 'none') { if (!contextMenu.contains(e.target)) hideContextMenu(); return; }
+
+      /* Source / About ウィンドウ外クリックで閉じる */
+      var ossModalEl = $('ossModal');
+      if (ossModalEl && ossModalEl.classList.contains('show')) {
+        if (!ossModalEl.contains(e.target)) closePanel('ossModal');
+        return;
+      }
+      var devModalEl = $('devMessageModal');
+      if (devModalEl && devModalEl.classList.contains('show')) {
+        if (!devModalEl.contains(e.target)) closePanel('devMessageModal');
+        return;
+      }
+
       if (state.isOptionsOpen) {
-        var devModal = $('devMessageModal'); if (devModal && devModal.classList.contains('show')) return;
-        var ossModalEl = $('ossModal'); if (ossModalEl && ossModalEl.classList.contains('show')) return;
         var hBtns = document.querySelectorAll('header button');
         for (var bi = 0; bi < hBtns.length; bi++) { if (hBtns[bi] === e.target || hBtns[bi].contains(e.target)) return; }
         var fmEl = $('fontMgrModal'); if (fmEl && fmEl.contains(e.target)) return;
@@ -5430,17 +5481,254 @@ VERUP_緊急アップデートを複数回実施
 
   </script>
 
+  <!-- 計算提案ポップアップ -->
+  <script>
+  (function initCalcPopup() {
+    var popup = document.createElement('div');
+    popup.id = 'calcPopup';
+    popup.className = 'glass';
+    document.body.appendChild(popup);
+
+    var edit = document.getElementById('edit');
+    var _hideTimer = null;
+
+    /* ── 再帰下降パーサー（eval / new Function 不使用） ── */
+    function parse(src) {
+      var s = src.replace(/\s/g, '').replace(/[，,]/g, '.');
+      var pos = 0;
+
+      function peek()  { return s[pos]; }
+      function eat(c)  { if (s[pos] === c) { pos++; return true; } return false; }
+
+      function parseNumber() {
+        var start = pos;
+        if (peek() === '-') pos++;
+        while (pos < s.length && /[0-9]/.test(s[pos])) pos++;
+        if (peek() === '.') {
+          pos++;
+          while (pos < s.length && /[0-9]/.test(s[pos])) pos++;
+        }
+        if (pos === start || (pos === start + 1 && s[start] === '-')) return NaN;
+        return parseFloat(s.slice(start, pos));
+      }
+
+      function parseFactor() {
+        if (peek() === '(') {
+          pos++;
+          var v = parseExpr();
+          if (!eat(')')) return NaN;
+          return v;
+        }
+        if (peek() === '-') {
+          pos++;
+          var inner = parseFactor();
+          return isNaN(inner) ? NaN : -inner;
+        }
+        return parseNumber();
+      }
+
+      function parseTerm() {
+        var left = parseFactor();
+        if (isNaN(left)) return NaN;
+        while (pos < s.length) {
+          var op = peek();
+          if (op !== '*' && op !== '/' && op !== '%') break;
+          pos++;
+          var right = parseFactor();
+          if (isNaN(right)) return NaN;
+          if (op === '*') left *= right;
+          else if (op === '/') { if (right === 0) return NaN; left /= right; }
+          else left %= right;
+        }
+        return left;
+      }
+
+      function parseExpr() {
+        var left = parseTerm();
+        if (isNaN(left)) return NaN;
+        while (pos < s.length) {
+          var op = peek();
+          if (op !== '+' && op !== '-') break;
+          /* 末尾の符号は式の終わりとみなす */
+          if (pos + 1 >= s.length) break;
+          pos++;
+          var right = parseTerm();
+          if (isNaN(right)) return NaN;
+          left = op === '+' ? left + right : left - right;
+        }
+        return left;
+      }
+
+      var result = parseExpr();
+      /* すべて消費できていれば成功 */
+      if (pos !== s.length) return NaN;
+      return result;
+    }
+
+    /* 計算式らしいかチェック（演算子が含まれる必要あり） */
+    function looksLikeExpr(expr) {
+      var clean = expr.replace(/\s/g, '');
+      if (clean.length < 3 || clean.length > 60) return false;
+      if (!/[+\-*/%]/.test(clean.replace(/^\s*-/,''))) return false;
+      if (!/\d/.test(clean)) return false;
+      if (/[^0-9+\-*/%.(),，\s]/.test(clean)) return false;
+      return true;
+    }
+
+    /* カーソル行のテキスト座標を取得 */
+    function getCaretXY(el, selStart, selEnd) {
+      var cs  = window.getComputedStyle(el);
+      var mir = document.createElement('div');
+      ['fontFamily','fontSize','fontWeight','fontStyle','lineHeight',
+       'letterSpacing','wordSpacing',
+       'paddingTop','paddingRight','paddingBottom','paddingLeft',
+       'borderTopWidth','borderRightWidth','borderBottomWidth','borderLeftWidth',
+       'width','boxSizing'].forEach(function(p) { mir.style[p] = cs[p]; });
+      mir.style.position   = 'absolute';
+      mir.style.visibility = 'hidden';
+      mir.style.top        = '-9999px';
+      mir.style.left       = '-9999px';
+      mir.style.whiteSpace = 'pre-wrap';
+      mir.style.wordWrap   = 'break-word';
+      mir.style.height     = 'auto';
+
+      var text = el.value;
+      var before = document.createTextNode(text.slice(0, selStart));
+      var mark   = document.createElement('span');
+      mark.textContent = selEnd > selStart ? text.slice(selStart, selEnd) : '\u200b';
+      var after  = document.createTextNode(text.slice(selEnd > selStart ? selEnd : selStart));
+      mir.appendChild(before);
+      mir.appendChild(mark);
+      mir.appendChild(after);
+      document.body.appendChild(mir);
+
+      var mr = mir.getBoundingClientRect();
+      var sr = mark.getBoundingClientRect();
+      document.body.removeChild(mir);
+
+      var er = el.getBoundingClientRect();
+      return {
+        x: er.left + (sr.left - mr.left) + sr.width / 2,
+        y: er.top  + (sr.top  - mr.top)  - el.scrollTop,
+        h: sr.height || parseFloat(cs.lineHeight) || 20
+      };
+    }
+
+    function fmtNum(n) {
+      var s = String(Math.round(n * 1e10) / 1e10);
+      return s.length > 15 ? n.toPrecision(10) : s;
+    }
+
+    var _currentResult = '';
+    var _exprLineEnd   = 0;
+    var _suppressed    = false;
+    var _suppressTimer = null;
+
+    function showCalcPopup(x, y, h, text) {
+      if (_suppressed) return;
+      popup.textContent = '= ' + text;
+      popup.style.visibility = 'hidden';
+      popup.classList.add('visible');
+      var pw = popup.offsetWidth, ph = popup.offsetHeight;
+      var px = Math.max(8, Math.min(x - pw / 2, window.innerWidth - pw - 8));
+      var py = y - ph - 8;
+      if (py < 8) py = y + h + 8;
+      popup.style.left = px + 'px';
+      popup.style.top  = py + 'px';
+      popup.style.visibility = '';
+    }
+
+    function hideCalcPopup(suppress) {
+      popup.classList.remove('visible');
+      _currentResult = '';
+      if (suppress) {
+        _suppressed = true;
+        clearTimeout(_suppressTimer);
+        /* 次にテキストエリアへ入力するまで再表示しない */
+        _suppressTimer = setTimeout(function() { _suppressed = false; }, 800);
+      }
+    }
+
+    /* ポップアップクリック → スペースなしで「=答え」を挿入 */
+    popup.addEventListener('mousedown', function(e) { e.preventDefault(); e.stopPropagation(); });
+    popup.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (!_currentResult || !edit) return;
+      var insertText = '=' + _currentResult;
+      var before = edit.value.slice(0, _exprLineEnd);
+      var after  = edit.value.slice(_exprLineEnd);
+      edit.value = before + insertText + after;
+      var newPos = _exprLineEnd + insertText.length;
+      edit.setSelectionRange(newPos, newPos);
+      edit.focus();
+      if (window.ActionHandlers) ActionHandlers.updateText(edit.value);
+      edit.dispatchEvent(new Event('input', { bubbles: true }));
+      hideCalcPopup(false);
+    });
+
+    function update() {
+      clearTimeout(_hideTimer);
+      if (_suppressed) return;
+      var text     = edit.value;
+      var selStart = edit.selectionStart;
+      var selEnd   = edit.selectionEnd;
+      var expr, lineStart, lineEnd;
+
+      if (selStart !== selEnd) {
+        lineStart = selStart; lineEnd = selEnd;
+        expr = text.slice(selStart, selEnd).trim();
+      } else {
+        lineStart = text.lastIndexOf('\n', selStart - 1) + 1;
+        lineEnd   = text.indexOf('\n', selStart);
+        if (lineEnd === -1) lineEnd = text.length;
+        expr = text.slice(lineStart, lineEnd).trim();
+      }
+
+      if (!expr || !looksLikeExpr(expr)) { hideCalcPopup(false); return; }
+      var result = parse(expr);
+      if (isNaN(result) || !isFinite(result)) { hideCalcPopup(false); return; }
+
+      var pos = getCaretXY(edit, selStart, selEnd);
+      var er  = edit.getBoundingClientRect();
+      if (pos.y < er.top - 4 || pos.y > er.bottom + 4) { hideCalcPopup(false); return; }
+
+      _currentResult = fmtNum(result);
+      _exprLineEnd   = lineEnd;
+      showCalcPopup(pos.x, pos.y, pos.h, _currentResult);
+    }
+
+    var debouncedUpdate = (function() {
+      var t;
+      return function() { clearTimeout(t); t = setTimeout(update, 60); };
+    })();
+
+    /* キー入力時はsuppressを解除してから更新 */
+    edit.addEventListener('input', function() { _suppressed = false; clearTimeout(_suppressTimer); debouncedUpdate(); });
+    edit.addEventListener('keyup',    debouncedUpdate);
+    edit.addEventListener('mouseup',  function() { setTimeout(update, 0); });
+    edit.addEventListener('touchend', function() { setTimeout(update, 0); });
+    document.addEventListener('selectionchange', function() {
+      if (document.activeElement !== edit) return;
+      debouncedUpdate();
+    });
+    /* クリックで消す＋suppress */
+    edit.addEventListener('mousedown', function() { hideCalcPopup(true); });
+    document.addEventListener('mousedown', function(ev) {
+      if (ev.target !== popup && !popup.contains(ev.target)) hideCalcPopup(true);
+    });
+    edit.addEventListener('blur', function() {
+      _hideTimer = setTimeout(function() { hideCalcPopup(false); }, 150);
+    });
+  })();
+  </script>
+
   <!-- Service Worker 登録 -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('./sw.js')
-          .then(function(reg) {
-            /* console.log('[SW] 登録完了:', reg.scope); */
-          })
-          .catch(function(err) {
-            /* console.warn('[SW] 登録失敗:', err); */
-          });
+          .then(function(reg) { /* SW登録成功 */ })
+          .catch(function(err) { /* SW登録失敗 */ });
       });
     }
   </script>
