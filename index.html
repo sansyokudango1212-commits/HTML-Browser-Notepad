@@ -1545,6 +1545,10 @@
       <label class="ios-toggle"><input type="checkbox" id="footerAlwaysToggle"><span class="ios-toggle-slider"></span></label>
       <span style="font-size:10px; color:var(--dim); margin-left:4px; white-space:nowrap;" data-i18n="opt.footerspan">常時表示</span>
     </div>
+    <div>
+      <span class="label" data-i18n="opt.calc">計算提案</span>
+      <label class="ios-toggle"><input type="checkbox" id="calcToggle"><span class="ios-toggle-slider"></span></label>
+    </div>
     <div id="pwLockRow">
       <span class="label" data-i18n="opt.pwlock">パスワードロック</span>
       <label class="ios-toggle"><input type="checkbox" id="pwLockToggle"><span class="ios-toggle-slider"></span></label>
@@ -1561,8 +1565,8 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 2603032132</span>
-      <span>Version 26.2.11</span>
+      <span>Build 2603032137</span>
+      <span>Version 26.2.12</span>
       <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_Gemini2.5Pro<br>Trae_Chat GPT5.2beta<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Tikuwa_Nerimono1</span>
     </div>
   </div>
@@ -1862,6 +1866,7 @@ Visit the Open Source section for attribution information.</div>
         'opt.savespan':'文章情報を含める','opt.pwlock':'パスワードロック',
         'opt.passkey':'パスキー','opt.lang':'言語',
         'opt.sidebar':'サイドバー','opt.tab':'タブ',
+        'opt.calc':'計算提案',
         'ctx.copy':'コピー','ctx.cut':'切り取り','ctx.paste':'貼り付け',
         'ctx.search':'検索','ctx.translate':'翻訳','ctx.share':'共有',
         'ctx.compare':'比較','ctx.find':'文字検索',
@@ -1998,6 +2003,7 @@ Visit the Open Source section for attribution information.</div>
         'opt.savespan':'Incl. metadata','opt.pwlock':'PW Lock',
         'opt.passkey':'Passkey','opt.lang':'Language',
         'opt.sidebar':'Sidebar','opt.tab':'Tab',
+        'opt.calc':'Calc Suggest',
         'ctx.copy':'Copy','ctx.cut':'Cut','ctx.paste':'Paste',
         'ctx.search':'Search','ctx.translate':'Translate','ctx.share':'Share',
         'ctx.compare':'Compare','ctx.find':'Find',
@@ -4871,6 +4877,15 @@ Visit the Open Source section for attribution information.</div>
     for (var j = 12; j <= 80; j += 2) sSel.add(new Option(j + 'px', j));
     sSel.value = 18;
 
+    var calcToggle = $('calcToggle');
+    if (calcToggle) {
+      calcToggle.checked = localStorage.getItem('calcSuggest') !== 'false';
+      calcToggle.onchange = function() {
+        localStorage.setItem('calcSuggest', calcToggle.checked);
+        if (!calcToggle.checked && window._hideCalcPopup) window._hideCalcPopup();
+      };
+    }
+
     var dictSel = $('dictSel');
     dictSel.value = localStorage.getItem('dictEngine') || 'wikipedia';
     dictSel.onchange = function() { localStorage.setItem('dictEngine', dictSel.value); };
@@ -5666,9 +5681,12 @@ Visit the Open Source section for attribution information.</div>
       hideCalcPopup(false);
     });
 
+    window._hideCalcPopup = function() { hideCalcPopup(false); };
+
     function update() {
       clearTimeout(_hideTimer);
       if (_suppressed) return;
+      if (localStorage.getItem('calcSuggest') === 'false') { hideCalcPopup(false); return; }
       var text     = edit.value;
       var selStart = edit.selectionStart;
       var selEnd   = edit.selectionEnd;
