@@ -26,6 +26,13 @@
       --accent: #c9a181;
       --accent-rgb: 201, 161, 129;
     }
+    body.light-mode {
+      --bg: #f0ede8;
+      --text: #1a1a1a;
+      --ui-bg: rgba(255, 252, 248, 0.72);
+      --hover: rgba(0, 0, 0, 0.06);
+      --dim: #777;
+    }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       margin: 0;
@@ -35,12 +42,18 @@
       font-weight: 200;
       height: 100vh;
       overflow: hidden;
+      transition: background 0.3s cubic-bezier(0.4,0,0.2,1), color 0.3s cubic-bezier(0.4,0,0.2,1);
     }
     select, input[type="text"] {
       border-radius: 8px; padding: 4px; font-size: 12px;
       font-family: inherit; border: 1px solid rgba(255,255,255,0.1);
       background: #333; color: var(--text);
     }
+    body.light-mode select, body.light-mode input[type="text"] {
+      background: #e8e4df; color: var(--text);
+      border: 1px solid rgba(0,0,0,0.12);
+    }
+    body.light-mode select option { background: #e8e4df; color: #1a1a1a; }
     select option { background: #2d2d2d; color: #fff; }
 
     .glass {
@@ -51,14 +64,17 @@
       border-radius: var(--radius);
       z-index: 10;
     }
+    body.light-mode .glass {
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
 
     #lockScreen {
       position: fixed; inset: 0; z-index: 9999;
       background: var(--bg);
       display: flex; align-items: center; justify-content: center;
       transition: opacity 0.35s cubic-bezier(0.4,0,1,1);
-    }
-    #lockScreen.unlocking { opacity: 0; pointer-events: none; }
+    }    #lockScreen.unlocking { opacity: 0; pointer-events: none; }
     #lockScreen.hidden    { display: none; }
 
     @keyframes lockCardUnlock {
@@ -96,6 +112,10 @@
       font-size: 16px; color: var(--text); font-family: inherit;
       outline: none; letter-spacing: 6px;
       transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    body.light-mode .lock-pw-input {
+      background: rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.15);
     }
     .lock-pw-input:focus {
       border-color: var(--accent);
@@ -317,6 +337,29 @@
     .oss-dot:active { transform: scale(0.9); }
     .oss-dot:focus  { outline: none; }
 
+    .theme-dot {
+      position: absolute; top: 12px; right: 52px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: rgba(255,255,255,0.18); border: 1px solid #494949;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25); cursor: pointer; padding: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      z-index: 10;
+      transition: transform 0.15s, background 0.2s;
+    }
+    .theme-dot svg { width: 8px; height: 8px; display: block; }
+    body.light-mode .theme-dot {
+      background: rgba(0,0,0,0.07); border: 1px solid #222;
+    }
+    .theme-dot:hover  { transform: scale(1.1); }
+    .theme-dot:active { transform: scale(0.9); }
+    .theme-dot:focus  { outline: none; }
+    /* ライトモード時はinfo/oss dotの縁も黒く */
+    body.light-mode .info-dot,
+    body.light-mode .oss-dot {
+      background: rgba(0,0,0,0.07); border: 1px solid #222;
+      color: var(--text);
+    }
+
     /* OSS Modal */
     #ossModal { width: min(340px,92vw); padding: 28px 24px 22px; border-radius: 20px; z-index: 210; box-shadow: 0 12px 40px rgba(0,0,0,0.22); }
     #ossModal .oss-title { font-size: 14px; font-weight: bold; text-align: center; margin-bottom: 16px; }
@@ -357,6 +400,7 @@
       background: #333; color: inherit; font-family: inherit; font-size: 14px;
       margin-bottom: 20px; outline: none; text-align: center;
     }
+    body.light-mode #fileNameInput { background: #e8e4df; border: 1px solid rgba(0,0,0,0.12); }
     .modal-btns { display: flex; gap: 10px; width: 100%; }
     .modal-btns button {
       flex: 1; padding: 10px 0; border-radius: 15px; border: none; cursor: pointer;
@@ -746,6 +790,7 @@
     }
     #contextMenu button:hover  { background: var(--hover); }
     #contextMenu button:active { transform: scale(0.95); background: rgba(255,255,255,0.12); }
+    body.light-mode #contextMenu button:active { background: rgba(0,0,0,0.08); }
     .ctx-divider { height: 1px; background: rgba(128,128,128,0.18); margin: 3px 8px; }
 
     #searchHighlightMirror {
@@ -817,6 +862,7 @@
       width: 32px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.45);
       pointer-events: none; opacity: 0; transition: opacity 0.2s cubic-bezier(0.4,0,0.2,1);
     }
+    body.light-mode #optionsDragHandle::after, body.light-mode .swp-header::after { background: rgba(0,0,0,0.2); }
     #optionsDragHandle:hover::after, .swp-header:hover::after { opacity: 1; }
     #translatePanel .tp-header {
       display: flex; align-items: center; padding: 11px 14px;
@@ -832,6 +878,8 @@
       display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--dim);
     }
     #translatePanel .tp-lang select { border-radius: 10px; padding: 3px 6px; font-size: 12px; font-family: inherit; border: 1px solid rgba(255,255,255,0.1); background: #333; color: var(--text); cursor: pointer; }
+    body.light-mode #translatePanel .tp-lang select { background: #e8e4df; border: 1px solid rgba(0,0,0,0.15); color: var(--text); }
+    body.light-mode #translatePanel .tp-lang select option { background: #e8e4df; color: #1a1a1a; }
     #translatePanel .tp-lang .tp-arrow { font-size: 13px; color: var(--dim); user-select: none; }
     #translatePanel .tp-body { padding: 14px 18px 10px; overflow-y: auto; flex: 1; scrollbar-width: none; }
     #translatePanel .tp-body::-webkit-scrollbar { display: none; }
@@ -1258,15 +1306,23 @@
       position: relative; overflow: hidden;
       -webkit-user-select: none; user-select: none;
     }
-    /* Bottom Accent Line */
+    /* Bottom Accent Line (::after は非表示 — スライダーに置き換え) */
     .page-tab::after {
       content: ''; position: absolute;
       bottom: 0; left: 14%; right: 14%; height: 2px;
       background: var(--accent); border-radius: 2px;
-      opacity: 0; transition: opacity 0.22s cubic-bezier(0.4,0,0.2,1);
+      opacity: 0;
     }
-    /* 削除中：インジケーター非表示（再描画後にフェードイン） */
-    #pageTabBar.hide-indicators .page-tab::after { opacity: 0 !important; transition: none !important; }
+    /* Sliding Tab Indicator */
+    #tabSliderLine {
+      position: absolute;
+      bottom: 0; height: 2px;
+      background: var(--accent); border-radius: 2px;
+      pointer-events: none;
+      opacity: 0;
+      will-change: left, width;
+    }
+    #tabSliderLine.visible { opacity: 1; }
     /* Add animation: slide in from top */
     .page-tab-wrap.tab-add-enter .page-tab {
       transform: translateY(-14px);
@@ -1286,7 +1342,7 @@
       border-color: rgba(255,255,255,0.09);
       color: rgba(255,255,255,0.80);
     }
-    .page-tab.active::after { opacity: 1; }
+    /* .page-tab.active::after は使用しない (スライダー使用) */
     .page-tab-name {
       flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
       font-size: 12px; font-weight: 400; line-height: 1;
@@ -1365,6 +1421,12 @@
       transform-origin: top center;
       animation: tabPopupIn 0.32s cubic-bezier(0.34,1.56,0.64,1) both;
     }
+    body.light-mode #tabNamePopup {
+      background: rgba(245,242,238,0.97);
+      border: 1px solid rgba(0,0,0,0.1);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+    }
+    body.light-mode #tabNamePopup label { color: rgba(0,0,0,0.4); }
     #tabNamePopup.open { display: flex; }
     @keyframes tabPopupIn {
       from { opacity:0; transform: translateY(-10px) scale(0.88); filter: blur(3px); }
@@ -1386,6 +1448,50 @@
 
     /* タブバーモード時のヘッダー・テキストエリア位置調整 */
     body.tab-bar-mode { --header-top: 68px; }
+
+    /* ライトモード：タブバー全体 */
+    body.light-mode #pageTabBar {
+      background: rgba(240, 237, 232, 0.82);
+      border-bottom: 1px solid rgba(0,0,0,0.09);
+    }
+    body.light-mode .page-tab {
+      border: 1px solid rgba(0,0,0,0.08);
+      background: rgba(0,0,0,0.03);
+      color: rgba(0,0,0,0.35);
+    }
+    body.light-mode .page-tab:hover {
+      background: rgba(0,0,0,0.06);
+      border-color: rgba(0,0,0,0.12);
+      color: rgba(0,0,0,0.6);
+    }
+    body.light-mode .page-tab.active {
+      background: rgba(0,0,0,0.05);
+      border-color: rgba(0,0,0,0.10);
+      color: rgba(0,0,0,0.85);
+    }
+    body.light-mode .page-tab-name-input {
+      color: rgba(0,0,0,0.85);
+    }
+    body.light-mode #pageTabAddBtn {
+      border: 1px solid rgba(0,0,0,0.10);
+      background: rgba(0,0,0,0.03);
+      color: rgba(0,0,0,0.35);
+    }
+    body.light-mode #pageTabAddBtn:hover {
+      background: rgba(0,0,0,0.07); color: rgba(0,0,0,0.7);
+      border-color: rgba(0,0,0,0.18);
+    }
+    body.light-mode #pageTabEditBtn {
+      border: 1px solid rgba(0,0,0,0.10);
+      background: rgba(0,0,0,0.03);
+      color: rgba(0,0,0,0.4);
+    }
+    body.light-mode #pageTabEditBtn:hover { background: rgba(0,0,0,0.07); color: rgba(0,0,0,0.75); }
+    body.light-mode #tabNamePopupInput {
+      background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.12);
+      color: rgba(0,0,0,0.9);
+    }
+    body.light-mode #tabNamePopupHint { color: rgba(0,0,0,0.3); }
     /* header[data-dragged] の top はJSのclampで制御するためCSS固定は削除 */
     body.tab-bar-mode textarea,
     body.tab-bar-mode #searchHighlightMirror { padding-top: 120px !important; }
@@ -1499,6 +1605,7 @@
     <button class="close-dot" onclick="act('toggle')" aria-label="閉じる"></button>
     <button class="oss-dot"  onclick="showOssModal()"  aria-label="オープンソース情報">o</button>
     <button class="info-dot" onclick="showDevMessage()" aria-label="開発者メッセージ">i</button>
+    <button class="theme-dot" id="themeDot" onclick="toggleLightMode()" aria-label="ライト/ダークモード切り替え"></button>
     <div><span class="label" data-i18n="opt.font">フォント</span><select id="fSel"></select><button id="fontMgrBtn" data-i18n="fmgr.title" data-i18n-attr="title" title="フォント管理" onclick="openFontMgr()">＋</button></div>
     <div><span class="label" data-i18n="opt.size">サイズ</span><select id="sSel"></select></div>
     <div><span class="label" data-i18n="opt.search">検索</span>
@@ -1565,8 +1672,8 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 2603032137</span>
-      <span>Version 26.2.12</span>
+      <span>Build 2603042027</span>
+      <span>Version 26.2.13</span>
       <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_Gemini2.5Pro<br>Trae_Chat GPT5.2beta<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Tikuwa_Nerimono1</span>
     </div>
   </div>
@@ -1690,10 +1797,11 @@
   </div>
 
   <div id="devMessageModal" class="glass panel-modal">
-    <div class="dev-title-main">About This App</div>
-    <div class="dev-body">Notepad26 is a clean, lightweight web notepad with advanced features including multi-page support, password protection, drawing tools, translation, and search capabilities.
-
-Visit the Open Source section for attribution information.</div>
+    <div class="dev-title-main">Information</div>
+    <div style="text-align: center; font-weight: 100; font-size: 10px;">Informationと言いながら開発者の独り言</div>
+    <br>
+    <div class="dev-body">最近学校で英語の授業出禁になりました。<br>結構悲しいです
+    </div>
     <button class="dev-close" onclick="hideDevMessage()" data-i18n="common.close">閉じる</button>
   </div>
 
@@ -2665,6 +2773,24 @@ Visit the Open Source section for attribution information.</div>
     saveMeta: localStorage.getItem('saveMeta') !== 'false',
     footerAlways: localStorage.getItem('footerAlways') === 'true'
   };
+
+  /* ---- ライト/ダークモード ---- */
+  var _sunSVG  = '<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/><line x1="4.93" y1="19.07" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.07" y2="4.93"/></svg>';
+  var _moonSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.65)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+
+  (function() {
+    var isLight = localStorage.getItem('lightMode') === 'true';
+    if (isLight) document.body.classList.add('light-mode');
+    var dot = document.getElementById('themeDot');
+    if (dot) dot.innerHTML = isLight ? _moonSVG : _sunSVG;
+  })();
+
+  window.toggleLightMode = function() {
+    var isLight = document.body.classList.toggle('light-mode');
+    localStorage.setItem('lightMode', isLight);
+    var dot = document.getElementById('themeDot');
+    if (dot) dot.innerHTML = isLight ? _moonSVG : _sunSVG;
+  };
   var supportedFonts = ['Arial','Noto Sans JP','Noto Serif JP','Zen Maru Gothic','Dela Gothic One','Kosugi Maru'];
 
   /* ---- Google Fonts カスタムフォント管理 ---- */
@@ -3379,6 +3505,12 @@ Visit the Open Source section for attribution information.</div>
     });
   }
   window.addEventListener('resize', adjustOptionsScale);
+  window.addEventListener('resize', function() {
+    /* タブスライダーをリサイズ後に正しい位置へ再配置 */
+    if (document.body.classList.contains('tab-bar-mode')) {
+      positionTabSlider(false, null);
+    }
+  });
 
   function openPanel(id) {
     var el = $(id); if (!el) return;
@@ -3948,6 +4080,45 @@ Visit the Open Source section for attribution information.</div>
     } else { indicator.style.top = top + 'px'; indicator.style.opacity = '1'; }
   }
 
+  /* ── Tab Slider Indicator ─────────────────────────────────────── */
+  function getTabSliderPos(tab, bar) {
+    var barRect = bar.getBoundingClientRect();
+    var tabRect = tab.getBoundingClientRect();
+    var margin  = tabRect.width * 0.14;
+    return {
+      left:  (tabRect.left - barRect.left) + bar.scrollLeft + margin,
+      width: tabRect.width * 0.72
+    };
+  }
+
+  function positionTabSlider(animate, fromData) {
+    var bar = $('pageTabBar');
+    if (!bar) return;
+    var slider = document.getElementById('tabSliderLine');
+    var activeTab = bar.querySelector('.page-tab.active');
+    if (!slider) return;
+    if (!activeTab) { slider.classList.remove('visible'); return; }
+
+    var to = getTabSliderPos(activeTab, bar);
+
+    if (animate && fromData) {
+      slider.style.transition = 'none';
+      slider.style.left  = fromData.left  + 'px';
+      slider.style.width = fromData.width + 'px';
+      slider.offsetWidth;
+      slider.style.transition =
+        'left 0.42s cubic-bezier(0.65,0,0.35,1),' +
+        'width 0.42s cubic-bezier(0.65,0,0.35,1),' +
+        'opacity 0.18s ease';
+    } else {
+      slider.style.transition = 'none';
+      slider.offsetWidth;
+    }
+    slider.style.left  = to.left  + 'px';
+    slider.style.width = to.width + 'px';
+    slider.classList.add('visible');
+  }
+
   /* Page Tab Bar Rendering */
   var _tabAddPending = false;
 
@@ -4017,17 +4188,15 @@ Visit the Open Source section for attribution information.</div>
       }
     }
 
-    /* 削除後の再描画時 — インジケーターをフェードイン */
-    if (bar.classList.contains('hide-indicators')) {
-      /* 次フレームで hide を外してフェードイン */
-      requestAnimationFrame(function() {
-        bar.classList.remove('hide-indicators');
-      });
-    }
+    /* スライダー要素を追加して即時配置 */
+    var sliderEl = document.createElement('div');
+    sliderEl.id = 'tabSliderLine';
+    bar.appendChild(sliderEl);
 
     requestAnimationFrame(function() {
       var activeEl = bar.querySelector('.page-tab.active');
       if (activeEl) activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      positionTabSlider(false, null);
     });
   };
 
@@ -4175,17 +4344,27 @@ Visit the Open Source section for attribution information.</div>
   (function() {
     var origSwitch = switchPage;
     switchPage = function(idx) {
+      /* 切り替え前のアクティブタブ位置を記録 */
+      var bar = $('pageTabBar');
+      var fromData = null;
+      if (bar) {
+        var oldActive = bar.querySelector('.page-tab.active');
+        if (oldActive) fromData = getTabSliderPos(oldActive, bar);
+      }
+
       origSwitch(idx);
-      if (document.body.classList.contains('tab-bar-mode')) {
-        var bar = $('pageTabBar');
-        if (bar) {
-          bar.querySelectorAll('.page-tab').forEach(function(t) {
-            var ti = parseInt(t.dataset.pageIdx);
-            t.classList.toggle('active', ti === idx);
-          });
-          var activeTab = bar.querySelector('.page-tab.active');
-          if (activeTab) activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-        }
+
+      if (document.body.classList.contains('tab-bar-mode') && bar) {
+        bar.querySelectorAll('.page-tab').forEach(function(t) {
+          var ti = parseInt(t.dataset.pageIdx);
+          t.classList.toggle('active', ti === idx);
+        });
+        var activeTab = bar.querySelector('.page-tab.active');
+        if (activeTab) activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        /* スライダーをアニメーション付きで移動 */
+        requestAnimationFrame(function() {
+          positionTabSlider(true, fromData);
+        });
       }
     };
   })();
@@ -4529,6 +4708,8 @@ Visit the Open Source section for attribution information.</div>
               /* 初回移行：ページタブ→ファイルタブ（アニメーション付き） */
               window.animateTabSwitch(window.renderFolderTabs);
             } else {
+              /* タブ間スライダーアニメーション */
+              requestAnimationFrame(function() { positionTabSlider(true, null); });
               window.renderFolderTabs();
             }
           }
@@ -4642,9 +4823,14 @@ Visit the Open Source section for attribution information.</div>
         wrap.appendChild(tab);
         bar.appendChild(wrap);
       });
+      /* スライダー要素を追加して即時配置 */
+      var sliderEl2 = document.createElement('div');
+      sliderEl2.id = 'tabSliderLine';
+      bar.appendChild(sliderEl2);
       requestAnimationFrame(function() {
         var activeEl = bar.querySelector('.page-tab.active');
         if (activeEl) activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        positionTabSlider(false, null);
       });
     }
     window.renderFolderTabs = renderFolderTabs;
@@ -5754,6 +5940,5 @@ Visit the Open Source section for attribution information.</div>
   <div id="langTransitionOverlay"><span id="langTransitionLabel"></span></div>
 </body>
 </html>
-
 
 
