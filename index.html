@@ -1120,14 +1120,49 @@
     #pagePanelHeader .pph-edit { width: 28px; height: 28px; border-radius: 50%; border: none; background: rgba(255,255,255,0.10); color: var(--text); font-size: 14px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), background 0.15s; }
     #pagePanelHeader .pph-edit:hover  { background: rgba(255,255,255,0.18); }
     #pagePanelHeader .pph-edit:active { transform: scale(0.88); }
-    #pageList { flex: 1; overflow-y: auto; padding: 8px 12px 24px; scrollbar-width: none; }
+    #pageList { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 8px 12px 24px; scrollbar-width: none; position: relative; }
     #pageList::-webkit-scrollbar { display: none; }
-    .page-card { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 14px; cursor: pointer; position: relative; margin-bottom: 3px; -webkit-user-select: none; user-select: none; height: 61px; box-sizing: border-box; z-index: 1; }
+    .page-card { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 14px; cursor: pointer; position: relative; margin-bottom: 3px; -webkit-user-select: none; user-select: none; height: 61px; box-sizing: border-box; z-index: 1; overflow: hidden; }
+
+    /* ページカード追加アニメ（右から速い→遅い） */
+    @keyframes pageCardSlideIn {
+      0%   { transform: translateX(120%); opacity: 0; }
+      100% { transform: translateX(0);    opacity: 1; }
+    }
+    .page-card-entering {
+      animation: pageCardSlideIn 0.5s cubic-bezier(0.08, 0.82, 0.17, 1) both;
+    }
+
+    /* ページカード削除アニメ（遅い→速い ease-in） */
+    @keyframes pageCardSlideOut {
+      0%   { transform: translateX(0);    opacity: 1; max-height: 64px; margin-bottom: 3px; }
+      55%  { transform: translateX(120%); opacity: 0; max-height: 64px; margin-bottom: 3px; }
+      100% { transform: translateX(120%); opacity: 0; max-height: 0px;  margin-bottom: 0px; }
+    }
+    .page-card-exiting {
+      animation: pageCardSlideOut 0.52s cubic-bezier(0.55, 0, 1, 1) both;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+
+    #pageActiveBar {
+      position: absolute;
+      right: 6px;
+      width: 4px;
+      height: 28px;
+      border-radius: 99px;
+      background: var(--accent);
+      pointer-events: none;
+      z-index: 10;
+      top: 0;
+      transition: top 0.35s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.2s;
+      opacity: 0;
+    }
     .page-card:hover  { background: rgba(255,255,255,0.07); }
     .page-card:active { background: rgba(255,255,255,0.12); }
     .page-num { width: 30px; height: 30px; border-radius: 8px; background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.10); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--dim); flex-shrink: 0; }
     .page-card.active .page-num { background: var(--accent); border-color: transparent; color: #fff; }
-    #pageNumIndicator { position: absolute; left: 0; right: 0; height: 61px; border-radius: 14px; background: rgba(var(--accent-rgb), 0.15); pointer-events: none; z-index: 0; transition: top 0.32s cubic-bezier(0.34,1.2,0.64,1), opacity 0.18s cubic-bezier(0.4,0,0.2,1); opacity: 1; }
     .page-info { flex: 1; min-width: 0; }
     .page-title-text { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; cursor: text; }
     .page-preview { font-size: 11px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; line-height: 1.3; }
@@ -1362,6 +1397,18 @@
       transform: translateY(0);
       transition: transform 0.24s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
+    /* Delete animation: slide up and out (遅い→速い) */
+    @keyframes tabSlideUpFade {
+      0%   { transform: translateY(0);     opacity: 1; }
+      100% { transform: translateY(-18px); opacity: 0; }
+    }
+    .page-tab-wrap.tab-exit {
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .page-tab-wrap.tab-exit .page-tab {
+      animation: tabSlideUpFade 0.22s cubic-bezier(0.55, 0, 1, 1) both;
+    }
     .page-tab:hover {
       background: rgba(255,255,255,0.06);
       border-color: rgba(255,255,255,0.10);
@@ -1415,6 +1462,7 @@
       background: rgba(255,255,255,0.09); color: rgba(255,255,255,0.75);
       border-color: rgba(255,255,255,0.20); transform: scale(1.1);
     }
+
     /* 名前編集ボタン（右端固定） */
     #pageTabEditBtn {
       position: fixed; right: 10px; top: 11px;
@@ -1484,6 +1532,33 @@
       background: rgba(240, 237, 232, 0.82);
       border-bottom: 1px solid rgba(0,0,0,0.09);
     }
+
+    /* ── タブバー上部カスタムスクロールバー ── */
+    #tabScrollbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      z-index: 201;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+    #tabScrollbar.visible {
+      pointer-events: auto;
+      opacity: 1;
+    }
+    #tabScrollThumb {
+      position: absolute;
+      top: 0; height: 100%;
+      min-width: 28px;
+      background: rgba(var(--accent-rgb), 0.55);
+      border-radius: 0 0 2px 2px;
+      cursor: grab;
+      transition: background 0.15s;
+    }
+    #tabScrollThumb:hover,
+    #tabScrollThumb.dragging { background: rgba(var(--accent-rgb), 0.85); cursor: grabbing; }
+    body.light-mode #tabScrollThumb { background: rgba(var(--accent-rgb), 0.65); }
     body.light-mode .page-tab {
       border: 1px solid rgba(0,0,0,0.08);
       background: rgba(0,0,0,0.03);
@@ -1718,8 +1793,8 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 2603050112</span>
-      <span>Version 26.2.14</span>
+      <span>Build 2603062348</span>
+      <span>Version 26.2.15</span>
       <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_Gemini2.5Pro<br>Trae_Chat GPT5.2beta<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Tikuwa_Nerimono1</span>
     </div>
   </div>
@@ -1846,7 +1921,7 @@
     <div class="dev-title-main">Information</div>
     <div style="text-align: center; font-weight: 100; font-size: 10px;">Informationと言いながら開発者の独り言</div>
     <br>
-    <div class="dev-body">最近学校で英語の授業出禁になりました。<br>結構悲しいです
+    <div class="dev-body">最近学校で英語の授業出禁になりました。<br>結構悲しいです<br>追記:先生陣が悪かったということで謝って来ましたからもう許しました。
     </div>
     <button class="dev-close" onclick="hideDevMessage()" data-i18n="common.close">閉じる</button>
   </div>
@@ -1940,6 +2015,7 @@
   <div id="pageSwipeTrigger"></div>
   <!-- ページタブバー (PC専用・タブバーモード時に表示) -->
   <div id="pageTabBar"></div>
+  <div id="tabScrollbar"><div id="tabScrollThumb"></div></div>
   <button id="pageTabEditBtn" title="ページ名を編集" style="transform:scaleX(-1);">✎</button>
   <!-- タブ名編集ポップアップ -->
   <div id="tabNamePopup">
@@ -2000,7 +2076,8 @@
         <button class="pph-add" onclick="addPage()">＋</button>
       </div>
     </div>
-    <div id="pageList"><div id="pageNumIndicator"></div></div>
+    <div id="pageList"></div>
+    <div id="pageActiveBar"></div>
     <div id="pageMaxMsg"></div>
   </div>
 
@@ -3983,6 +4060,12 @@
     if (pages[curPageIdx]._fileEditor) return;
     savePages();
   }
+
+  /* ページ切替時にバースライドをブロックするフラグ */
+  var _skipBarUpdate   = false;
+  /* 追加アニメを適用するページインデックス（-1=なし） */
+  var _addingNewPageIdx = -1;
+
   function switchPage(idx) {
     if (titleEditMode) commitTitleEdit();
     if (idx === curPageIdx) return;
@@ -3992,74 +4075,82 @@
     var fromId = pages[curPageIdx] ? pages[curPageIdx].id : null;
     var penSlideIn = window.penPageSwitch ? window.penPageSwitch(fromId, pages[idx].id, dir) : null;
     saveCurrentPage();
-    curPageIdx = idx; localStorage.setItem(PAGES_CUR, pages[curPageIdx].id);
+    curPageIdx = idx;
+    localStorage.setItem(PAGES_CUR, pages[curPageIdx].id);
     var p = pages[curPageIdx], fSel = $('fSel'), sSel = $('sSel');
     edit.value = p.text || '';
     for (var i = 0; i < fSel.options.length; i++) { if (fSel.options[i].value === p.font) { fSel.selectedIndex = i; break; } }
-    sSel.value = String(p.size || 18); applyStyles(); ActionHandlers.updateText(edit.value); render(); renderPageList();
+    sSel.value = String(p.size || 18);
+    applyStyles(); ActionHandlers.updateText(edit.value); render();
+    _skipBarUpdate = true;
+    renderPageList();
+    _skipBarUpdate = false;
     requestAnimationFrame(function() { updatePageIndicator(true); });
     slidePageIn(edit);
     if (penSlideIn) penSlideIn();
   }
+
   window.addPage = function() {
     if (window.folderFileActive) { queueToast(window.i18n.t('toast.page_add_blocked_fileeditor'), 2000); return; }
-    var realCount = pages.filter(function(p){return !p._fileEditor;}).length;
+    var realCount = pages.filter(function(p) { return !p._fileEditor; }).length;
     if (realCount >= MAX_PAGES) { queueToast(window.i18n.t('toast.page_max_prefix') + MAX_PAGES + window.i18n.t('toast.page_max_suffix'), 2000); return; }
-    var edit = $('edit');
+    var edit  = $('edit');
     var fromId = pages[curPageIdx] ? pages[curPageIdx].id : null;
     var newId  = genPageId();
     var penSlideIn = window.penPageSwitch ? window.penPageSwitch(fromId, newId, 'right') : null;
     saveCurrentPage();
-    var np = { id: newId, title: window.i18n.t('page.default') + (pages.length + 1), text: '', font: $('fSel').value || 'Arial', size: parseInt($('sSel').value) || 18, titleLocked: false };
-    pages.push(np); curPageIdx = pages.length - 1; localStorage.setItem(PAGES_CUR, np.id);
+    var np = { id: newId, title: window.i18n.t('page.default') + (pages.length + 1), text: '',
+               font: $('fSel').value || 'Arial', size: parseInt($('sSel').value) || 18, titleLocked: false };
+    pages.push(np);
+    curPageIdx = pages.length - 1;
+    localStorage.setItem(PAGES_CUR, np.id);
+    _addingNewPageIdx = curPageIdx;
+    _skipBarUpdate    = true;
     edit.value = ''; ActionHandlers.updateText(''); savePages(); render(); renderPageList();
+    _addingNewPageIdx = -1;
+    _skipBarUpdate    = false;
     requestAnimationFrame(function() { updatePageIndicator(true); });
     slidePageIn(edit);
     if (penSlideIn) penSlideIn();
   };
+
   window.deletePage = function(idx, e) {
     e.stopPropagation();
     if (pages[idx] && pages[idx]._fileEditor) return;
     var realCount = pages.filter(function(p) { return !p._fileEditor; }).length;
-    if (realCount <= 1) {
-      queueToast(window.i18n.t('toast.page_last_delete_blocked'), 2000);
-      return;
-    }
+    if (realCount <= 1) { queueToast(window.i18n.t('toast.page_last_delete_blocked'), 2000); return; }
 
-    var ANIM_DUR = 0.32;
-    var ANIM_EASE = 'cubic-bezier(0.45, 0, 0.55, 1)';
-    var transitionVal = 'opacity ' + ANIM_DUR + 's ' + ANIM_EASE + ', transform ' + ANIM_DUR + 's ' + ANIM_EASE + ', max-width ' + ANIM_DUR + 's ' + ANIM_EASE + ', padding ' + ANIM_DUR + 's ' + ANIM_EASE + ', border ' + ANIM_DUR + 's ' + ANIM_EASE;
-
-    /* タブバーのアニメーション */
     var bar = $('pageTabBar');
-    var tabs = bar ? Array.prototype.slice.call(bar.children) : [];
-    var tabToRemove = tabs[idx];
-    var firstRects = tabs.map(function(tab) { return tab.getBoundingClientRect(); });
 
-    if (tabToRemove) {
-      tabToRemove.style.transition = transitionVal;
-      tabToRemove.style.opacity    = '0';
-      tabToRemove.style.transform  = 'scale(0.8)';
-      tabToRemove.style.maxWidth   = '0px';
-      tabToRemove.style.paddingLeft  = '0';
-      tabToRemove.style.paddingRight = '0';
-      tabToRemove.style.border = 'none';
+    /* アニメ開始前にスライダーの現在位置を記録 */
+    var sliderFrom = null;
+    if (bar) {
+      var currentActive = bar.querySelector('.page-tab.active');
+      if (currentActive) sliderFrom = getTabSliderPos(currentActive, bar);
     }
 
-    /* ページリストのアニメーション */
-    var pageList = $('pageList');
-    var cardToRemove = pageList ? pageList.children[idx] : null;
-    if (cardToRemove) {
-      cardToRemove.style.transition = 'opacity ' + ANIM_DUR + 's ' + ANIM_EASE + ', transform ' + ANIM_DUR + 's ' + ANIM_EASE + ', max-height ' + ANIM_DUR + 's ' + ANIM_EASE + ', margin ' + ANIM_DUR + 's ' + ANIM_EASE + ', padding ' + ANIM_DUR + 's ' + ANIM_EASE + ', border ' + ANIM_DUR + 's ' + ANIM_EASE;
-      cardToRemove.style.opacity   = '0';
-      cardToRemove.style.transform = 'scale(0.8)';
-      cardToRemove.style.maxHeight = '0px';
-      cardToRemove.style.margin    = '0';
-      cardToRemove.style.padding   = '0';
-      cardToRemove.style.border    = 'none';
+    /* タブを上へ・カードを右へスライドアウト */
+    if (bar) {
+      var wraps = bar.querySelectorAll('.page-tab-wrap');
+      if (wraps[idx]) {
+        var exitWrap = wraps[idx];
+        var wrapW = exitWrap.getBoundingClientRect().width;
+        exitWrap.style.width      = wrapW + 'px';
+        exitWrap.style.flexShrink = '0';
+        exitWrap.classList.add('tab-exit');
+        /* タブが消えた後に幅を縮小 → +ボタンが左へ詰まる */
+        setTimeout(function() {
+          exitWrap.style.transition = 'width 0.28s cubic-bezier(0.55,0,1,1), margin 0.28s cubic-bezier(0.55,0,1,1)';
+          exitWrap.style.width  = '0px';
+          exitWrap.style.margin = '0';
+        }, 220);
+      }
     }
+    var cards = $('pageList') ? $('pageList').querySelectorAll('.page-card') : [];
+    if (cards[idx]) cards[idx].classList.add('page-card-exiting');
 
-    requestAnimationFrame(function() {
+    /* アニメ完了後にデータ・DOM更新 */
+    setTimeout(function() {
       var deletedId      = pages[idx].id;
       var wasCurrentPage = (idx === curPageIdx);
       var fromId         = wasCurrentPage ? deletedId : null;
@@ -4071,47 +4162,25 @@
 
       var p = pages[curPageIdx], edit = $('edit');
       var penSlideIn = (wasCurrentPage && window.penPageSwitch)
-        ? window.penPageSwitch(fromId, pages[curPageIdx].id, 'left')
-        : null;
+        ? window.penPageSwitch(fromId, pages[curPageIdx].id, 'left') : null;
 
-      edit.value         = p.text || '';
-      $('fSel').value    = p.font || 'Arial';
-      $('sSel').value    = String(p.size || 18);
+      edit.value      = p.text || '';
+      $('fSel').value = p.font || 'Arial';
+      $('sSel').value = String(p.size || 18);
+      applyStyles(); ActionHandlers.updateText(edit.value); savePages(); render();
 
-      applyStyles();
-      ActionHandlers.updateText(edit.value);
-      savePages();
-      render();
+      _skipBarUpdate = true;
       renderPageList();
-      if (penSlideIn) penSlideIn();
+      _skipBarUpdate = false;
 
-      /* 残りタブをFLIPアニメーション */
-      var newBar  = $('pageTabBar');
-      var newTabs = newBar ? Array.prototype.slice.call(newBar.children) : [];
-      var lastRects = newTabs.map(function(tab) { return tab.getBoundingClientRect(); });
-
-      newTabs.forEach(function(tab, i) {
-        var firstIdx = i < idx ? i : i + 1;
-        var fRect = firstRects[firstIdx];
-        var lRect = lastRects[i];
-        if (!fRect || !lRect) return;
-        var deltaX = fRect.left - lRect.left;
-        var deltaY = fRect.top  - lRect.top;
-        if (deltaX === 0 && deltaY === 0) return;
-        tab.style.transition = 'none';
-        tab.style.transform  = 'translate(' + deltaX + 'px, ' + deltaY + 'px)';
-        tab.getBoundingClientRect();
-        tab.style.transition = 'transform ' + ANIM_DUR + 's ' + ANIM_EASE;
-        tab.style.transform  = 'translate(0, 0)';
+      /* DOM確定後、縦バーと横スライダーをアニメ移動 */
+      requestAnimationFrame(function() {
+        updatePageIndicator(true);
+        positionTabSlider(!!sliderFrom, sliderFrom);
       });
 
-      setTimeout(function() {
-        newTabs.forEach(function(tab) {
-          tab.style.transition = '';
-          tab.style.transform  = '';
-        });
-      }, ANIM_DUR * 1000);
-    });
+      if (penSlideIn) penSlideIn();
+    }, 500);
   };
 
   var titleEditMode = false;
@@ -4155,7 +4224,7 @@
       if (p._fileEditor) return;
       displayNum++;
       var card = document.createElement('div');
-      card.className = 'page-card' + (i === curPageIdx ? ' active' : '');
+      card.className = 'page-card' + (i === curPageIdx ? ' active' : '') + (i === _addingNewPageIdx ? ' page-card-entering' : '');
       card.onclick = function() { switchPage(i); };
       var num = document.createElement('div'); num.className = 'page-num'; num.textContent = String(displayNum);
       var info = document.createElement('div'); info.className = 'page-info';
@@ -4180,18 +4249,30 @@
     });
     var realCount = pages.filter(function(p){return !p._fileEditor;}).length;
     var msg = $('pageMaxMsg'); if (msg) msg.textContent = realCount >= MAX_PAGES ? window.i18n.t('pagemax.msg').replace('MAX', MAX_PAGES) : '';
-    updatePageIndicator(false);
+    if (!_skipBarUpdate) updatePageIndicator(false);
     /* タブバーモード時はタブも更新 */
     if (window.renderPageTabs) window.renderPageTabs();
   }
   function updatePageIndicator(animate) {
-    var indicator = $('pageNumIndicator'), list = $('pageList'); if (!indicator || !list) return;
+    var list = $('pageList'); if (!list) return;
     var cards = list.querySelectorAll('.page-card'); if (!cards[curPageIdx]) return;
-    var top = cards[curPageIdx].offsetTop;
+    var activeBar = document.getElementById('pageActiveBar');
+    var panel     = document.getElementById('pagePanel');
+    if (!activeBar || !panel) return;
+
+    var cardRect  = cards[curPageIdx].getBoundingClientRect();
+    var panelRect = panel.getBoundingClientRect();
+    var barTop = (cardRect.top - panelRect.top) + Math.round((cardRect.height - 28) / 2);
+
     if (!animate) {
-      indicator.style.transition = 'none'; indicator.style.top = top + 'px'; indicator.style.opacity = '1';
-      requestAnimationFrame(function() { indicator.style.transition = ''; });
-    } else { indicator.style.top = top + 'px'; indicator.style.opacity = '1'; }
+      activeBar.style.transition = 'none';
+      activeBar.style.top        = barTop + 'px';
+      activeBar.style.opacity    = '1';
+      requestAnimationFrame(function() { activeBar.style.transition = ''; });
+    } else {
+      activeBar.style.top     = barTop + 'px';
+      activeBar.style.opacity = '1';
+    }
   }
 
   /* ── Tab Slider Indicator ─────────────────────────────────────── */
@@ -6053,6 +6134,87 @@
   </script>
 
   <div id="langTransitionOverlay"><span id="langTransitionLabel"></span></div>
+
+  <!-- タブバー上部カスタムスクロールバー -->
+  <script>
+  (function() {
+    var bar   = document.getElementById('pageTabBar');
+    var track = document.getElementById('tabScrollbar');
+    var thumb = document.getElementById('tabScrollThumb');
+    if (!bar || !track || !thumb) return;
+
+    /* サムのサイズ・位置を更新 */
+    function updateScrollbar() {
+      var overflow = bar.scrollWidth > bar.clientWidth + 2;
+      /* タブバーが非表示の場合は隠す */
+      if (!bar.classList.contains('active') || !overflow) {
+        track.classList.remove('visible');
+        return;
+      }
+      track.classList.add('visible');
+      var ratio    = bar.clientWidth / bar.scrollWidth;
+      var thumbW   = Math.max(28, ratio * bar.clientWidth);
+      var maxScroll = bar.scrollWidth - bar.clientWidth;
+      var thumbLeft = maxScroll > 0
+        ? (bar.scrollLeft / maxScroll) * (bar.clientWidth - thumbW)
+        : 0;
+      thumb.style.width = thumbW + 'px';
+      thumb.style.left  = thumbLeft + 'px';
+    }
+
+    bar.addEventListener('scroll', updateScrollbar);
+    window.addEventListener('resize', updateScrollbar);
+
+    /* タブ追加・削除など DOM 変化を監視 */
+    new MutationObserver(function() {
+      requestAnimationFrame(updateScrollbar);
+    }).observe(bar, { childList: true, subtree: false });
+
+    /* タブバー表示切替を監視 */
+    new MutationObserver(function() {
+      requestAnimationFrame(updateScrollbar);
+    }).observe(bar, { attributes: true, attributeFilter: ['class'] });
+
+    /* ── サムのドラッグ ── */
+    var dragging = false, dragStartX = 0, dragStartScroll = 0;
+
+    thumb.addEventListener('mousedown', function(e) {
+      dragging = true;
+      dragStartX     = e.clientX;
+      dragStartScroll = bar.scrollLeft;
+      thumb.classList.add('dragging');
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', function(e) {
+      if (!dragging) return;
+      var thumbW    = parseFloat(thumb.style.width) || 0;
+      var maxScroll = bar.scrollWidth - bar.clientWidth;
+      var trackW    = bar.clientWidth - thumbW;
+      if (trackW <= 0) return;
+      var dx = e.clientX - dragStartX;
+      bar.scrollLeft = dragStartScroll + (dx / trackW) * maxScroll;
+    });
+    document.addEventListener('mouseup', function() {
+      if (!dragging) return;
+      dragging = false;
+      thumb.classList.remove('dragging');
+    });
+
+    /* トラック上のクリックでジャンプ */
+    track.addEventListener('click', function(e) {
+      if (e.target === thumb) return;
+      var rect      = track.getBoundingClientRect();
+      var thumbW    = parseFloat(thumb.style.width) || 0;
+      var ratio     = (e.clientX - rect.left - thumbW / 2) / (rect.width - thumbW);
+      bar.scrollLeft = Math.max(0, ratio) * (bar.scrollWidth - bar.clientWidth);
+    });
+
+    /* 初期化（ページ表示後に一度実行） */
+    window.addEventListener('load', function() {
+      setTimeout(updateScrollbar, 600);
+    });
+  })();
+  </script>
 </body>
 </html>
 
