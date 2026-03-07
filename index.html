@@ -280,13 +280,44 @@
       border-color: rgba(var(--accent-rgb), 0.5);
       color: var(--accent);
     }
-    #clearAutoSaveBtn {
-      background: rgba(229,57,53,0.12); border: 1px solid rgba(229,57,53,0.4);
-      border-radius: 8px; cursor: pointer; padding: 0 7px; height: 26px;
-      display: inline-flex; align-items: center; justify-content: center;
-      transition: background 0.18s, transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
+    body.light-mode .page-nav-mode-btn {
+      border-color: rgba(0,0,0,0.22);
+      color: var(--dim);
+      background: rgba(0,0,0,0.03);
     }
-    #clearAutoSaveBtn:active { transform: scale(0.92); background: rgba(229,57,53,0.22); }
+    body.light-mode .page-nav-mode-btn:hover { background: rgba(0,0,0,0.08); color: var(--text); }
+    body.light-mode .page-nav-mode-btn.active {
+      background: rgba(var(--accent-rgb), 0.15);
+      border-color: rgba(var(--accent-rgb), 0.7);
+      color: var(--accent);
+    }
+    /* 設定行の共通ボタン/セレクト */
+    .opt-row-btn {
+      height: 26px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.13);
+      background: rgba(255,255,255,0.07);
+      color: var(--text); font-family: inherit; font-size: 11px;
+      padding: 0 8px; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: background 0.15s, transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .opt-row-icon-btn {
+      height: 26px; width: 26px; padding: 0; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.13);
+      background: rgba(255,255,255,0.07);
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+      transition: background 0.15s, transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .opt-row-btn:active { /* selectにはアニメーションなし */ }
+    .opt-row-icon-btn:active { transform: scale(0.92); }
+    body.light-mode .opt-row-btn,
+    body.light-mode .opt-row-icon-btn {
+      border-color: rgba(0,0,0,0.18);
+      background: rgba(0,0,0,0.05);
+      color: var(--text);
+    }
+    #clearAutoSaveBtn { border-color: rgba(229,57,53,0.4) !important; background: rgba(229,57,53,0.12) !important; }
+    #clearAutoSaveBtn:active { transform: scale(0.92); background: rgba(229,57,53,0.22) !important; }
 
     /* ロールバックモーダル */
     #rollbackModal {
@@ -361,6 +392,12 @@
     #rollbackModal .rb-footer button:active { transform: scale(0.95); }
     #rbCloseBtn { background: rgba(255,255,255,0.08); color: var(--text); }
     #rbClearBtn { background: rgba(229,57,53,0.14); color: #e57373; border: 1px solid rgba(229,57,53,0.28) !important; }
+    body.light-mode #rbCloseBtn { background: rgba(0,0,0,0.07); color: var(--text); }
+    body.light-mode #rbClearBtn { background: rgba(229,57,53,0.1); color: #c62828; border-color: rgba(229,57,53,0.4) !important; }
+    body.light-mode .rb-item:hover { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); }
+    body.light-mode #rollbackList::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); }
+    body.light-mode .rb-item-time { color: var(--accent); }
+    body.light-mode .rb-empty { color: var(--dim); }
     .options-version {
       font-size: 10px; color: var(--dim); justify-content: center;
       border-top: 1px solid rgba(128,128,128,0.1); padding-top: 8px; margin-top: 8px;
@@ -377,9 +414,7 @@
       border: 1px solid rgba(0,0,0,0.25); box-shadow: 0 2px 6px rgba(0,0,0,0.25);
       cursor: pointer; padding: 0; display: inline-block;
       z-index: 10;
-      transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), filter 0.15s;
     }
-    .close-dot:hover  { transform: scale(1.2); filter: brightness(1.1); }
     .close-dot:active { transform: scale(0.88); }
     .close-dot:focus  { outline: none; }
     .info-dot {
@@ -1797,14 +1832,14 @@
     <div id="replacePanelDragHandle" class="drag-handle" style="position:absolute;top:0;left:0;right:0;height:36px;border-radius:18px 18px 0 0;"></div>
     <button class="close-dot" id="replacePanelCloseBtn" aria-label="閉じる"></button>
     <div class="sp-row">
-      <input id="replaceSearchInput" type="text" placeholder="検索..." autocomplete="off">
+      <input id="replaceSearchInput" type="text" placeholder="検索..." autocomplete="off" data-i18n="rp.placeholder" data-i18n-attr="placeholder">
     </div>
     <div class="sp-row">
-      <input id="replaceWithInput" type="text" placeholder="置換後..." autocomplete="off">
+      <input id="replaceWithInput" type="text" placeholder="置換後..." autocomplete="off" data-i18n="rp.with" data-i18n-attr="placeholder">
     </div>
     <div class="sp-row" style="justify-content:center; gap:6px;">
-      <button class="sp-btn" id="rpReplaceBtn">置換</button>
-      <button class="sp-btn" id="rpReplaceAllBtn">すべて置換</button>
+      <button class="sp-btn" id="rpReplaceBtn" data-i18n="rp.replace">置換</button>
+      <button class="sp-btn" id="rpReplaceAllBtn" data-i18n="rp.replaceall">すべて置換</button>
     </div>
   </div>
 
@@ -1826,10 +1861,17 @@
     <div>
       <span class="label" data-i18n="opt.autosave">自動保存</span>
       <label class="ios-toggle"><input type="checkbox" id="autoSaveToggle"><span class="ios-toggle-slider"></span></label>
-      <button id="rollbackBtn" title="自動保存の履歴" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:8px;cursor:pointer;padding:0 7px;height:26px;display:inline-flex;align-items:center;justify-content:center;margin-right:2px;transition:background 0.15s,transform 0.12s cubic-bezier(0.34,1.56,0.64,1);">
+      <select id="autoSaveIntervalSel" class="opt-row-btn">
+        <option value="30">30秒</option>
+        <option value="60">1分</option>
+        <option value="120" selected>2分</option>
+        <option value="300">5分</option>
+        <option value="600">10分</option>
+      </select>
+      <button id="rollbackBtn" class="opt-row-btn opt-row-icon-btn" title="自動保存の履歴">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);display:block;"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
       </button>
-      <button id="clearAutoSaveBtn" title="保存済みデータを消去">
+      <button id="clearAutoSaveBtn" class="opt-row-icon-btn" title="保存済みデータを消去">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#e53935;display:block;">
           <polyline points="3 6 5 6 21 6"/>
           <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
@@ -1883,8 +1925,8 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 2603071713</span>
-      <span>Version 26.2.16.1</span>
+      <span>Build 2603072245</span>
+      <span>Version 26.2.17</span>
       <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_Gemini2.5Pro<br>Trae_Chat GPT5.2beta<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Tikuwa_Nerimono1</span>
     </div>
   </div>
@@ -2048,7 +2090,7 @@
     <button id="ctxShare"   onclick="ctxShareText()"             data-i18n="ctx.share">共有</button>
     <button id="ctxCompare" onclick="openCompareFromContextMenu()" data-i18n="ctx.compare">比較</button>
     <button id="ctxFind"    onclick="ctxOpenSearch()"            data-i18n="ctx.find">文字検索</button>
-    <button id="ctxReplace" onclick="ctxOpenReplace()">文字置換</button>
+    <button id="ctxReplace" onclick="ctxOpenReplace()" data-i18n="ctx.replace">文字置換</button>
   </div>
   <div id="searchHighlightMirror"></div>
   <textarea id="edit" spellcheck="false"></textarea>
@@ -2191,8 +2233,11 @@
         'opt.calc':'計算提案',
         'ctx.copy':'コピー','ctx.cut':'切り取り','ctx.paste':'貼り付け',
         'ctx.search':'検索','ctx.translate':'翻訳','ctx.share':'共有',
-        'ctx.compare':'比較','ctx.find':'文字検索',
+        'ctx.compare':'比較','ctx.find':'文字検索','ctx.replace':'文字置換',
         'sp.placeholder':'検索...','sp.prev':'↑ 前へ','sp.next':'↓ 次へ',
+        'rp.placeholder':'検索...','rp.with':'置換後...','rp.replace':'置換','rp.replaceall':'すべて置換',
+        'rp.toast.notfound':'一致する文字が見つかりません',
+        'rp.toast.replaced':'件置換しました',
         'tab.label':'ページ名','tab.placeholder':'ページ名を入力...',
         'tab.hint':'Enter で確定 · Esc でキャンセル',
         'pp.title':'ページ',
@@ -2291,7 +2336,7 @@
         'toast.font_size_prefix':'フォントサイズ: ',
         'toast.offline_error':'エラー: インターネット接続が遮断されました',
         'pws.strength_prefix':'強度: ',
-        'pws.strength_weak':'弱い（6文字以上推奨）',
+        'pws.strength_weak':'弱い（6文字以上・2種類以上の文字を推奨）',
         'pws.strength_medium':'普通',
         'pws.strength_strong':'強い',
         'pws.error_mismatch':'パスワードが一致しません',
@@ -2314,9 +2359,9 @@
         'fmgr.del.title':'削除',
         'fmgr.err.empty':'URLを入力してください',
         'fmgr.err.noname':'フォント名を取得できませんでした',
-        'fmgr.err.notgoogle':'Google Fonts の specimen URL か CSS URL を入力してください',
+        'fmgr.err.notgoogle':'CSS または フォントファイル (.woff2, .ttf) の URL を入力してください',
         'fmgr.err.exists':'はすでに追加されています',
-        'fmgr.hint.suffix':'フォント以外のフォントURLは受け付けません。<br>以下の形式でテキストボックスにURLを入力してください。<br>（例: fonts.google.com/specimen/DotGothic16）',
+        'fmgr.hint.suffix':'Google Fonts・cdnjs・セルフホストなどのCSS/フォントURLが使えます。<br>（例: fonts.google.com/specimen/DotGothic16）',
         'fmgr.toast.added':'を追加しました',
         'fmgr.toast.removed':'を削除しました',
         'swp.adult_title':'成人向けコンテンツ',
@@ -2335,8 +2380,11 @@
         'opt.calc':'Calc Suggest',
         'ctx.copy':'Copy','ctx.cut':'Cut','ctx.paste':'Paste',
         'ctx.search':'Search','ctx.translate':'Translate','ctx.share':'Share',
-        'ctx.compare':'Compare','ctx.find':'Find',
+        'ctx.compare':'Compare','ctx.find':'Find','ctx.replace':'Replace',
         'sp.placeholder':'Search...','sp.prev':'↑ Prev','sp.next':'↓ Next',
+        'rp.placeholder':'Search...','rp.with':'Replace with...','rp.replace':'Replace','rp.replaceall':'Replace All',
+        'rp.toast.notfound':'No matches found',
+        'rp.toast.replaced':' replaced',
         'tab.label':'Page Name','tab.placeholder':'Enter page name...',
         'tab.hint':'Enter to confirm · Esc to cancel',
         'pp.title':'Pages',
@@ -2408,7 +2456,7 @@
         'toast.autosave_prefix':'Autosaved ',
         'toast.page_blocked_fileeditor':'Pages are unavailable while the file editor is open',
         'toast.page_add_blocked_fileeditor':'Cannot add pages while the file editor is open',
-        'toast.page_max_prefix':'Maximum pages: ',
+        'toast.page_max_prefix':'The maximum number of pages is ',
         'toast.page_max_suffix':'',
         'toast.page_last_delete_blocked':'The last page cannot be deleted',
         'toast.fileeditor_enter_prefix':'Switched to file editor — ',
@@ -2435,7 +2483,7 @@
         'toast.font_size_prefix':'Font size: ',
         'toast.offline_error':'Error: Internet connection lost',
         'pws.strength_prefix':'Strength: ',
-        'pws.strength_weak':'Weak (6+ chars recommended)',
+        'pws.strength_weak':'Weak (6+ chars, 2+ character types)',
         'pws.strength_medium':'Medium',
         'pws.strength_strong':'Strong',
         'pws.error_mismatch':'Passwords do not match',
@@ -2458,9 +2506,9 @@
         'fmgr.del.title':'Remove',
         'fmgr.err.empty':'Please enter a URL',
         'fmgr.err.noname':'Could not retrieve font name',
-        'fmgr.err.notgoogle':'Please enter a Google Fonts specimen or CSS URL',
+        'fmgr.err.notgoogle':'Please enter a CSS or font file URL (.woff2, .ttf)',
         'fmgr.err.exists':' is already added',
-        'fmgr.hint.suffix':'Only Google Fonts URLs are accepted.<br>Enter the URL in the format below.<br>(e.g. fonts.google.com/specimen/DotGothic16)',
+        'fmgr.hint.suffix':'Supports Google Fonts, cdnjs, self-hosted CSS/font URLs.<br>(e.g. fonts.google.com/specimen/DotGothic16)',
         'fmgr.toast.added':' added',
         'fmgr.toast.removed':' removed',
         'swp.adult_title':'Adult Content',
@@ -2809,8 +2857,11 @@
   function getStrength(pw) {
     if (!pw) return null;
     var len = pw.length;
-    if (len < 6)  return { level: 'weak',   labelKey: 'pws.strength_weak' };
-    if (len < 8)  return { level: 'medium', labelKey: 'pws.strength_medium' };
+    var hasUpper = /[A-Z]/.test(pw), hasLower = /[a-z]/.test(pw);
+    var hasNum   = /[0-9]/.test(pw), hasSymbol = /[^A-Za-z0-9]/.test(pw);
+    var variety  = [hasUpper, hasLower, hasNum, hasSymbol].filter(Boolean).length;
+    if (len < 6 || variety < 2) return { level: 'weak',   labelKey: 'pws.strength_weak' };
+    if (len < 10 || variety < 3) return { level: 'medium', labelKey: 'pws.strength_medium' };
     return { level: 'strong', labelKey: 'pws.strength_strong' };
   }
   function updatePwSaveBtn() {
@@ -2932,7 +2983,10 @@
   }
   function sanitizeFileName(name) {
     name = (name || 'memo.txt').trim().replace(/[/\\:*?"<>|]/g, '');
-    return name.toLowerCase().endsWith('.txt') ? name : name + '.txt';
+    var supported = ['.txt','.html','.htm','.json','.md','.css','.js','.xml','.csv','.py'];
+    var lower = name.toLowerCase();
+    for (var i = 0; i < supported.length; i++) { if (lower.endsWith(supported[i])) return name; }
+    return name + '.txt';
   }
 
   function doFileSave(withMeta) {
@@ -3045,17 +3099,20 @@
 
   function injectFontLink(url) {
     if (document.querySelector('link[data-custom-font][href="' + url + '"]')) return;
+    /* woff2/ttf/otf などの直接フォントファイルURL は @font-face で注入 */
+    if (/\.(woff2?|ttf|otf)(\?|$)/i.test(url)) {
+      var style = document.createElement('style');
+      style.dataset.customFont = '1';
+      style.dataset.customFontHref = url;
+      var name = parseFontNameFromUrl(url) || 'CustomFont';
+      style.textContent = '@font-face { font-family: "' + name + '"; src: url("' + url + '"); }';
+      document.head.appendChild(style);
+      return;
+    }
     var link = document.createElement('link');
     link.rel = 'stylesheet'; link.href = url;
     link.dataset.customFont = '1';
     document.head.appendChild(link);
-  }
-
-  function parseFontNameFromUrl(url) {
-    var m = url.match(/[?&]family=([^&:]+)/);
-    if (!m) return null;
-    var firstFamily = m[1].split('|')[0].split(';')[0];
-    return decodeURIComponent(firstFamily.replace(/\+/g, ' ')).trim();
   }
 
   /* fonts.google.com/specimen/FontName → googleapis CSS URL に自動変換 */
@@ -3115,6 +3172,19 @@
     });
   }
 
+  function parseFontNameFromUrl(url) {
+    /* Google Fonts CSS URL: ?family=FontName */
+    var m = url.match(/[?&]family=([^&:]+)/);
+    if (m) {
+      var firstFamily = m[1].split('|')[0].split(';')[0];
+      return decodeURIComponent(firstFamily.replace(/\+/g, ' ')).trim();
+    }
+    /* セルフホスト等: パス末尾のファイル名からフォント名を推測 */
+    var path = url.split('?')[0].split('#')[0];
+    var base = path.split('/').pop().replace(/\.(css|woff2?|ttf|otf)$/i, '').replace(/[-_]/g, ' ').trim();
+    return base || null;
+  }
+
   function addCustomFont() {
     var raw = ($('fontMgrUrl').value || '').trim();
     var errEl = $('fontMgrError');
@@ -3122,15 +3192,21 @@
 
     if (!raw) { errEl.textContent = window.i18n.t('fmgr.err.empty'); return; }
 
-    /* specimen URL を自動変換 (例: fonts.google.com/specimen/DotGothic16) */
+    /* https:// がなければ補完 */
     var url = raw;
+    if (url.indexOf('://') === -1) url = 'https://' + url;
+
+    /* specimen URL を自動変換 (例: fonts.google.com/specimen/DotGothic16) */
     if (url.indexOf('fonts.google.com/specimen/') !== -1) {
       var converted = specimenUrlToApiUrl(url);
       if (!converted) { errEl.textContent = window.i18n.t('fmgr.err.noname'); return; }
       url = converted;
     }
 
-    if (url.indexOf('fonts.googleapis.com') === -1) {
+    /* Google Fonts以外のCSS/フォントURLも受け付ける */
+    var isGoogleFonts = url.indexOf('fonts.googleapis.com') !== -1;
+    var isCssOrFont   = /\.(css|woff2?|ttf|otf)(\?|$)/i.test(url);
+    if (!isGoogleFonts && !isCssOrFont) {
       errEl.textContent = window.i18n.t('fmgr.err.notgoogle'); return;
     }
 
@@ -3143,7 +3219,7 @@
     }
 
     var cleanUrl = url;
-    if (cleanUrl.indexOf('display=') === -1) {
+    if (isGoogleFonts && cleanUrl.indexOf('display=') === -1) {
       cleanUrl += (cleanUrl.indexOf('?') === -1 ? '?' : '&') + 'display=swap';
     }
 
@@ -3167,9 +3243,10 @@
     customs = customs.filter(function(c) { if (c.name === name) { item = c; return false; } return true; });
     setCustomFonts(customs);
 
-    /* link タグを除去 */
+    /* link/style タグを除去 */
     if (item) {
       var el = document.querySelector('link[data-custom-font][href="' + item.url + '"]');
+      if (!el) el = document.querySelector('style[data-custom-font][data-custom-font-href="' + item.url + '"]');
       if (el) el.parentNode.removeChild(el);
     }
 
@@ -3228,14 +3305,9 @@
     }}
   ];
 
-  function openFileOrFolderChooser() {
-    openPanel('openChooserModal');
-  }
-  (function initOpenChooser() {
-
-    document.getElementById('ocFileBtn').onclick = async function() {
-      closePanel('openChooserModal');
-      if (window.showOpenFilePicker) {
+  function openFilePicker() {
+    if (window.showOpenFilePicker) {
+      (async function() {
         try {
           var handles = await window.showOpenFilePicker({ multiple: false, types: SUPPORTED_EXTS_PICKER });
           var handle = handles[0];
@@ -3245,58 +3317,33 @@
           state.curFile = file.name;
           edit.value = text;
           ActionHandlers.updateText(text);
-          saveCurrentPage();
-          render();
-          /* フォルダパネルが開いていれば閉じる */
+          saveCurrentPage(); render();
           if (window.closeFolderPanel) window.closeFolderPanel();
         } catch(e) {
           if (e.name !== 'AbortError') queueToast(window.i18n.t('toast.open_file_failed'), 2500);
         }
-      } else {
-        /* フォールバック */
-        var fi = $('fileInput'); try { fi.value = ''; } catch(e2) {} fi.click();
-      }
-    };
+      })();
+    } else {
+      var fi = $('fileInput'); try { fi.value = ''; } catch(e) {} fi.click();
+    }
+  }
 
+  function openFileOrFolderChooser() { openPanel('openChooserModal'); }
+  (function initOpenChooser() {
+    document.getElementById('ocFileBtn').onclick = function() { closePanel('openChooserModal'); openFilePicker(); };
     document.getElementById('ocFolderBtn').onclick = function() {
       closePanel('openChooserModal');
-      /* フォルダパネルの openDirectory を呼ぶ */
-      if (window.folderOpenDirectory) {
-        window.folderOpenDirectory();
-      } else {
-        queueToast(window.i18n.t('toast.folder_not_supported'), 3000);
-      }
+      if (window.folderOpenDirectory) { window.folderOpenDirectory(); }
+      else { queueToast(window.i18n.t('toast.folder_not_supported'), 3000); }
     };
-
-    document.getElementById('ocCancelBtn').onclick = function() {
-      closePanel('openChooserModal');
-    };
+    document.getElementById('ocCancelBtn').onclick = function() { closePanel('openChooserModal'); };
   })();
 
   var ActionHandlers = {
     new: function() { state.modalType = 'new'; state.isModalOpen = true; openPanel('confirmModal'); },
     open: function() {
       state.isModalOpen = false; state.isOptionsOpen = false; render();
-      if (window.showOpenFilePicker) {
-        (async function() {
-          try {
-            var handles = await window.showOpenFilePicker({ multiple: false, types: SUPPORTED_EXTS_PICKER });
-            var handle = handles[0];
-            var file = await handle.getFile();
-            var text = await file.text();
-            var edit = $('edit');
-            state.curFile = file.name;
-            edit.value = text;
-            ActionHandlers.updateText(text);
-            saveCurrentPage(); render();
-            if (window.closeFolderPanel) window.closeFolderPanel();
-          } catch(e) {
-            if (e.name !== 'AbortError') queueToast(window.i18n.t('toast.open_file_failed'), 2500);
-          }
-        })();
-      } else {
-        var fi = $('fileInput'); try { fi.value = ''; } catch(e) {} fi.click();
-      }
+      openFilePicker();
     },
     save: function() {
       state.text = $('edit').value;
@@ -3393,13 +3440,20 @@
   function showContextMenu(x, y, hasSel) {
     if (!contextMenu) contextMenu = $('contextMenu');
     var isMob = state.device === 'Mobile';
-    [$('ctxCopy'), $('ctxCut')].forEach(function(el) { if (el) el.style.display = (!isMob && hasSel) ? '' : 'none'; });
+    [$('ctxCopy'), $('ctxCut')].forEach(function(el) { if (el) el.style.display = hasSel ? '' : 'none'; });
     [$('ctxDivider'), $('ctxSearch'), $('ctxTrans'), $('ctxCompare'), $('ctxShare')].forEach(function(el) { if (el) el.style.display = hasSel ? '' : 'none'; });
     var ctxFind = $('ctxFind'); if (ctxFind) ctxFind.style.display = '';
     var ctxReplace = $('ctxReplace'); if (ctxReplace) ctxReplace.style.display = '';
     var paste = $('ctxPaste'), hasClip = (localStorage.getItem(CLIP_KEY) || '').length > 0;
     paste.style.display = (!isMob && !hasSel) ? '' : 'none';
     paste.style.color = hasClip ? '' : 'var(--dim)'; paste.style.cursor = hasClip ? '' : 'default'; paste.style.pointerEvents = hasClip ? '' : 'none';
+    /* システムクリップボードも非同期で確認して更新 */
+    if (!isMob && !hasSel && navigator.clipboard && navigator.clipboard.readText) {
+      navigator.clipboard.readText().then(function(text) {
+        var has = (text || '').length > 0;
+        paste.style.color = has ? '' : 'var(--dim)'; paste.style.cursor = has ? '' : 'default'; paste.style.pointerEvents = has ? '' : 'none';
+      }).catch(function() {});
+    }
     contextMenu.classList.remove('animating');
     contextMenu.style.left = x + 'px'; contextMenu.style.top = y + 'px'; contextMenu.style.display = 'block';
     var rect = contextMenu.getBoundingClientRect(), fx = x, fy = y;
@@ -3409,7 +3463,12 @@
     contextMenu.style.transformOrigin = ((fy !== y) ? 'bottom' : 'top') + ' ' + ((fx !== x) ? 'right' : 'left');
     void contextMenu.offsetWidth; contextMenu.classList.add('animating');
   }
-  function copyToClipboard(text, onDone) { localStorage.setItem(CLIP_KEY, text); if (onDone) onDone(); }
+  function copyToClipboard(text, onDone) {
+    localStorage.setItem(CLIP_KEY, text);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() { if (onDone) onDone(); }, function() { if (onDone) onDone(); });
+    } else { if (onDone) onDone(); }
+  }
   window.ctxCopyText  = function() { if (!selectedText) { hideContextMenu(); return; } var t = selectedText; hideContextMenu(); copyToClipboard(t, function() { queueToast(window.i18n.t('toast.copied'), 1000); }); };
   window.ctxOpenSearch = function() {
     hideContextMenu();
@@ -3430,9 +3489,15 @@
     copyToClipboard(t, function() { edit.setRangeText('', s, e, 'start'); ActionHandlers.updateText(edit.value); scheduleAutoSave(); render(); selectedText = ''; queueToast(window.i18n.t('toast.cut_done'), 1000); });
   };
   window.ctxPasteText = function() {
-    var text = localStorage.getItem(CLIP_KEY) || ''; if (!text) { hideContextMenu(); return; }
-    var edit = $('edit'); edit.setRangeText(text, edit.selectionStart, edit.selectionEnd, 'end');
-    ActionHandlers.updateText(edit.value); scheduleAutoSave(); render(); hideContextMenu();
+    hideContextMenu();
+    function doInsert(text) {
+      if (!text) return;
+      var edit = $('edit'); edit.setRangeText(text, edit.selectionStart, edit.selectionEnd, 'end');
+      ActionHandlers.updateText(edit.value); scheduleAutoSave(); render();
+    }
+    if (navigator.clipboard && navigator.clipboard.readText) {
+      navigator.clipboard.readText().then(function(text) { doInsert(text || localStorage.getItem(CLIP_KEY) || ''); }, function() { doInsert(localStorage.getItem(CLIP_KEY) || ''); });
+    } else { doInsert(localStorage.getItem(CLIP_KEY) || ''); }
   };
 
   /* ---- 文字置換パネル ---- */
@@ -3479,16 +3544,16 @@
         var count = 0;
         var idx = text.indexOf(searchVal);
         while (idx !== -1) { count++; idx = text.indexOf(searchVal, idx + 1); }
-        if (count === 0) { queueToast('一致する文字が見つかりません', 1500); return; }
+        if (count === 0) { queueToast(window.i18n.t('rp.toast.notfound'), 1500); return; }
         edit.value = text.split(searchVal).join(replaceVal);
         ActionHandlers.updateText(edit.value); scheduleAutoSave(); render();
-        queueToast(count + '件置換しました', 2000);
+        queueToast(window.i18n.lang() === 'en' ? count + window.i18n.t('rp.toast.replaced') : count + window.i18n.t('rp.toast.replaced'), 2000);
         closePanel('replacePanel');
       } else {
         var start = edit.selectionStart;
         var pos = text.indexOf(searchVal, start);
         if (pos === -1) pos = text.indexOf(searchVal, 0);
-        if (pos === -1) { queueToast('一致する文字が見つかりません', 1500); return; }
+        if (pos === -1) { queueToast(window.i18n.t('rp.toast.notfound'), 1500); return; }
         edit.setRangeText(replaceVal, pos, pos + searchVal.length, 'end');
         edit.setSelectionRange(pos + replaceVal.length, pos + replaceVal.length);
         edit.focus();
@@ -4100,7 +4165,7 @@
   ═══════════════════════════════════════════════ */
   var autoSaveTimer     = null;
   var autoSaveIsInterval = false;
-  var AUTO_SAVE_INTERVAL   = 2 * 60 * 1000;
+  var AUTO_SAVE_INTERVAL   = parseInt(localStorage.getItem('autoSaveInterval') || '120') * 1000;
   var AUTOSAVE_HIST_PREFIX = 'autosave_hist_';
   var AUTOSAVE_MAX         = 10;
 
@@ -4246,7 +4311,7 @@
     var newId  = genPageId();
     var penSlideIn = window.penPageSwitch ? window.penPageSwitch(fromId, newId, 'right') : null;
     saveCurrentPage();
-    var np = { id: newId, title: window.i18n.t('page.default') + (pages.length + 1), text: '',
+    var np = { id: newId, title: window.i18n.t('page.default') + (realCount + 1), text: '',
                font: $('fSel').value || 'Arial', size: parseInt($('sSel').value) || 18, titleLocked: false };
     pages.push(np);
     curPageIdx = pages.length - 1;
@@ -5429,6 +5494,15 @@
 
     var autoSaveToggle = $('autoSaveToggle');
     autoSaveToggle.checked = state.autoSave;
+
+    var aiSel = $('autoSaveIntervalSel');
+    aiSel.value = localStorage.getItem('autoSaveInterval') || '120';
+    aiSel.disabled = !state.autoSave;
+    aiSel.onchange = function() {
+      localStorage.setItem('autoSaveInterval', aiSel.value);
+      AUTO_SAVE_INTERVAL = parseInt(aiSel.value) * 1000;
+      if (state.autoSave) { clearAutoSaveTimer(); scheduleAutoSave(); }
+    };
     if (state.autoSave) {
       var saved = localStorage.getItem('autosave_text'), savedFile = localStorage.getItem('autosave_file');
       var savedFont = localStorage.getItem('autosave_font'), savedSize = localStorage.getItem('autosave_size');
@@ -5443,6 +5517,7 @@
     }
     autoSaveToggle.onchange = function() {
       state.autoSave = autoSaveToggle.checked; localStorage.setItem('autoSave', state.autoSave);
+      aiSel.disabled = !state.autoSave;
       if (!state.autoSave) clearAutoSaveTimer(); else { addHistoryEntry(); scheduleAutoSave(); }
     };
     $('clearAutoSaveBtn').onclick = function() {
@@ -5791,10 +5866,15 @@
         hideOssModal();
       }
       if ((e.ctrlKey || e.metaKey) && e.key === 'f') { e.preventDefault(); ActionHandlers.toggleSearch(); render(); }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'h') { e.preventDefault(); window.ctxOpenReplace && window.ctxOpenReplace(); }
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); addHistoryEntry(); saveCurrentPage(); }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'm') { e.preventDefault(); ActionHandlers.new(); render(); }
+      if ((e.ctrlKey || e.metaKey) && e.key === '\\') { e.preventDefault(); ActionHandlers.toggle(); render(); }
     });
 
     var ctxJustOpened = false;
     edit.addEventListener('contextmenu', function(e) {
+      if (state.device === 'Mobile') return; /* モバイルはOSネイティブメニューに委ねる */
       e.preventDefault();
       var text = window.getSelection().toString().trim();
       selectedText = text;
