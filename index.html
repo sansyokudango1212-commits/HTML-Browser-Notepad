@@ -1925,8 +1925,9 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 2603072245</span>
-      <span>Version 26.2.17</span>
+      <span>Build 2603072330
+      </span>
+      <span>Version 26.2.17.1</span>
       <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_Gemini2.5Pro<br>Trae_Chat GPT5.2beta<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Tikuwa_Nerimono1</span>
     </div>
   </div>
@@ -3469,7 +3470,7 @@
       navigator.clipboard.writeText(text).then(function() { if (onDone) onDone(); }, function() { if (onDone) onDone(); });
     } else { if (onDone) onDone(); }
   }
-  window.ctxCopyText  = function() { if (!selectedText) { hideContextMenu(); return; } var t = selectedText; hideContextMenu(); copyToClipboard(t, function() { queueToast(window.i18n.t('toast.copied'), 1000); }); };
+  window.ctxCopyText  = function() { if (!selectedText) { hideContextMenu(); return; } var t = selectedText; hideContextMenu(); copyToClipboard(t, function() { }); };
   window.ctxOpenSearch = function() {
     hideContextMenu();
     if (!state.isSearchOpen) { state.isSearchOpen = true; openPanel('searchPanel'); doSearch(0); }
@@ -3486,7 +3487,7 @@
   window.ctxCutText   = function() {
     if (!selectedText) { hideContextMenu(); return; }
     var edit = $('edit'), s = edit.selectionStart, e = edit.selectionEnd, t = selectedText; hideContextMenu();
-    copyToClipboard(t, function() { edit.setRangeText('', s, e, 'start'); ActionHandlers.updateText(edit.value); scheduleAutoSave(); render(); selectedText = ''; queueToast(window.i18n.t('toast.cut_done'), 1000); });
+    copyToClipboard(t, function() { edit.setRangeText('', s, e, 'start'); ActionHandlers.updateText(edit.value); scheduleAutoSave(); render(); selectedText = ''; });
   };
   window.ctxPasteText = function() {
     hideContextMenu();
