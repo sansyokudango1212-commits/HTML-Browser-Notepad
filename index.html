@@ -287,6 +287,80 @@
       transition: background 0.18s, transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
     }
     #clearAutoSaveBtn:active { transform: scale(0.92); background: rgba(229,57,53,0.22); }
+
+    /* ロールバックモーダル */
+    #rollbackModal {
+      width: min(360px, calc(100vw - 32px));
+      max-height: 80vh; display: flex; flex-direction: column;
+      padding: 24px 18px 18px;
+      border-radius: 22px; z-index: 220; box-shadow: 0 16px 50px rgba(0,0,0,0.35);
+    }
+    #rollbackModal .rb-title {
+      font-size: 14px; font-weight: 200; text-align: center;
+      margin-bottom: 4px; color: var(--text);
+    }
+    #rollbackModal .rb-subtitle {
+      font-size: 11px; color: var(--dim); text-align: center;
+      margin-bottom: 14px;
+    }
+    #rollbackList {
+      flex: 1; overflow-y: auto; min-height: 0;
+    }
+    #rollbackList::-webkit-scrollbar { width: 4px; }
+    #rollbackList::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    .rb-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 10px; border-radius: 12px;
+      border: 1px solid transparent;
+      margin-bottom: 6px;
+      transition: background 0.12s, border-color 0.12s;
+      cursor: pointer;
+    }
+    .rb-item:hover { background: var(--hover); border-color: rgba(255,255,255,0.1); }
+    .rb-item-info { flex: 1; min-width: 0; }
+    .rb-item-time {
+      font-size: 12px; color: var(--accent); margin-bottom: 3px;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .rb-item-badge {
+      font-size: 9px; padding: 1px 6px; border-radius: 4px;
+      background: rgba(var(--accent-rgb),0.18); color: var(--accent);
+    }
+    .rb-item-preview {
+      font-size: 11px; color: var(--dim);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .rb-del-btn {
+      width: 24px; height: 24px; border-radius: 7px; border: none; flex-shrink: 0;
+      background: rgba(229,57,53,0.1); color: #e57373; cursor: pointer;
+      font-size: 14px; display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.12s, background 0.12s, transform 0.1s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .rb-item:hover .rb-del-btn { opacity: 1; }
+    .rb-del-btn:hover  { background: rgba(229,57,53,0.25); }
+    .rb-del-btn:active { transform: scale(0.86); }
+    .rb-empty {
+      text-align: center; color: var(--dim); font-size: 12px;
+      padding: 32px 0;
+      animation: rbEmptyFadeIn 0.3s cubic-bezier(0.4,0,0.2,1) both;
+    }
+    @keyframes rbEmptyFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    #rollbackModal .rb-footer {
+      border-top: 1px solid rgba(128,128,128,0.12);
+      padding-top: 12px; margin-top: 8px;
+      display: flex; gap: 8px;
+    }
+    #rollbackModal .rb-footer button {
+      flex: 1; padding: 9px 0; border-radius: 12px; border: none;
+      cursor: pointer; font-size: 13px; font-family: inherit;
+      transition: filter 0.15s, transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #rollbackModal .rb-footer button:active { transform: scale(0.95); }
+    #rbCloseBtn { background: rgba(255,255,255,0.08); color: var(--text); }
+    #rbClearBtn { background: rgba(229,57,53,0.14); color: #e57373; border: 1px solid rgba(229,57,53,0.28) !important; }
     .options-version {
       font-size: 10px; color: var(--dim); justify-content: center;
       border-top: 1px solid rgba(128,128,128,0.1); padding-top: 8px; margin-top: 8px;
@@ -1680,6 +1754,18 @@
     </div>
   </div>
 
+  <!-- ロールバックモーダル -->
+  <div id="rollbackModal" class="glass panel-modal" style="z-index:220;">
+    <button class="close-dot" id="rbCloseBtn2"></button>
+    <div class="rb-title" data-i18n="rb.title">自動保存の履歴</div>
+    <div class="rb-subtitle" data-i18n="rb.subtitle">最大10件まで保持されます</div>
+    <div id="rollbackList"></div>
+    <div class="rb-footer">
+      <button id="rbCloseBtn" data-i18n="rb.close">閉じる</button>
+      <button id="rbClearBtn" data-i18n="rb.clear">履歴を消去</button>
+    </div>
+  </div>
+
   <div id="appContent">
   <header class="glass">
     <div id="headerTopBar">
@@ -1689,6 +1775,7 @@
     <button onclick="act('open')"             data-i18n="hdr.open">開く</button>
     <button onclick="act('save')"             data-i18n="hdr.save">保存</button>
     <button id="headerShareBtn" onclick="act('share')"          data-i18n="hdr.share">共有</button>
+    <button id="headerHistoryBtn" onclick="openRollbackModalGlobal()" data-i18n="hdr.history">履歴</button>
     <button id="headerPageBtn"  onclick="act('togglePagePanel')" data-i18n="hdr.pages">ページ</button>
     <button onclick="act('toggle')"           data-i18n="hdr.settings">設定</button>
   </header>
@@ -1739,6 +1826,9 @@
     <div>
       <span class="label" data-i18n="opt.autosave">自動保存</span>
       <label class="ios-toggle"><input type="checkbox" id="autoSaveToggle"><span class="ios-toggle-slider"></span></label>
+      <button id="rollbackBtn" title="自動保存の履歴" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:8px;cursor:pointer;padding:0 7px;height:26px;display:inline-flex;align-items:center;justify-content:center;margin-right:2px;transition:background 0.15s,transform 0.12s cubic-bezier(0.34,1.56,0.64,1);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);display:block;"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+      </button>
       <button id="clearAutoSaveBtn" title="保存済みデータを消去">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#e53935;display:block;">
           <polyline points="3 6 5 6 21 6"/>
@@ -1793,8 +1883,8 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 2603062348</span>
-      <span>Version 26.2.15</span>
+      <span>Build 2603071640</span>
+      <span>Version 26.2.16</span>
       <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_Gemini2.5Pro<br>Trae_Chat GPT5.2beta<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Tikuwa_Nerimono1</span>
     </div>
   </div>
@@ -2090,7 +2180,7 @@
     var dict = {
       ja: {
         'hdr.new':'新規','hdr.open':'開く','hdr.save':'保存',
-        'hdr.share':'共有','hdr.pages':'ページ','hdr.settings':'設定',
+        'hdr.share':'共有','hdr.history':'履歴','hdr.pages':'ページ','hdr.settings':'設定',
         'opt.font':'フォント','opt.size':'サイズ','opt.search':'検索',
         'opt.translate':'翻訳','opt.theme':'テーマ','opt.autosave':'自動保存',
         'opt.save':'保存','opt.page':'ページ','opt.pageview':'ページ表示',
@@ -2189,6 +2279,13 @@
         'toast.memo_returned':'メモ帳に戻りました',
         'toast.autosave_restored':'自動保存データを復元しました',
         'toast.autosave_cleared':'自動保存データを消去しました',
+        'rb.title':'自動保存の履歴',
+        'rb.subtitle':'最大10件まで保持されます',
+        'rb.close':'閉じる',
+        'rb.clear':'すべて削除',
+        'rb.empty':'履歴がありません',
+        'rb.restored':'履歴から復元しました',
+        'rb.chars':'文字',
         'toast.passkey_require_password':'先にパスワードを登録してください',
         'toast.passkey_unlinked':'パスキー認証の連携を解除しました',
         'toast.font_size_prefix':'フォントサイズ: ',
@@ -2227,7 +2324,7 @@
       },
       en: {
         'hdr.new':'New','hdr.open':'Open','hdr.save':'Save',
-        'hdr.share':'Share','hdr.pages':'Pages','hdr.settings':'Settings',
+        'hdr.share':'Share','hdr.history':'History','hdr.pages':'Pages','hdr.settings':'Settings',
         'opt.font':'Font','opt.size':'Size','opt.search':'Search',
         'opt.translate':'Translate','opt.theme':'Theme','opt.autosave':'Auto Save',
         'opt.save':'Save','opt.page':'Pages','opt.pageview':'Page View',
@@ -2326,6 +2423,13 @@
         'toast.memo_returned':'Returned to memo',
         'toast.autosave_restored':'Autosave restored',
         'toast.autosave_cleared':'Autosave cleared',
+        'rb.title':'Autosave History',
+        'rb.subtitle':'Up to 10 entries are kept',
+        'rb.close':'Close',
+        'rb.clear':'Delete All',
+        'rb.empty':'No history yet',
+        'rb.restored':'Restored from history',
+        'rb.chars':'chars',
         'toast.passkey_require_password':'Please register a password first',
         'toast.passkey_unlinked':'Passkey link removed',
         'toast.font_size_prefix':'Font size: ',
@@ -2833,6 +2937,7 @@
 
   function doFileSave(withMeta) {
     try {
+      addHistoryEntry();
       var text = $('edit').value;
       var fullText = withMeta
         ? '##FONT:"' + $('fSel').value + '"\n##SIZE:' + $('sSel').value + '\n' + text
@@ -3990,24 +4095,65 @@
   }
   function clearSearchHighlight() { searchMatches = []; searchIndex = 0; var m = $('searchHighlightMirror'); if (m) m.innerHTML = ''; }
 
-  var autoSaveTimer = null, autoSaveIsInterval = false;
-  var AUTO_SAVE_INTERVAL = 2 * 60 * 1000;
+  /* ═══════════════════════════════════════════════
+     自動保存履歴（ページ別・最大10件）
+  ═══════════════════════════════════════════════ */
+  var autoSaveTimer     = null;
+  var autoSaveIsInterval = false;
+  var AUTO_SAVE_INTERVAL   = 2 * 60 * 1000;
+  var AUTOSAVE_HIST_PREFIX = 'autosave_hist_';
+  var AUTOSAVE_MAX         = 10;
 
+  /* ── データ操作 ── */
+  function getCurrentPageId() {
+    return (pages && pages[curPageIdx]) ? pages[curPageIdx].id : 'default';
+  }
+  function getHistKey(pageId) {
+    return AUTOSAVE_HIST_PREFIX + (pageId || 'default');
+  }
+  function getAutoSaveHistory(pageId) {
+    try { return JSON.parse(localStorage.getItem(getHistKey(pageId)) || '[]'); } catch(e) { return []; }
+  }
+  function setAutoSaveHistory(pageId, arr) {
+    try { localStorage.setItem(getHistKey(pageId), JSON.stringify(arr)); } catch(e) {}
+  }
+  function addHistoryEntry() {
+    var edit = $('edit');
+    if (!edit) return;
+    var text = edit.value;
+    if (!text || !text.trim()) return;
+    var pageId = getCurrentPageId();
+    var hist   = getAutoSaveHistory(pageId);
+    if (hist.length > 0 && hist[0].text === text) return;
+    hist.unshift({
+      ts:   Date.now(),
+      text: text,
+      file: state.curFile,
+      font: $('fSel') ? $('fSel').value : 'Arial',
+      size: $('sSel') ? $('sSel').value : '18'
+    });
+    if (hist.length > AUTOSAVE_MAX) hist.length = AUTOSAVE_MAX;
+    setAutoSaveHistory(pageId, hist);
+    /* 後方互換キー（起動時復元用）。pageIdも一緒に保存してマイグレーション誤混入を防ぐ */
+    localStorage.setItem('autosave_text',   text);
+    localStorage.setItem('autosave_pageid', pageId);
+    localStorage.setItem('autosave_file',   state.curFile);
+    localStorage.setItem('autosave_font',   ($('fSel') ? $('fSel').value : 'Arial'));
+    localStorage.setItem('autosave_size',   ($('sSel') ? $('sSel').value : '18'));
+  }
+
+  /* ── タイマー ── */
   function clearAutoSaveTimer() {
     if (autoSaveTimer === null) return;
-    if (autoSaveIsInterval) clearInterval(autoSaveTimer); else clearTimeout(autoSaveTimer);
+    (autoSaveIsInterval ? clearInterval : clearTimeout)(autoSaveTimer);
     autoSaveTimer = null; autoSaveIsInterval = false;
   }
   function doAutoSave() {
-    if (!state.autoSave) return;
-    if (window.folderFileActive) return;
-    localStorage.setItem('autosave_text', $('edit').value);
-    localStorage.setItem('autosave_file', state.curFile);
-    localStorage.setItem('autosave_font', $('fSel') ? $('fSel').value : 'Arial');
-    localStorage.setItem('autosave_size', $('sSel') ? $('sSel').value : '18');
+    if (!state.autoSave || window.folderFileActive) return;
+    addHistoryEntry();
     saveCurrentPage();
-    var locale = (window.i18n.lang() === 'en') ? 'en-US' : 'ja-JP';
-    queueToast(window.i18n.t('toast.autosave_prefix') + new Date().toLocaleTimeString(locale,{hour:'2-digit',minute:'2-digit'}), 2000);
+    var locale = window.i18n.lang() === 'en' ? 'en-US' : 'ja-JP';
+    queueToast(window.i18n.t('toast.autosave_prefix') + new Date().toLocaleTimeString(locale, {hour:'2-digit', minute:'2-digit'}), 2000);
   }
   function scheduleAutoSave() {
     if (!state.autoSave) return; clearAutoSaveTimer(); autoSaveIsInterval = false;
@@ -4075,6 +4221,7 @@
     var fromId = pages[curPageIdx] ? pages[curPageIdx].id : null;
     var penSlideIn = window.penPageSwitch ? window.penPageSwitch(fromId, pages[idx].id, dir) : null;
     saveCurrentPage();
+    addHistoryEntry();
     curPageIdx = idx;
     localStorage.setItem(PAGES_CUR, pages[curPageIdx].id);
     var p = pages[curPageIdx], fSel = $('fSel'), sSel = $('sSel');
@@ -5296,13 +5443,192 @@
     }
     autoSaveToggle.onchange = function() {
       state.autoSave = autoSaveToggle.checked; localStorage.setItem('autoSave', state.autoSave);
-      if (!state.autoSave) clearAutoSaveTimer(); else scheduleAutoSave();
+      if (!state.autoSave) clearAutoSaveTimer(); else { addHistoryEntry(); scheduleAutoSave(); }
     };
     $('clearAutoSaveBtn').onclick = function() {
       localStorage.removeItem('autosave_text'); localStorage.removeItem('autosave_file');
       localStorage.removeItem('autosave_font'); localStorage.removeItem('autosave_size');
+      setAutoSaveHistory(getCurrentPageId(), []);
       queueToast(window.i18n.t('toast.autosave_cleared'), 2000);
     };
+
+    /* ═══════════════════════════════════════════════
+       ロールバックモーダル
+    ═══════════════════════════════════════════════ */
+    var rbModal   = $('rollbackModal');
+    var rbOverlay = null;
+
+    /* ── 開閉 ── */
+    function openRollbackModal() {
+      renderRollbackList();
+      if (!rbOverlay) {
+        rbOverlay = document.createElement('div');
+        rbOverlay.style.cssText = 'position:fixed;inset:0;z-index:215;background:rgba(0,0,0,0.35);'
+          + 'backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);opacity:0;transition:opacity 0.22s;';
+        rbOverlay.addEventListener('click', closeRollbackModal);
+        document.body.appendChild(rbOverlay);
+      }
+      rbOverlay.style.display = '';
+      requestAnimationFrame(function() { rbOverlay.style.opacity = '1'; });
+      openPanel('rollbackModal');
+    }
+    function closeRollbackModal() {
+      closePanel('rollbackModal');
+      if (!rbOverlay) return;
+      rbOverlay.style.opacity = '0';
+      setTimeout(function() { if (rbOverlay) rbOverlay.style.display = 'none'; }, 250);
+    }
+    window.openRollbackModalGlobal = openRollbackModal;
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && rbModal.classList.contains('show')) closeRollbackModal();
+    });
+
+    /* ── モーダル高さアニメ ── */
+    function animateModalHeight(beforeH, renderFn) {
+      rbModal.style.cssText += ';transition:none;height:auto;overflow:hidden;';
+      renderFn();
+      var afterH = rbModal.offsetHeight;
+      rbModal.style.height = beforeH + 'px';
+      requestAnimationFrame(function() { requestAnimationFrame(function() {
+        rbModal.style.transition = 'height 0.35s cubic-bezier(0.34,1.1,0.64,1)';
+        rbModal.style.height     = afterH + 'px';
+        setTimeout(function() {
+          rbModal.style.height = rbModal.style.overflow = rbModal.style.transition = '';
+        }, 380);
+      }); });
+    }
+
+    /* ── アイテム削除アニメ（右スライド→コラプス） ── */
+    function animateItemDelete(item, onDone) {
+      var snapH  = item.offsetHeight;
+      var snapMB = parseInt(getComputedStyle(item).marginBottom) || 6;
+
+      /* wrapperで高さを管理し、itemを右スライドアウト */
+      var wrapper = document.createElement('div');
+      wrapper.style.cssText = 'overflow:hidden;max-height:' + snapH + 'px;margin-bottom:' + snapMB + 'px;';
+      item.parentNode.insertBefore(wrapper, item);
+      wrapper.appendChild(item);
+      item.style.marginBottom = '0';
+      item.style.transition   = 'transform 0.2s cubic-bezier(0.4,0,1,1), opacity 0.2s cubic-bezier(0.4,0,1,1)';
+      requestAnimationFrame(function() { requestAnimationFrame(function() {
+        item.style.transform = 'translateX(130%)';
+        item.style.opacity   = '0';
+      }); });
+
+      /* スライド完了後にwrapperをコラプス */
+      setTimeout(function() {
+        wrapper.style.transition = 'max-height 0.22s cubic-bezier(0.4,0,0.2,1), margin-bottom 0.22s cubic-bezier(0.4,0,0.2,1)';
+        requestAnimationFrame(function() { requestAnimationFrame(function() {
+          wrapper.style.maxHeight = wrapper.style.marginBottom = '0';
+        }); });
+        setTimeout(function() { wrapper.remove(); onDone(); }, 240);
+      }, 210);
+    }
+
+    /* ── ユーティリティ ── */
+    function escHtml(s) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    /* ── リスト描画 ── */
+    function renderRollbackList() {
+      var list      = $('rollbackList');
+      var pageId    = getCurrentPageId();
+      var pageTitle = (pages && pages[curPageIdx]) ? pages[curPageIdx].title : '';
+      var hist      = getAutoSaveHistory(pageId);
+      var lang      = window.i18n.lang();
+      var locale    = lang === 'en' ? 'en-US' : 'ja-JP';
+      list.innerHTML = '';
+
+      if (!hist.length) {
+        list.style.overflowY = 'hidden';
+        var em = document.createElement('div');
+        em.className   = 'rb-empty';
+        em.textContent = window.i18n.t('rb.empty');
+        list.appendChild(em);
+        return;
+      }
+
+      list.style.overflowY = 'auto';
+      hist.forEach(function(entry, idx) {
+        var item    = document.createElement('div');
+        item.className = 'rb-item';
+        var dt      = new Date(entry.ts);
+        var timeStr = dt.toLocaleDateString(locale, {month:'numeric', day:'numeric'}) + ' '
+                    + dt.toLocaleTimeString(locale, {hour:'2-digit', minute:'2-digit'});
+        var preview = (entry.text || '').replace(/\s+/g, ' ').trim().slice(0, 60) || '—';
+        var badge   = idx === 0
+          ? '<span class="rb-item-badge">' + (lang === 'en' ? 'Latest' : '最新') + '</span>'
+          : '';
+        item.innerHTML =
+          '<div class="rb-item-info">'
+          + '<div class="rb-item-time">⏱ ' + timeStr + badge + '</div>'
+          + '<div class="rb-item-preview">' + escHtml(preview) + '</div>'
+          + '</div>'
+          + '<button class="rb-del-btn" title="' + (lang === 'en' ? 'Delete' : '削除') + '">✕</button>';
+
+        item.addEventListener('click', function() { applyRollbackEntry(entry); closeRollbackModal(); });
+
+        item.querySelector('.rb-del-btn').addEventListener('click', function(e) {
+          e.stopPropagation();
+          var deletedTime = new Date(entry.ts).toLocaleTimeString(locale, {hour:'2-digit', minute:'2-digit'});
+          animateItemDelete(item, function() {
+            var h = getAutoSaveHistory(pageId);
+            h.splice(idx, 1);
+            setAutoSaveHistory(pageId, h);
+            queueToast(deletedTime + 'の「' + pageTitle + '」の履歴を削除しました', 2000);
+            h.length === 0 ? animateModalHeight(rbModal.offsetHeight, renderRollbackList) : renderRollbackList();
+          });
+        });
+
+        list.appendChild(item);
+      });
+    }
+
+    /* ── 復元適用 ── */
+    function applyRollbackEntry(entry) {
+      var edit = $('edit');
+      if (entry.file) state.curFile = entry.file;
+      if (entry.font) updateSelectValue('fSel', entry.font);
+      if (entry.size) updateSelectValue('sSel', normalizeSize(parseInt(entry.size) || 18));
+      applyStyles();
+      edit.value = entry.text || '';
+      ActionHandlers.updateText(edit.value);
+      render();
+      queueToast(window.i18n.t('rb.restored'), 2500);
+    }
+
+    /* ── ボタン ── */
+    $('rollbackBtn').onclick = openRollbackModal;
+    $('rbCloseBtn').onclick  = closeRollbackModal;
+    $('rbCloseBtn2').onclick = closeRollbackModal;
+    $('rbClearBtn').onclick  = function() {
+      var beforeH = rbModal.offsetHeight;
+      ['autosave_text','autosave_file','autosave_font','autosave_size'].forEach(function(k) { localStorage.removeItem(k); });
+      setAutoSaveHistory(getCurrentPageId(), []);
+      animateModalHeight(beforeH, renderRollbackList);
+      queueToast(window.i18n.t('toast.autosave_cleared'), 2000);
+    };
+
+    /* ── 起動時マイグレーション（旧形式 → ページ別キー） ── */
+    (function() {
+      var oldText   = localStorage.getItem('autosave_text');
+      var oldPageId = localStorage.getItem('autosave_pageid');
+      if (oldText) {
+        var targetId = oldPageId || getCurrentPageId();
+        if (!oldPageId) localStorage.setItem('autosave_pageid', targetId);
+        var hist = getAutoSaveHistory(targetId);
+        if (!hist.length || hist[0].text !== oldText) {
+          hist.unshift({ ts: Date.now() - 1000, text: oldText,
+            file: localStorage.getItem('autosave_file') || '',
+            font: localStorage.getItem('autosave_font') || 'Arial',
+            size: localStorage.getItem('autosave_size') || '18' });
+          if (hist.length > AUTOSAVE_MAX) hist.length = AUTOSAVE_MAX;
+          setAutoSaveHistory(targetId, hist);
+        }
+      }
+      setTimeout(addHistoryEntry, 500);
+    })();
 
     var saveMetaToggle = $('saveMetaToggle');
     saveMetaToggle.checked = state.saveMeta;
