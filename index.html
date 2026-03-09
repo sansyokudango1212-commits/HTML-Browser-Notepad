@@ -1147,6 +1147,139 @@
     body.no-anim #replacePanel,
     body.no-anim #devMessageModal, body.no-anim .modal { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: rgba(30,30,30,0.97) !important; }
 
+    /* ── 写真レイヤー ── */
+    
+
+    /* ドロップ受付時のハイライト */
+    #photoLayer.drag-over::after {
+      content: '';
+      position: absolute; inset: 0;
+      border: 2px dashed rgba(var(--accent-rgb), 0.6);
+      border-radius: 12px;
+      background: rgba(var(--accent-rgb), 0.06);
+      pointer-events: none;
+      z-index: 200;
+    }
+    #photoLayer {
+      position: fixed; inset: 0; z-index: 105;
+      pointer-events: none; overflow: hidden;
+    }
+    /* 写真ウィンドウ全体 */
+    .photo-item {
+      position: absolute;
+      pointer-events: auto;
+      -webkit-user-select: none; user-select: none;
+      touch-action: none;
+      border-radius: 10px;
+      overflow: visible;
+      /* ヘッダーと同じ：padding-top アニメーションで上に空間を作る */
+      transition: opacity 0.22s cubic-bezier(0.4,0,1,1),
+                  transform 0.22s cubic-bezier(0.4,0,1,1),
+                  padding-top 0.18s cubic-bezier(0.4,0,0.2,1);
+    }
+    /* ホバーor掴んだとき：上に26px空間が生まれ、画像が下へ押し出される */
+    .photo-item:hover,
+    .photo-item.photo-grabbed {
+      padding-top: 26px;
+    }
+    .photo-item.photo-exiting {
+      opacity: 0 !important;
+      transform: scale(0.94) !important;
+      pointer-events: none;
+    }
+
+    /* タイトルバー：画像幅のみ */
+    .photo-titlebar {
+      position: absolute;
+      left: 0; right: 0;
+      top: 0;
+      height: 26px;
+      border-radius: 8px 8px 0 0;
+      background: rgba(36,36,36,0.80);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-bottom: none;
+      display: flex; align-items: center; padding: 0 8px;
+      cursor: grab;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.08s cubic-bezier(0.4,0,0.2,1);
+      z-index: 4;
+    }
+    /* 中央ピル：flex で正確に中央配置 */
+    .photo-titlebar::after {
+      content: '';
+      display: block;
+      width: 28px; height: 3px; border-radius: 2px;
+      background: rgba(255,255,255,0.4);
+      margin: 0 auto;
+      flex: 1;
+      /* flexアイテムとして中央に表示するためmax-widthで幅固定 */
+      max-width: 28px;
+      pointer-events: none;
+    }
+    body.light-mode .photo-titlebar { background: rgba(228,225,220,0.88); border-color: rgba(0,0,0,0.14); }
+    body.light-mode .photo-titlebar::after { background: rgba(0,0,0,0.28); }
+    .photo-item:hover .photo-titlebar,
+    .photo-item.photo-grabbed .photo-titlebar {
+      opacity: 1; pointer-events: auto;
+      transition: opacity 0.18s cubic-bezier(0.4,0,0.2,1) 0.18s;
+    }
+    .photo-titlebar:active { cursor: grabbing; }
+
+    
+
+    /* タイトルバー内の赤ボタン */
+    .photo-close-dot {
+      width: 13px; height: 13px; border-radius: 50%; flex-shrink: 0;
+      background: radial-gradient(circle at 30% 30%, #ff6b6b, #e53935);
+      border: 1px solid rgba(0,0,0,0.2);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.22);
+      cursor: pointer; padding: 0;
+      transition: filter 0.15s, transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .photo-close-dot:hover  { filter: brightness(1.18); }
+    .photo-close-dot:active { transform: scale(0.88); }
+
+    /* 画像部分：padding-topで押し出されるのでtop指定不要 */
+    .photo-img-wrap {
+      width: 100%; height: 100%;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.0);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.28);
+      transition: border-color 0.18s, box-shadow 0.18s, border-radius 0.16s;
+      background: #1a1a1a;
+    }
+    body.light-mode .photo-img-wrap { background: #e0deda; }
+    .photo-item:hover .photo-img-wrap,
+    .photo-item.photo-grabbed .photo-img-wrap {
+      border-color: rgba(255,255,255,0.18);
+      border-radius: 0 0 10px 10px;
+      box-shadow: 0 6px 32px rgba(0,0,0,0.38);
+    }
+    body.light-mode .photo-item:hover .photo-img-wrap,
+    body.light-mode .photo-item.photo-grabbed .photo-img-wrap {
+      border-color: rgba(0,0,0,0.14);
+    }
+    .photo-item img {
+      display: block; width: 100%; height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    /* リサイズハンドル */
+    .photo-resize-handle {
+      position: absolute; bottom: -6px; right: -6px;
+      width: 18px; height: 18px; border-radius: 4px;
+      background: rgba(255,255,255,0.22); border: 1px solid rgba(255,255,255,0.5);
+      cursor: nwse-resize; z-index: 3;
+      opacity: 0; transition: opacity 0.15s;
+    }
+    .photo-item:hover .photo-resize-handle,
+    .photo-item.photo-grabbed .photo-resize-handle { opacity: 1; }
+    body.light-mode .photo-resize-handle { background: rgba(0,0,0,0.16); border-color: rgba(0,0,0,0.32); }
+
     #pageSwipeTrigger   { position: fixed; right: 0; top: 0; width: 24px; height: 100%; z-index: 300; }
 
     /* Right Page Panel Pull-Tab */
@@ -1862,11 +1995,11 @@
       <span class="label" data-i18n="opt.autosave">自動保存</span>
       <label class="ios-toggle"><input type="checkbox" id="autoSaveToggle"><span class="ios-toggle-slider"></span></label>
       <select id="autoSaveIntervalSel" class="opt-row-btn">
-        <option value="30">30秒</option>
-        <option value="60">1分</option>
-        <option value="120" selected>2分</option>
-        <option value="300">5分</option>
-        <option value="600">10分</option>
+        <option value="30">30s</option>
+        <option value="60">1m</option>
+        <option value="120" selected>2m</option>
+        <option value="300">5m</option>
+        <option value="600">10m</option>
       </select>
       <button id="rollbackBtn" class="opt-row-btn opt-row-icon-btn" title="自動保存の履歴">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);display:block;"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
@@ -1925,8 +2058,9 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 2603072245</span>
-      <span>Version 26.2.17</span>
+      <span>Build 2603091720
+      </span>
+      <span>Version 26.2.18</span>
       <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_Gemini2.5Pro<br>Trae_Chat GPT5.2beta<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Tikuwa_Nerimono1</span>
     </div>
   </div>
@@ -2130,8 +2264,11 @@
   </div>
   <!-- 消しゴムカーソル -->
   <div id="eraserCursor"></div>
-  <input type="file" id="fileInput"        hidden accept=".txt,.html,.htm,.json,.md,.css,.js,.xml,.csv">
+  <!-- 写真レイヤー -->
+  <div id="photoLayer"></div>
+  <input type="file" id="fileInput"        hidden accept=".txt,.html,.htm,.json,.md,.css,.js,.xml,.csv,image/*">
   <input type="file" id="compareFileInput" hidden accept=".txt">
+  <input type="file" id="photoInput"       hidden accept="image/*">
   <div id="diffOverlay" style="display:none;position:fixed;inset:0;z-index:300;overflow:hidden;background:var(--bg);">
     <div id="diffHeader" class="glass diff-enter">
       <span class="diff-label"  data-i18n="diff.title">比較結果</span>
@@ -2167,6 +2304,13 @@
         <span class="oc-label">
           <strong data-i18n="oc.file.title">ファイルを開く</strong>
           <span data-i18n="oc.file.desc">.txt .html .json など</span>
+        </span>
+      </button>
+      <button class="oc-btn" id="ocPhotoBtn">
+        <span class="oc-icon">🖼️</span>
+        <span class="oc-label">
+          <strong>写真を開く</strong>
+          <span>.jpg .png .gif など</span>
         </span>
       </button>
       <button class="oc-btn" id="ocFolderBtn">
@@ -2592,7 +2736,7 @@
     }
     function hex2buf(hex) {
       var arr = new Uint8Array(hex.length / 2);
-      for (var i = 0; i < arr.length; i++) arr[i] = parseInt(hex.substr(i * 2, 2), 16);
+      for (var i = 0; i < arr.length; i++) arr[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
       return arr.buffer;
     }
     async function deriveKey(password, salt) {
@@ -3013,7 +3157,7 @@
   }
   function debounce(fn, wait) {
     var t;
-    return function() { var ctx = this, args = arguments; clearTimeout(t); t = setTimeout(function() { fn.apply(ctx, args); }, wait); };
+    return function(...args) { var ctx = this; clearTimeout(t); t = setTimeout(function() { fn.apply(ctx, args); }, wait); };
   }
   function isFontAvailable(font) {
     if (!font) return false;
@@ -3302,6 +3446,13 @@
       'application/xml':  ['.xml'],
       'text/csv':         ['.csv'],
       'text/x-python':    ['.py']
+    }},
+    { description: '画像ファイル', accept: {
+      'image/jpeg': ['.jpg', '.jpeg'],
+      'image/png':  ['.png'],
+      'image/gif':  ['.gif'],
+      'image/webp': ['.webp'],
+      'image/svg+xml': ['.svg']
     }}
   ];
 
@@ -3312,6 +3463,10 @@
           var handles = await window.showOpenFilePicker({ multiple: false, types: SUPPORTED_EXTS_PICKER });
           var handle = handles[0];
           var file = await handle.getFile();
+          if (file.type.startsWith('image/')) {
+            if (window._insertPhotoFile) window._insertPhotoFile(file);
+            return;
+          }
           var text = await file.text();
           var edit = $('edit');
           state.curFile = file.name;
@@ -3331,6 +3486,11 @@
   function openFileOrFolderChooser() { openPanel('openChooserModal'); }
   (function initOpenChooser() {
     document.getElementById('ocFileBtn').onclick = function() { closePanel('openChooserModal'); openFilePicker(); };
+    document.getElementById('ocPhotoBtn').onclick = function() {
+      closePanel('openChooserModal');
+      var pi = document.getElementById('photoInput');
+      if (pi) { try { pi.value = ''; } catch(e) {} pi.click(); }
+    };
     document.getElementById('ocFolderBtn').onclick = function() {
       closePanel('openChooserModal');
       if (window.folderOpenDirectory) { window.folderOpenDirectory(); }
@@ -3469,7 +3629,7 @@
       navigator.clipboard.writeText(text).then(function() { if (onDone) onDone(); }, function() { if (onDone) onDone(); });
     } else { if (onDone) onDone(); }
   }
-  window.ctxCopyText  = function() { if (!selectedText) { hideContextMenu(); return; } var t = selectedText; hideContextMenu(); copyToClipboard(t, function() { queueToast(window.i18n.t('toast.copied'), 1000); }); };
+  window.ctxCopyText  = function() { if (!selectedText) { hideContextMenu(); return; } var t = selectedText; hideContextMenu(); copyToClipboard(t, function() { }); };
   window.ctxOpenSearch = function() {
     hideContextMenu();
     if (!state.isSearchOpen) { state.isSearchOpen = true; openPanel('searchPanel'); doSearch(0); }
@@ -3486,7 +3646,7 @@
   window.ctxCutText   = function() {
     if (!selectedText) { hideContextMenu(); return; }
     var edit = $('edit'), s = edit.selectionStart, e = edit.selectionEnd, t = selectedText; hideContextMenu();
-    copyToClipboard(t, function() { edit.setRangeText('', s, e, 'start'); ActionHandlers.updateText(edit.value); scheduleAutoSave(); render(); selectedText = ''; queueToast(window.i18n.t('toast.cut_done'), 1000); });
+    copyToClipboard(t, function() { edit.setRangeText('', s, e, 'start'); ActionHandlers.updateText(edit.value); scheduleAutoSave(); render(); selectedText = ''; });
   };
   window.ctxPasteText = function() {
     hideContextMenu();
@@ -5851,6 +6011,15 @@
 
     $('fileInput').onchange = function(e) {
       var file = e.target.files[0]; if (!file) return;
+      if (file.type.startsWith('image/')) {
+        if (window.openPhotoInsert) {
+          /* insertFromFile を直接呼べるよう photoInput 経由でなく DataTransfer trick は使えないので
+             photoInput に同じファイルを渡す代わりに window._insertPhotoFile を公開しておく */
+          if (window._insertPhotoFile) window._insertPhotoFile(file);
+        }
+        try { e.target.value = ''; } catch(_) {}
+        return;
+      }
       state.curFile = file.name;
       var reader = new FileReader();
       reader.onload = function() { edit.value = reader.result; ActionHandlers.updateText(edit.value); saveCurrentPage(); render(); };
@@ -6282,6 +6451,268 @@
     };
   })();
 
+  /* ── 写真挿入・IndexedDB永続化 ── */
+  (function initPhotos() {
+    var DB_NAME = 'np26_photos', DB_VER = 1, STORE = 'photos';
+    var db = null;
+    var currentPageId = 'p0';
+
+    function openDB(cb) {
+      if (db) { cb(db); return; }
+      var req = indexedDB.open(DB_NAME, DB_VER);
+      req.onupgradeneeded = function(e) {
+        var d = e.target.result;
+        if (!d.objectStoreNames.contains(STORE)) {
+          var st = d.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true });
+          st.createIndex('pageId', 'pageId', { unique: false });
+        }
+      };
+      req.onsuccess = function(e) { db = e.target.result; cb(db); };
+      req.onerror   = function()  { /* Photo DB open failed */ };
+    }
+
+    function savePhoto(pageId, dataUrl, x, y, w, h, cb) {
+      openDB(function(d) {
+        var tx  = d.transaction(STORE, 'readwrite');
+        var req = tx.objectStore(STORE).add({ pageId: pageId, dataUrl: dataUrl, x: x, y: y, w: w, h: h });
+        req.onsuccess = function() { if (cb) cb(req.result); };
+      });
+    }
+
+    function updatePhotoPos(id, x, y, w, h) {
+      openDB(function(d) {
+        var tx    = d.transaction(STORE, 'readwrite');
+        var store = tx.objectStore(STORE);
+        var req   = store.get(id);
+        req.onsuccess = function() {
+          var rec = req.result; if (!rec) return;
+          rec.x = x; rec.y = y;
+          if (w !== undefined) rec.w = w;
+          if (h !== undefined) rec.h = h;
+          store.put(rec);
+        };
+      });
+    }
+
+    function deletePhotoById(id, el) {
+      openDB(function(d) { d.transaction(STORE, 'readwrite').objectStore(STORE).delete(id); });
+      if (!el || !el.parentNode) return;
+      el.classList.add('photo-exiting');
+      setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 230);
+    }
+
+    function loadPhotosForPage(pageId) {
+      var layer = document.getElementById('photoLayer');
+      if (!layer) return;
+      layer.innerHTML = '';
+      openDB(function(d) {
+        var tx  = d.transaction(STORE, 'readonly');
+        var req = tx.objectStore(STORE).index('pageId').getAll(pageId);
+        req.onsuccess = function() {
+          (req.result || []).forEach(function(rec) { renderPhoto(rec); });
+        };
+      });
+    }
+
+    function renderPhoto(rec) {
+      var layer = document.getElementById('photoLayer');
+      if (!layer) return;
+
+      var item = document.createElement('div');
+      item.className    = 'photo-item';
+      item.style.left   = rec.x + 'px';
+      item.style.top    = rec.y + 'px';
+      item.style.width  = rec.w + 'px';
+      item.style.height = rec.h + 'px';
+
+      /* タイトルバー */
+      var titlebar = document.createElement('div');
+      titlebar.className = 'photo-titlebar';
+
+      var closeBtn = document.createElement('button');
+      closeBtn.className = 'photo-close-dot';
+      closeBtn.title     = '写真を削除';
+      closeBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        deletePhotoById(rec.id, item);
+      });
+      titlebar.appendChild(closeBtn);
+
+      /* 画像ラップ */
+      var imgWrap = document.createElement('div');
+      imgWrap.className = 'photo-img-wrap';
+      var img = document.createElement('img');
+      img.src = rec.dataUrl; img.draggable = false;
+      imgWrap.appendChild(img);
+
+      /* リサイズハンドル */
+      var resizeHandle = document.createElement('div');
+      resizeHandle.className = 'photo-resize-handle';
+
+      item.appendChild(titlebar);
+      item.appendChild(imgWrap);
+      item.appendChild(resizeHandle);
+      layer.appendChild(item);
+
+      initDragMove(titlebar, item, rec);
+      initDragResize(resizeHandle, item, rec);
+    }
+
+    function initDragMove(dragTarget, item, rec) {
+      var startX, startY, origL, origT, dragging = false;
+      function onDown(e) {
+        if (e.target === item.querySelector('.photo-close-dot') ||
+            e.target === item.querySelector('.photo-resize-handle')) return;
+        dragging = true;
+        var pt = e.touches ? e.touches[0] : e;
+        startX = pt.clientX; startY = pt.clientY;
+        origL  = parseInt(item.style.left) || 0;
+        origT  = parseInt(item.style.top)  || 0;
+        item.classList.add('photo-grabbed');
+        dragTarget.style.cursor = 'grabbing';
+        if (e.cancelable) e.preventDefault();
+      }
+      function onMove(e) {
+        if (!dragging) return;
+        var pt = e.touches ? e.touches[0] : e;
+        item.style.left = (origL + pt.clientX - startX) + 'px';
+        item.style.top  = (origT + pt.clientY - startY) + 'px';
+        if (e.cancelable) e.preventDefault();
+      }
+      function onUp() {
+        if (!dragging) return; dragging = false;
+        item.classList.remove('photo-grabbed');
+        dragTarget.style.cursor = 'grab';
+        rec.x = parseInt(item.style.left) || 0;
+        rec.y = parseInt(item.style.top)  || 0;
+        updatePhotoPos(rec.id, rec.x, rec.y);
+      }
+      dragTarget.addEventListener('mousedown',  onDown);
+      dragTarget.addEventListener('touchstart', onDown, { passive: false });
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('touchmove', onMove, { passive: false });
+      document.addEventListener('mouseup',  onUp);
+      document.addEventListener('touchend', onUp);
+    }
+
+    function initDragResize(handle, item, rec) {
+      var startX, startY, origW, origH, resizing = false;
+      function onDown(e) {
+        resizing = true;
+        var pt = e.touches ? e.touches[0] : e;
+        startX = pt.clientX; startY = pt.clientY;
+        origW  = rec.w;
+        origH  = rec.h;
+        e.stopPropagation();
+        if (e.cancelable) e.preventDefault();
+      }
+      function onMove(e) {
+        if (!resizing) return;
+        var pt = e.touches ? e.touches[0] : e;
+        var nw = Math.max(60, origW + pt.clientX - startX);
+        var nh = Math.max(60, origH + pt.clientY - startY);
+        item.style.width  = nw + 'px';
+        item.style.height = nh + 'px';
+        if (e.cancelable) e.preventDefault();
+      }
+      function onUp() {
+        if (!resizing) return; resizing = false;
+        rec.w = parseInt(item.style.width)  || rec.w;
+        rec.h = parseInt(item.style.height) || rec.h;
+        updatePhotoPos(rec.id, rec.x, rec.y, rec.w, rec.h);
+      }
+      handle.addEventListener('mousedown',  onDown);
+      handle.addEventListener('touchstart', onDown, { passive: false });
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('touchmove', onMove, { passive: false });
+      document.addEventListener('mouseup',  onUp);
+      document.addEventListener('touchend', onUp);
+    }
+
+    function insertFromFile(file, dropX, dropY) {
+      if (!file || !file.type.startsWith('image/')) return;
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        var dataUrl = ev.target.result;
+        var tmpImg  = new Image();
+        tmpImg.onload = function() {
+          var ratio = tmpImg.naturalHeight / (tmpImg.naturalWidth || 1);
+          var w = 300, h = Math.round(300 * ratio);
+          var x = (dropX !== undefined) ? Math.max(0, Math.round(dropX - w / 2))
+                                        : Math.max(0, Math.round((window.innerWidth  - w) / 2));
+          var y = (dropY !== undefined) ? Math.max(0, Math.round(dropY - h / 2))
+                                        : Math.max(0, Math.round((window.innerHeight - h) / 2));
+          savePhoto(currentPageId, dataUrl, x, y, w, h, function(id) {
+            renderPhoto({ id: id, pageId: currentPageId, dataUrl: dataUrl, x: x, y: y, w: w, h: h });
+          });
+        };
+        tmpImg.src = dataUrl;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    /* ── ウィンドウ外ドラッグ＆ドロップ ── */
+    var photoLayer = document.getElementById('photoLayer');
+    var dragCounter = 0;
+
+    document.addEventListener('dragenter', function(e) {
+      var hasImage = Array.prototype.some.call(e.dataTransfer.types || [], function(t) {
+        return t === 'Files';
+      });
+      if (!hasImage) return;
+      e.preventDefault();
+      dragCounter++;
+      if (photoLayer) { photoLayer.style.pointerEvents = 'auto'; photoLayer.classList.add('drag-over'); }
+    });
+
+    document.addEventListener('dragleave', function(e) {
+      dragCounter--;
+      if (dragCounter <= 0) {
+        dragCounter = 0;
+        if (photoLayer) { photoLayer.classList.remove('drag-over'); photoLayer.style.pointerEvents = ''; }
+      }
+    });
+
+    document.addEventListener('dragover', function(e) { e.preventDefault(); });
+
+    document.addEventListener('drop', function(e) {
+      e.preventDefault();
+      dragCounter = 0;
+      if (photoLayer) { photoLayer.classList.remove('drag-over'); photoLayer.style.pointerEvents = ''; }
+      var files = e.dataTransfer.files;
+      for (var i = 0; i < files.length; i++) {
+        if (files[i].type.startsWith('image/')) {
+          insertFromFile(files[i], e.clientX, e.clientY);
+        }
+      }
+    });
+
+    /* ── ページ切替フック ── */
+    var _origPenPageSwitch = window.penPageSwitch;
+    window.penPageSwitch = function(fromId, toId, dir) {
+      var penFn = _origPenPageSwitch ? _origPenPageSwitch(fromId, toId, dir) : null;
+      return function() {
+        if (penFn) penFn();
+        currentPageId = toId;
+        loadPhotosForPage(toId);
+      };
+    };
+
+    /* ── 初期ページ読込フック ── */
+    var _origPenSetInitialPage = window.penSetInitialPage;
+    window.penSetInitialPage = function(pageId) {
+      if (_origPenSetInitialPage) _origPenSetInitialPage(pageId);
+      currentPageId = pageId;
+      loadPhotosForPage(pageId);
+    };
+
+    /* ── グローバル公開（メニューバーから呼び出し用） ── */
+    window.openPhotoInsert = function() {
+      var pi = document.getElementById('photoInput');
+      if (pi) { try { pi.value = ''; } catch(e) {} pi.click(); }
+    };
+    window._insertPhotoFile = function(file) { insertFromFile(file); };
+  })();
   </script>
 
   <!-- 計算提案ポップアップ -->
@@ -6623,6 +7054,5 @@
   </script>
 </body>
 </html>
-
 
 
