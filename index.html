@@ -594,7 +594,7 @@
     footer {
       position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
       padding: 5px 14px; font-size: 11px; color: var(--dim);
-      display: flex; gap: 8px; max-width: 90vw; justify-content: center;
+      display: flex; gap: 8px; max-width: 90vw; justify-content: center; align-items: center;
       white-space: nowrap; border-radius: var(--radius);
       z-index: 150;
       transition: transform 0.22s cubic-bezier(0.4,0,0.2,1), opacity 0.22s cubic-bezier(0.4,0,0.2,1);
@@ -603,7 +603,7 @@
 
     .ft-slot {
       position: relative; overflow: hidden;
-      display: inline-block; vertical-align: middle; line-height: 1.4;
+      display: inline-flex; align-items: center; line-height: 1.4;
     }
     .ft-slot-inner { display: block; }
     @keyframes ftSlotOut {
@@ -616,6 +616,62 @@
     }
     .ft-slot-inner.slot-out { animation: ftSlotOut 0.08s cubic-bezier(0.4,0,1,1) forwards; }
     .ft-slot-inner.slot-in  { animation: ftSlotIn  0.14s cubic-bezier(0.34,1.3,0.64,1) forwards; }
+
+    .ft-divider { display: inline-flex; align-items: center; margin: 0; opacity: 0.5; font-size: 9px; line-height: 1; }
+
+    #f-info-wrap, #f-line-wrap { text-align: right; }
+
+    #clockWidget {
+      position: fixed; bottom: 15px; left: 12px;
+      padding: 5px 10px; font-size: 11px; color: var(--dim);
+      border-radius: 14px; z-index: 9998;
+      letter-spacing: 0.5px;
+      cursor: pointer; user-select: none;
+      transition: color 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.2s;
+    }
+    #clockWidget.clock-fade { opacity: 0; }
+    #clockWidget:hover { color: var(--fg); }
+    #clockWidget.timer-active { color: var(--accent); }
+
+    #timerPopover {
+      position: fixed; bottom: 52px; left: 12px;
+      background: var(--ui-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 14px; padding: 10px 12px; z-index: 9999;
+      display: flex; flex-direction: column; gap: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      opacity: 0; transform: translateY(6px) scale(0.97); pointer-events: none;
+      transition: opacity 0.18s cubic-bezier(0.4,0,0.2,1), transform 0.18s cubic-bezier(0.4,0,0.2,1);
+      min-width: 160px;
+    }
+    #timerPopover.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
+    #timerPopover .tp-row { display: flex; align-items: center; gap: 6px; }
+    #timerPopover .tp-label { font-size: 10px; color: var(--dim); flex-shrink: 0; }
+    #timerPopover .tp-inputs { display: flex; align-items: center; gap: 4px; flex: 1; }
+    #timerPopover .tp-input {
+      width: 38px; text-align: center; background: rgba(128,128,128,0.12);
+      border: 1px solid rgba(128,128,128,0.2); border-radius: 7px;
+      color: var(--fg); font-size: 13px; padding: 4px 2px; outline: none;
+      transition: border-color 0.12s;
+      -webkit-appearance: none; -moz-appearance: textfield; appearance: none;
+    }
+    #timerPopover .tp-input::-webkit-inner-spin-button,
+    #timerPopover .tp-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    #timerPopover .tp-input:focus { border-color: var(--accent); }
+    #timerPopover .tp-colon { font-size: 13px; color: var(--dim); }
+    #timerPopover .tp-actions { display: flex; gap: 5px; }
+    #timerPopover .tp-btn {
+      flex: 1; padding: 5px 0; border-radius: 8px; font-size: 11px;
+      background: rgba(128,128,128,0.15); border: none; color: var(--fg);
+      cursor: pointer; transition: background 0.12s, transform 0.1s;
+    }
+    #timerPopover .tp-btn:hover { background: rgba(128,128,128,0.25); }
+    #timerPopover .tp-btn:active { transform: scale(0.95); }
+    #timerPopover .tp-btn.primary { background: var(--accent); color: #fff; }
+    #timerPopover .tp-btn.primary:hover { filter: brightness(1.1); }
+    #timerPopover .tp-countdown { font-size: 18px; font-weight: 600; text-align: center; color: var(--accent); letter-spacing: 1px; display: none; }
+    #timerPopover.counting .tp-countdown { display: block; }
+    #timerPopover.counting .tp-inputs-row { display: none; }
 
     #penToggleBtn {
       position: fixed; bottom: 15px; right: 16px;
@@ -2061,9 +2117,9 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 26030131919
+      <span>Build 26030140009
       </span>
-      <span>Version 26.2.19</span>
+      <span>Version 26.2.20</span>
       <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_Gemini2.5Pro<br>Trae_Chat GPT5.2beta<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Tikuwa_Nerimono1</span>
     </div>
   </div>
@@ -2233,8 +2289,24 @@
   <textarea id="edit" spellcheck="false"></textarea>
   <footer id="ft" class="glass">
     <span id="b-info"></span>
-    <span id="f-info-label-wrap" class="ft-slot"><span id="f-info-label" class="ft-slot-inner"></span></span><span id="f-info-wrap" class="ft-slot"><span id="f-info-num" class="ft-slot-inner"></span></span><span id="f-info-unit" data-i18n="footer.unit"></span>
+    <span id="f-info-label-wrap" class="ft-slot"><span id="f-info-label" class="ft-slot-inner"></span></span><span class="ft-divider">·</span><span id="f-info-wrap" class="ft-slot"><span id="f-info-num" class="ft-slot-inner"></span></span><span id="f-info-unit" data-i18n="footer.unit"></span><span id="f-line-divider" class="ft-divider">·</span><span id="f-line-wrap" class="ft-slot"><span id="f-line-num" class="ft-slot-inner"></span></span><span id="f-line-unit" data-i18n="footer.unit-lines"></span>
   </footer>
+  <div id="clockWidget" class="glass"></div>
+  <div id="timerPopover" class="glass">
+    <div class="tp-inputs-row tp-row">
+      <span class="tp-label">タイマー</span>
+      <div class="tp-inputs">
+        <input id="timerMin" class="tp-input" type="number" min="0" max="99" value="5" placeholder="00">
+        <span class="tp-colon">:</span>
+        <input id="timerSec" class="tp-input" type="number" min="0" max="59" value="0" placeholder="00">
+      </div>
+    </div>
+    <div class="tp-countdown" id="timerCountdown">05:00</div>
+    <div class="tp-actions">
+      <button class="tp-btn" id="timerCancelBtn" onclick="timerCancel()">キャンセル</button>
+      <button class="tp-btn primary" id="timerStartBtn" onclick="timerStart()">スタート</button>
+    </div>
+  </div>
   </div>
 
   <!-- 赤ペン機能 -->
@@ -2495,6 +2567,7 @@
         'page.default':'ページ ',
         'page.placeholder':'ページ名...',
         'footer.unit':' 文字',
+        'footer.unit-lines':' 行',
         'pp.empty':'空のページ',
         'folder.title':'フォルダ',
         'fmgr.title':'フォント管理',
@@ -2642,6 +2715,7 @@
         'page.default':'Page ',
         'page.placeholder':'Page name...',
         'footer.unit':' chars',
+        'footer.unit-lines':' lines',
         'pp.empty':'Empty page',
         'folder.title':'Folder',
         'fmgr.title':'Font Manager',
@@ -5518,6 +5592,8 @@
 
   var ftNumTimer   = null;
   var ftLastNum    = null;
+  var ftLineTimer  = null;
+  var ftLastLine   = null;
   var ftLabelTimer = null;
   var ftLastLabel  = null;
 
@@ -5583,18 +5659,45 @@
     }, 160);
   }
 
+  function updateFtLines(newLines) {
+    var wrap  = $('f-line-wrap');
+    var inner = $('f-line-num');
+    if (!wrap || !inner) return;
+    var numStr = String(newLines);
+    if (numStr === ftLastLine) return;
+    ftLastLine = numStr;
+
+    if (!state.footerAlways) {
+      inner.textContent = numStr;
+      return;
+    }
+    clearTimeout(ftLineTimer);
+    wrap.style.width = wrap.offsetWidth + 'px';
+    inner.classList.remove('slot-in');
+    inner.classList.add('slot-out');
+    ftLineTimer = setTimeout(function() {
+      inner.textContent = numStr;
+      inner.classList.remove('slot-out');
+      wrap.style.width  = '';
+      inner.classList.add('slot-in');
+      setTimeout(function() { inner.classList.remove('slot-in'); }, 300);
+    }, 160);
+  }
+
   function render() {
     var edit = $('edit'), isAnyOpen = state.isOptionsOpen || state.isModalOpen;
     if (isAnyOpen) { clearTimeout(state.hideTimer); state.isFooterHidden = false; }
     var pageTitle = (pages && pages[curPageIdx])
       ? (pages[curPageIdx].title || (window.i18n.t('page.default') + (curPageIdx + 1))).slice(0, 20)
       : state.curFile.slice(0, 20);
-    var charCount = edit.value.length;
+    var charCount = edit.value.replace(/\n/g, '').length;
+    var lineCount = edit.value === '' ? 1 : (edit.value.match(/\n/g) || []).length + 1;
 
     $('b-info').textContent = state.browser + '_' + state.device;
 
-    updateFtLabel(pageTitle + ' · ');
+    updateFtLabel(pageTitle);
     updateFtNum(charCount);
+    updateFtLines(lineCount);
 
     edit.placeholder        = state.browser + '_' + state.device + ' >';
     $('backdrop').className = isAnyOpen ? 'show' : '';
@@ -5605,6 +5708,110 @@
       $('ft').className = 'glass' + (state.isFooterHidden ? ' hidden' : '');
     }
   }
+
+  /* 時計更新 + タイマー */
+  (function() {
+    var timerInterval = null;
+    var timerRemaining = 0;
+    var popoverOpen = false;
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function fmtTime(sec) {
+      var m = Math.floor(sec / 60), s = sec % 60;
+      return pad(m) + ':' + pad(s);
+    }
+
+    function updateClock() {
+      var clockEl = $('clockWidget');
+      if (!clockEl) return;
+      if (timerInterval && timerRemaining > 0) {
+        clockEl.textContent = '⏱ ' + fmtTime(timerRemaining);
+        clockEl.classList.add('timer-active');
+      } else {
+        var now = new Date();
+        clockEl.textContent = pad(now.getHours()) + ':' + pad(now.getMinutes());
+        clockEl.classList.remove('timer-active');
+      }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function togglePopover() {
+      var pop = $('timerPopover');
+      if (!pop) return;
+      popoverOpen = !popoverOpen;
+      pop.classList.toggle('show', popoverOpen);
+    }
+
+    var clockEl = $('clockWidget');
+    if (clockEl) {
+      clockEl.addEventListener('click', function(e) {
+        e.stopPropagation();
+        togglePopover();
+      });
+    }
+
+    document.addEventListener('click', function(e) {
+      var pop = $('timerPopover');
+      if (pop && popoverOpen && !pop.contains(e.target)) {
+        popoverOpen = false;
+        pop.classList.remove('show');
+      }
+    });
+
+    window.timerStart = function() {
+      var minEl = $('timerMin'), secEl = $('timerSec');
+      if (!minEl || !secEl) return;
+      var total = (parseInt(minEl.value) || 0) * 60 + (parseInt(secEl.value) || 0);
+      if (total <= 0) return;
+      if (timerInterval) clearInterval(timerInterval);
+      timerRemaining = total;
+      var pop = $('timerPopover');
+      var countdown = $('timerCountdown');
+      var startBtn = $('timerStartBtn');
+      if (countdown) countdown.textContent = fmtTime(timerRemaining);
+      if (pop) pop.classList.add('counting');
+      if (startBtn) startBtn.textContent = '実行中';
+      updateClock();
+      timerInterval = setInterval(function() {
+        timerRemaining--;
+        if (countdown) countdown.textContent = fmtTime(timerRemaining);
+        updateClock();
+        if (timerRemaining <= 0) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          if (pop) pop.classList.remove('counting');
+          if (startBtn) startBtn.textContent = 'スタート';
+          var clockEl2 = $('clockWidget');
+          if (clockEl2) {
+            clockEl2.classList.add('clock-fade');
+            setTimeout(function() {
+              clockEl2.classList.remove('timer-active');
+              updateClock();
+              clockEl2.classList.remove('clock-fade');
+            }, 200);
+          } else {
+            updateClock();
+          }
+          queueToast('⏱ タイマー終了', 5000);
+        }
+      }, 1000);
+    };
+
+    window.timerCancel = function() {
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      timerRemaining = 0;
+      var pop = $('timerPopover');
+      var countdown = $('timerCountdown');
+      var startBtn = $('timerStartBtn');
+      if (pop) pop.classList.remove('counting');
+      if (startBtn) startBtn.textContent = 'スタート';
+      popoverOpen = false;
+      if (pop) pop.classList.remove('show');
+      updateClock();
+    };
+  })();
 
   /* 低スペック端末検出（モバイルは除外） */
   (function() {
