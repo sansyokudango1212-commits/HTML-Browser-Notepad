@@ -585,8 +585,11 @@
     textarea::-webkit-scrollbar { display: none; }
 
     @keyframes slideInRight  { from { opacity:0; transform:translateX(48px);  } to { opacity:1; transform:translateX(0); } }
+    @keyframes slideInLeft   { from { opacity:0; transform:translateX(-48px); } to { opacity:1; transform:translateX(0); } }
     textarea.page-slide-in-right  { animation: slideInRight  0.26s cubic-bezier(0.34,1.2,0.64,1) forwards; }
+    textarea.page-slide-in-left   { animation: slideInLeft   0.26s cubic-bezier(0.34,1.2,0.64,1) forwards; }
     #penCanvas.page-slide-in-right  { animation: slideInRight  0.26s cubic-bezier(0.34,1.2,0.64,1) forwards; }
+    #penCanvas.page-slide-in-left   { animation: slideInLeft   0.26s cubic-bezier(0.34,1.2,0.64,1) forwards; }
 
     footer {
       position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
@@ -2058,9 +2061,9 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 2603091720
+      <span>Build 26030131919
       </span>
-      <span>Version 26.2.18</span>
+      <span>Version 26.2.19</span>
       <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_Gemini2.5Pro<br>Trae_Chat GPT5.2beta<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Tikuwa_Nerimono1</span>
     </div>
   </div>
@@ -3110,11 +3113,12 @@
   var $ = function(id) { return document.getElementById(id); };
 
   /* ページ切り替えスライドアニメーションのヘルパー */
-  function slidePageIn(edit) {
-    edit.classList.remove('page-slide-in-right');
+  function slidePageIn(edit, dir) {
+    var cls = (dir === 'left') ? 'page-slide-in-left' : 'page-slide-in-right';
+    edit.classList.remove('page-slide-in-right', 'page-slide-in-left');
     void edit.offsetWidth;
-    edit.classList.add('page-slide-in-right');
-    setTimeout(function() { edit.classList.remove('page-slide-in-right'); }, 350);
+    edit.classList.add(cls);
+    setTimeout(function() { edit.classList.remove(cls); }, 350);
   }
 
   function escapeHtml(str) {
@@ -3707,7 +3711,7 @@
         if (count === 0) { queueToast(window.i18n.t('rp.toast.notfound'), 1500); return; }
         edit.value = text.split(searchVal).join(replaceVal);
         ActionHandlers.updateText(edit.value); scheduleAutoSave(); render();
-        queueToast(window.i18n.lang() === 'en' ? count + window.i18n.t('rp.toast.replaced') : count + window.i18n.t('rp.toast.replaced'), 2000);
+        queueToast(count + window.i18n.t('rp.toast.replaced'), 2000);
         closePanel('replacePanel');
       } else {
         var start = edit.selectionStart;
@@ -4458,7 +4462,7 @@
     renderPageList();
     _skipBarUpdate = false;
     requestAnimationFrame(function() { updatePageIndicator(true); });
-    slidePageIn(edit);
+    slidePageIn(edit, dir);
     if (penSlideIn) penSlideIn();
   }
 
@@ -4482,7 +4486,7 @@
     _addingNewPageIdx = -1;
     _skipBarUpdate    = false;
     requestAnimationFrame(function() { updatePageIndicator(true); });
-    slidePageIn(edit);
+    slidePageIn(edit, 'right');
     if (penSlideIn) penSlideIn();
   };
 
@@ -4997,6 +5001,7 @@
     pagePanelOpen = true;
     renderPageList(); $('pagePanel').classList.add('open'); $('pageOverlay').classList.add('open');
     var tab = $('pagePullTab'); if (tab) { tab.classList.remove('visible'); tab.classList.add('panel-open'); }
+    var pl = $('pageList'); if (pl && !pl._scrollListenerAdded) { pl.addEventListener('scroll', function() { updatePageIndicator(false); }); pl._scrollListenerAdded = true; }
   }
   window.closePagePanel = function() {
     if (!pagePanelOpen) return; pagePanelOpen = false;
@@ -5225,7 +5230,7 @@
       var dir = (!wasInFileEditor || activeIdx < 0 || idx > activeIdx) ? 'right' : 'left';
       var edit = $('edit');
 
-      edit.classList.remove('page-slide-in-right');
+      edit.classList.remove('page-slide-in-right', 'page-slide-in-left');
       void edit.offsetWidth;
 
       var loadPromise = f.handle.getFile().then(function(file) {
@@ -5285,7 +5290,7 @@
           } else {
             queueToast(f.name + window.i18n.t('toast.file_loaded_suffix'), 1800);
           }
-          slidePageIn(edit);
+          slidePageIn(edit, dir);
         }).catch(function(e) { queueToast(window.i18n.t('toast.load_failed_prefix') + f.name, 2500); });
       }, 160);
     }
@@ -5443,7 +5448,7 @@
         applyStyles();
         savePages(); render(); renderPageList();
         requestAnimationFrame(function() { updatePageIndicator(true); });
-        slidePageIn(edit);
+        slidePageIn(edit, 'left');
         window.closeFolderPanel();
         queueToast(window.i18n.t('toast.memo_returned'), 1500);
       };
