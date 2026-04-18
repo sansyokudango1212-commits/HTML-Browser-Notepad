@@ -1436,12 +1436,12 @@
 
     /* ページカード削除アニメ（遅い→速い ease-in） */
     @keyframes pageCardSlideOut {
-      0%   { transform: translateX(0);    opacity: 1; max-height: 64px; margin-bottom: 3px; }
-      55%  { transform: translateX(120%); opacity: 0; max-height: 64px; margin-bottom: 3px; }
-      100% { transform: translateX(120%); opacity: 0; max-height: 0px;  margin-bottom: 0px; }
+      0%   { transform: translateX(0);    opacity: 1; max-height: 64px; height: 61px; padding-top: 11px; padding-bottom: 11px; margin-bottom: 3px; }
+      50%  { transform: translateX(120%); opacity: 0; max-height: 64px; height: 61px; padding-top: 11px; padding-bottom: 11px; margin-bottom: 3px; }
+      100% { transform: translateX(120%); opacity: 0; max-height: 0px;  height: 0px;  padding-top: 0px;  padding-bottom: 0px;  margin-bottom: 0px; }
     }
     .page-card-exiting {
-      animation: pageCardSlideOut 0.52s cubic-bezier(0.55, 0, 1, 1) both;
+      animation: pageCardSlideOut 0.56s cubic-bezier(0.45, 0, 0.55, 1) both;
       pointer-events: none;
       overflow: hidden;
     }
@@ -2098,6 +2098,10 @@
       <span style="font-size:10px; color:var(--dim); margin-left:4px; white-space:nowrap;" data-i18n="opt.footerspan">常時表示</span>
     </div>
     <div>
+      <span class="label" data-i18n="opt.clock">時計</span>
+      <label class="ios-toggle"><input type="checkbox" id="clockToggle"><span class="ios-toggle-slider"></span></label>
+    </div>
+    <div>
       <span class="label" data-i18n="opt.calc">計算提案</span>
       <label class="ios-toggle"><input type="checkbox" id="calcToggle"><span class="ios-toggle-slider"></span></label>
     </div>
@@ -2117,9 +2121,9 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 26030140009
+      <span>Build 2604180937
       </span>
-      <span>Version 26.2.20</span>
+      <span>Version 26.2.21</span>
       <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_Gemini2.5Pro<br>Trae_Chat GPT5.2beta<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Tikuwa_Nerimono1</span>
     </div>
   </div>
@@ -2194,51 +2198,43 @@
 
 <div id="ossModal" class="glass panel-modal">
   <button class="close-dot" onclick="hideOssModal()" aria-label="閉じる"></button>
-  <div class="oss-title">Source</div>
+  <div class="oss-title" data-i18n="oss.title">ソース情報</div>
   <div class="oss-list">
 
     <div class="oss-item">
       <span class="oss-name">Google Fonts</span>
       <span class="oss-license">
-        Fonts licensed under SIL Open Font License 1.1 (varies by font) &nbsp;·&nbsp;
-        <a href="https://fonts.google.com" target="_blank" rel="noopener">
-          fonts.google.com
-        </a>
+        <span data-i18n="oss.gfonts">SIL Open Font License 1.1 のもとで提供されるフォント</span> &nbsp;·&nbsp;
+        <a href="https://fonts.google.com" target="_blank" rel="noopener">fonts.google.com</a>
       </span>
     </div>
 
     <div class="oss-item">
       <span class="oss-name">MyMemory Translation API</span>
       <span class="oss-license">
-        Service provided under Terms of Service &nbsp;·&nbsp;
-        <a href="https://mymemory.translated.net/doc/spec.php" target="_blank" rel="noopener">
-          mymemory.translated.net
-        </a>
+        <span data-i18n="oss.mymemory">利用規約に基づいて提供されるサービス</span> &nbsp;·&nbsp;
+        <a href="https://mymemory.translated.net/doc/spec.php" target="_blank" rel="noopener">mymemory.translated.net</a>
       </span>
     </div>
 
     <div class="oss-item">
       <span class="oss-name">Wikipedia / Wiktionary (via MediaWiki API)</span>
       <span class="oss-license">
-        Content licensed under CC BY-SA 4.0 &nbsp;·&nbsp;
-        <a href="https://www.mediawiki.org/wiki/API:Main_page" target="_blank" rel="noopener">
-          Wikimedia Foundation
-        </a>
+        <span data-i18n="oss.wiki">コンテンツは CC BY-SA 4.0 のもとでライセンスされています</span> &nbsp;·&nbsp;
+        <a href="https://www.mediawiki.org/wiki/API:Main_page" target="_blank" rel="noopener">Wikimedia Foundation</a>
       </span>
     </div>
 
     <div class="oss-item">
       <span class="oss-name">Web Authentication API (WebAuthn)</span>
       <span class="oss-license">
-        W3C Recommendation &nbsp;·&nbsp;
-        <a href="https://www.w3.org/TR/webauthn-2/" target="_blank" rel="noopener">
-          W3C Web Authentication
-        </a>
+        <span data-i18n="oss.webauthn">W3C 勧告</span> &nbsp;·&nbsp;
+        <a href="https://www.w3.org/TR/webauthn-2/" target="_blank" rel="noopener">W3C Web Authentication</a>
       </span>
     </div>
 
   </div>
-  <button class="oss-close" onclick="hideOssModal()">Close</button>
+  <button class="oss-close" onclick="hideOssModal()" data-i18n="oss.close">閉じる</button>
 </div>
   </div>
 
@@ -2449,7 +2445,12 @@
         'opt.savespan':'文章情報を含める','opt.pwlock':'パスワードロック',
         'opt.passkey':'パスキー','opt.lang':'言語',
         'opt.sidebar':'サイドバー','opt.tab':'タブ',
-        'opt.calc':'計算提案',
+        'opt.clock':'時計','opt.calc':'計算提案',
+        'oss.title':'ソース情報','oss.close':'閉じる',
+        'oss.gfonts':'SIL Open Font License 1.1 のもとで提供されるフォント',
+        'oss.mymemory':'利用規約に基づいて提供されるサービス',
+        'oss.wiki':'コンテンツは CC BY-SA 4.0 のもとでライセンスされています',
+        'oss.webauthn':'W3C 勧告',
         'ctx.copy':'コピー','ctx.cut':'切り取り','ctx.paste':'貼り付け',
         'ctx.search':'検索','ctx.translate':'翻訳','ctx.share':'共有',
         'ctx.compare':'比較','ctx.find':'文字検索','ctx.replace':'文字置換',
@@ -2597,7 +2598,12 @@
         'opt.savespan':'Incl. metadata','opt.pwlock':'PW Lock',
         'opt.passkey':'Passkey','opt.lang':'Language',
         'opt.sidebar':'Sidebar','opt.tab':'Tab',
-        'opt.calc':'Calc Suggest',
+        'opt.clock':'Clock','opt.calc':'Calc Suggest',
+        'oss.title':'Source','oss.close':'Close',
+        'oss.gfonts':'Fonts licensed under SIL Open Font License 1.1 (varies by font)',
+        'oss.mymemory':'Service provided under Terms of Service',
+        'oss.wiki':'Content licensed under CC BY-SA 4.0',
+        'oss.webauthn':'W3C Recommendation',
         'ctx.copy':'Copy','ctx.cut':'Cut','ctx.paste':'Paste',
         'ctx.search':'Search','ctx.translate':'Translate','ctx.share':'Share',
         'ctx.compare':'Compare','ctx.find':'Find','ctx.replace':'Replace',
@@ -5098,14 +5104,16 @@
       if (!startedFromEdge && dy > Math.abs(dx) * 1.5) { touching = false; return; }
       var GAP = 20;
       if (!pagePanelOpen && startedFromEdge) {
-        var open = Math.min(dx > 0 ? 0 : Math.abs(dx), panelW);
+        /* 右→左スワイプで開く: dx > 0 のとき open が増える */
+        var open = Math.min(dx > 0 ? Math.abs(dx) : 0, panelW);
         var tx = Math.max(0, panelW + GAP - open);
         panel.classList.add('dragging'); overlay.classList.add('dragging');
         panel.style.transform = 'translateX(' + tx + 'px)';
         overlay.style.background = 'rgba(0,0,0,' + (0.38 * open / panelW) + ')';
         overlay.style.pointerEvents = 'auto';
-      } else if (pagePanelOpen && dx > 0) {
-        var tx2 = Math.min(dx, panelW + GAP);
+      } else if (pagePanelOpen && dx < 0) {
+        /* 左→右スワイプで閉じる: dx < 0 のとき右方向へ動かす */
+        var tx2 = Math.min(-dx, panelW + GAP);
         panel.classList.add('dragging'); overlay.classList.add('dragging');
         panel.style.transform = 'translateX(' + tx2 + 'px)';
         overlay.style.background = 'rgba(0,0,0,' + (0.38 * Math.max(0, 1 - tx2/panelW)) + ')';
@@ -5116,8 +5124,9 @@
       panel.classList.remove('dragging'); overlay.classList.remove('dragging');
       panel.style.transform = ''; overlay.style.background = ''; overlay.style.pointerEvents = '';
       var dx = startX - e.changedTouches[0].clientX;
+      /* 開く: 右→左スワイプ (dx > THRESH)、閉じる: 左→右スワイプ (dx < -THRESH) */
       if (!pagePanelOpen && startedFromEdge && dx > THRESH) openPagePanel();
-      else if (pagePanelOpen && dx > THRESH) closePagePanel();
+      else if (pagePanelOpen && dx < -THRESH) closePagePanel();
       startedFromEdge = false;
     }, { passive: true });
     /* 右端近接でpagePullTabを出現、離れたら非表示 */
@@ -5736,6 +5745,11 @@
     }
     setInterval(updateClock, 1000);
     updateClock();
+    /* 初期表示設定を反映 */
+    (function() {
+      var cl = $('clockWidget');
+      if (cl && localStorage.getItem('clockVisible') === 'false') cl.style.display = 'none';
+    })();
 
     function togglePopover() {
       var pop = $('timerPopover');
@@ -5841,6 +5855,18 @@
     rebuildFontSelect();
     for (var j = 12; j <= 80; j += 2) sSel.add(new Option(j + 'px', j));
     sSel.value = 18;
+
+    var clockToggle = $('clockToggle');
+    if (clockToggle) {
+      clockToggle.checked = localStorage.getItem('clockVisible') !== 'false';
+      var clockEl = $('clockWidget');
+      if (clockEl) clockEl.style.display = clockToggle.checked ? '' : 'none';
+      clockToggle.onchange = function() {
+        localStorage.setItem('clockVisible', clockToggle.checked);
+        var cl = $('clockWidget');
+        if (cl) cl.style.display = clockToggle.checked ? '' : 'none';
+      };
+    }
 
     var calcToggle = $('calcToggle');
     if (calcToggle) {
