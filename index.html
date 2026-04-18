@@ -2121,9 +2121,9 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 2604182210
+      <span>Build 2604182330F
       </span>
-      <span>Version 26.2.22</span>
+      <span>Version 26.2.23</span>
       <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_Gemini2.5Pro<br>Trae_Chat GPT5.2beta<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Tikuwa_Nerimono1</span>
     </div>
   </div>
@@ -2240,9 +2240,9 @@
 
   <div id="devMessageModal" class="glass panel-modal">
     <div class="dev-title-main">Information</div>
-    <div style="text-align: center; font-weight: 100; font-size: 10px;">Informationと言いながら開発者の独り言</div>
     <br>
-    <div class="dev-body">中学進学しました。<br>めんどくさいです<br>今回のアップデートは主にバグ修正をメインとしています。
+    <div class="dev-body">Final update on April 18th
+The next update will be after the 20th.<br>今回のアップデートは主にバグ修正をメインとしています。
     </div>
     <button class="dev-close" onclick="hideDevMessage()" data-i18n="common.close">閉じる</button>
   </div>
@@ -4709,6 +4709,143 @@
     /* タブバーモード時はタブも更新 */
     if (window.renderPageTabs) window.renderPageTabs();
   }
+
+  /* ──────────────────────────────────────────
+     ファイルエディタ中の pagePanel にファイル一覧を表示する
+     タブバーの renderFolderTabs と同等のロジック
+     ────────────────────────────────────────── */
+  function renderFileListInPagePanel() {
+    /* ヘッダーをファイルモードに切り替え */
+    var titleEl = document.querySelector('#pagePanelHeader .pph-title');
+    var btnsEl  = document.querySelector('#pagePanelHeader .pph-btns');
+    if (titleEl) {
+      titleEl.textContent = window.folderPanelTitle || 'ファイル';
+      /* folderパネルのタイトル（フォルダ名）を取得して反映 */
+      var fTitle = $('folderPanelTitle');
+      if (fTitle && fTitle.dataset.i18nLocked) titleEl.textContent = fTitle.textContent;
+    }
+    /* ページ操作ボタン（編集・追加）を隠す */
+    if (btnsEl) btnsEl.style.display = 'none';
+
+    var list = $('pageList'); if (!list) return;
+    list.innerHTML = '';
+
+    /* fileHandles は folderPanel クロージャ内にあるため
+       window.getFolderFileHandles 経由でアクセス */
+    var handles = window.getFolderFileHandles ? window.getFolderFileHandles() : null;
+    var curActive = window.getFolderActiveIdx ? window.getFolderActiveIdx() : -1;
+    var writable  = window.getFolderIsWritable ? window.getFolderIsWritable() : false;
+    var unsaved   = window.getFolderHasUnsaved ? window.getFolderHasUnsaved() : false;
+
+    if (!handles || !handles.length) {
+      list.innerHTML = '<div class="folder-empty" style="padding:24px 16px;color:var(--dim);font-size:13px;text-align:center;">' +
+        (window.i18n ? window.i18n.t('folder.no_files') : 'ファイルなし') + '</div>';
+      var msg = $('pageMaxMsg'); if (msg) msg.textContent = '';
+      $('pageActiveBar').style.opacity = '0';
+      return;
+    }
+
+    handles.forEach(function(f, i) {
+      var isActive = (i === curActive);
+
+      var card = document.createElement('div');
+      card.className = 'page-card' + (isActive ? ' active' : '');
+      card.style.height = '61px';
+
+      /* 番号セル → 拡張子バッジとして流用 */
+      var num = document.createElement('div');
+      num.className = 'page-num';
+      num.style.cssText = 'font-size:9px;font-weight:700;letter-spacing:0.2px;';
+      num.textContent = f.ext ? f.ext.toUpperCase() : '?';
+
+      var info = document.createElement('div');
+      info.className = 'page-info';
+
+      var nameEl = document.createElement('div');
+      nameEl.className = 'page-title-text';
+      nameEl.textContent = f.name;
+
+      var sizeEl = document.createElement('div');
+      sizeEl.className = 'page-preview';
+      sizeEl.textContent = f.size !== undefined ? fmtFileSize(f.size) : '';
+
+      info.appendChild(nameEl);
+      info.appendChild(sizeEl);
+
+      var saveBtn = document.createElement('button');
+      saveBtn.className = 'page-del';
+      saveBtn.style.cssText = 'opacity:0;background:rgba(var(--accent-rgb),0.15);color:var(--accent);border-radius:6px;width:26px;height:26px;font-size:13px;';
+      saveBtn.title = window.i18n ? window.i18n.t('folder.save_overwrite') : '上書き保存';
+      saveBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>';
+      if (unsaved && isActive) saveBtn.style.background = 'rgba(255,180,50,0.18)';
+      saveBtn.onclick = function(e) {
+        e.stopPropagation();
+        if (writable && window.folderSaveFile) window.folderSaveFile(i);
+      };
+      if (isActive && writable) {
+        /* hover で表示させるため page-del クラスの hover CSS を流用 */
+        card.addEventListener('mouseenter', function() { saveBtn.style.opacity = '1'; saveBtn.style.pointerEvents = 'auto'; });
+        card.addEventListener('mouseleave', function() { saveBtn.style.opacity = '0'; saveBtn.style.pointerEvents = 'none'; });
+      }
+
+      card.appendChild(num);
+      card.appendChild(info);
+      if (writable) card.appendChild(saveBtn);
+      (function(idx) {
+        card.onclick = function() {
+          if (window.folderLoadFile) window.folderLoadFile(idx);
+          /* パネル内のアクティブ状態を即時更新 */
+          list.querySelectorAll('.page-card').forEach(function(c, ci) {
+            c.classList.toggle('active', ci === idx);
+            c.querySelector('.page-num').style.background = ci === idx ? '' : '';
+          });
+          renderFileListInPagePanel();
+        };
+      })(i);
+
+      list.appendChild(card);
+    });
+
+    /* activeBar をアクティブカードに合わせる */
+    var msg = $('pageMaxMsg'); if (msg) msg.textContent = '';
+    requestAnimationFrame(function() { updateFileActiveBar(); });
+  }
+
+  function updateFileActiveBar() {
+    var list      = $('pageList'); if (!list) return;
+    var cards     = list.querySelectorAll('.page-card');
+    var curActive = window.getFolderActiveIdx ? window.getFolderActiveIdx() : -1;
+    var activeBar = $('pageActiveBar');
+    var panel     = $('pagePanel');
+    if (!activeBar || !panel || curActive < 0 || !cards[curActive]) {
+      if (activeBar) activeBar.style.opacity = '0';
+      return;
+    }
+    var cardRect  = cards[curActive].getBoundingClientRect();
+    var panelRect = panel.getBoundingClientRect();
+    var barTop = (cardRect.top - panelRect.top) + Math.round((cardRect.height - 28) / 2);
+    activeBar.style.transition = 'none';
+    activeBar.style.top     = barTop + 'px';
+    activeBar.style.opacity = '1';
+    requestAnimationFrame(function() { activeBar.style.transition = ''; });
+  }
+
+  function fmtFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  /* ファイルエディタから通常ページに戻った時にヘッダーを元に戻す */
+  var _origClosePagePanel = null;
+
+  function restorePagePanelHeader() {
+    var titleEl = document.querySelector('#pagePanelHeader .pph-title');
+    var btnsEl  = document.querySelector('#pagePanelHeader .pph-btns');
+    if (titleEl) { titleEl.textContent = window.i18n ? window.i18n.t('pp.title') : 'ページ'; }
+    if (btnsEl)  { btnsEl.style.display = ''; }
+  }
+
   function updatePageIndicator(animate) {
     var list = $('pageList'); if (!list) return;
     var cards = list.querySelectorAll('.page-card'); if (!cards[curPageIdx]) return;
@@ -5075,11 +5212,16 @@
   };
 
   var pagePanelOpen = false;
+  window.pagePanelIsOpen = function() { return pagePanelOpen; };
   function openPagePanel() {
     if (pagePanelOpen) return;
-    if (window.folderFileActive) { queueToast(window.i18n.t('toast.page_blocked_fileeditor'), 2200); return; }
     pagePanelOpen = true;
-    renderPageList(); $('pagePanel').classList.add('open'); $('pageOverlay').classList.add('open');
+    if (window.folderFileActive) {
+      renderFileListInPagePanel();
+    } else {
+      renderPageList();
+    }
+    $('pagePanel').classList.add('open'); $('pageOverlay').classList.add('open');
     var tab = $('pagePullTab'); if (tab) { tab.classList.remove('visible'); tab.classList.add('panel-open'); }
     var pl = $('pageList'); if (pl && !pl._scrollListenerAdded) { pl.addEventListener('scroll', function() { updatePageIndicator(false); }); pl._scrollListenerAdded = true; }
   }
@@ -5087,6 +5229,7 @@
     if (!pagePanelOpen) return; pagePanelOpen = false;
     $('pagePanel').classList.remove('open'); $('pageOverlay').classList.remove('open');
     var tab = $('pagePullTab'); if (tab) { tab.classList.remove('panel-open'); }
+    restorePagePanelHeader();
   };
 
   (function initSwipe() {
@@ -5347,10 +5490,6 @@
           localStorage.setItem(PAGES_CUR, pages[curPageIdx].id);
 
           window.folderFileActive = true;
-          if (!document.body.classList.contains('tab-bar-mode')) {
-            var navModeRow = $('pageNavModeRow');
-            if (navModeRow) navModeRow.style.display = 'none';
-          }
           edit.value = newText;
           ActionHandlers.updateText(newText);
           render();
@@ -5374,6 +5513,8 @@
             queueToast(f.name + window.i18n.t('toast.file_loaded_suffix'), 1800);
           }
           slidePageIn(edit, dir);
+          /* pagePanel が開いていれば再描画して選択状態を同期 */
+          if (window.syncPagePanelIfOpen) window.syncPagePanelIfOpen();
         }).catch(function(e) { queueToast(window.i18n.t('toast.load_failed_prefix') + f.name, 2500); });
       }, 160);
     }
@@ -5490,6 +5631,21 @@
     }
     window.renderFolderTabs = renderFolderTabs;
 
+    /* pagePanel からアクセスするためのゲッター */
+    window.getFolderFileHandles = function() { return fileHandles; };
+    window.getFolderActiveIdx   = function() { return activeIdx; };
+    window.getFolderIsWritable  = function() { return isWritable; };
+    window.getFolderHasUnsaved  = function() { return hasUnsaved; };
+    window.folderLoadFile       = loadFile;
+    window.folderSaveFile       = saveToFile;
+
+    /* pagePanel が開いている場合に再描画する */
+    window.syncPagePanelIfOpen  = function() {
+      if (window.pagePanelIsOpen && window.pagePanelIsOpen() && window.folderFileActive) {
+        if (typeof renderFileListInPagePanel === 'function') renderFileListInPagePanel();
+      }
+    };
+
     openBtn.onclick    = openDirectory;
     refreshBtn.onclick = refreshDirectory;
 
@@ -5507,8 +5663,6 @@
         }
         window.folderFileActive = false;
         activeIdx = -1; hasUnsaved = false;
-        var navModeRow = $('pageNavModeRow');
-        if (navModeRow) navModeRow.style.display = '';
         if (document.body.classList.contains('tab-bar-mode')) {
           if (window.animateTabSwitch && window.renderPageTabs) {
             requestAnimationFrame(function() { window.animateTabSwitch(window.renderPageTabs); });
@@ -5533,6 +5687,8 @@
         requestAnimationFrame(function() { updatePageIndicator(true); });
         slidePageIn(edit, 'left');
         window.closeFolderPanel();
+        /* pagePanelが開いていたらヘッダーを通常モードに戻す */
+        if (window.closePagePanel) window.closePagePanel();
         queueToast(window.i18n.t('toast.memo_returned'), 1500);
       };
     }
@@ -6287,6 +6443,8 @@
       if (e.key === 'Escape') {
         if (pagePanelOpen) { closePagePanel(); return; }
         if (state.isFontMgrOpen) { closeFontMgr(); return; }
+        /* 履歴モーダルが開いている間はEscapeで設定を閉じない（履歴側で処理） */
+        var rbEl2 = $('rollbackModal'); if (rbEl2 && rbEl2.classList.contains('show')) return;
         if (state.isOptionsOpen || state.isModalOpen) { ActionHandlers.closeOverlays(); render(); }
         hideDevMessage();
         hideOssModal();
@@ -6332,6 +6490,8 @@
       }
 
       if (state.isOptionsOpen) {
+        /* 履歴モーダルが開いている間は設定の外クリック判定をスキップ */
+        var rbEl = $('rollbackModal'); if (rbEl && rbEl.classList.contains('show')) return;
         var hBtns = document.querySelectorAll('header button');
         for (var bi = 0; bi < hBtns.length; bi++) { if (hBtns[bi] === e.target || hBtns[bi].contains(e.target)) return; }
         var fmEl = $('fontMgrModal'); if (fmEl && fmEl.contains(e.target)) return;
