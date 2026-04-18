@@ -2121,9 +2121,9 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 2604180937
+      <span>Build 2604182210
       </span>
-      <span>Version 26.2.21</span>
+      <span>Version 26.2.22</span>
       <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_Gemini2.5Pro<br>Trae_Chat GPT5.2beta<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Tikuwa_Nerimono1</span>
     </div>
   </div>
@@ -2242,7 +2242,7 @@
     <div class="dev-title-main">Information</div>
     <div style="text-align: center; font-weight: 100; font-size: 10px;">Informationと言いながら開発者の独り言</div>
     <br>
-    <div class="dev-body">最近学校で英語の授業出禁になりました。<br>結構悲しいです<br>追記:先生陣が悪かったということで謝って来ましたからもう許しました。
+    <div class="dev-body">中学進学しました。<br>めんどくさいです<br>今回のアップデートは主にバグ修正をメインとしています。
     </div>
     <button class="dev-close" onclick="hideDevMessage()" data-i18n="common.close">閉じる</button>
   </div>
@@ -5904,7 +5904,16 @@
     if (state.autoSave) {
       var saved = localStorage.getItem('autosave_text'), savedFile = localStorage.getItem('autosave_file');
       var savedFont = localStorage.getItem('autosave_font'), savedSize = localStorage.getItem('autosave_size');
-      if (saved && saved.length > 0 && !edit.value) {
+      var savedPageId = localStorage.getItem('autosave_pageid');
+      /* 復元条件:
+         1. autosave_text が存在する
+         2. 保存時のpageIdが現在のページに一致する（または未記録の旧形式）
+         3. 現在のページ（pages配列）にテキストがない（pages優先）
+         4. editが空（二重復元防止） */
+      var currentPageId = getCurrentPageId();
+      var currentPageText = (pages[curPageIdx] && pages[curPageIdx].text) ? pages[curPageIdx].text : '';
+      var pageIdMatches = !savedPageId || savedPageId === currentPageId;
+      if (saved && saved.length > 0 && pageIdMatches && !currentPageText && !edit.value) {
         if (savedFile) state.curFile = savedFile;
         if (savedFont) updateSelectValue('fSel', savedFont);
         if (savedSize) updateSelectValue('sSel', normalizeSize(parseInt(savedSize) || 18));
@@ -5921,6 +5930,7 @@
     $('clearAutoSaveBtn').onclick = function() {
       localStorage.removeItem('autosave_text'); localStorage.removeItem('autosave_file');
       localStorage.removeItem('autosave_font'); localStorage.removeItem('autosave_size');
+      localStorage.removeItem('autosave_pageid');
       setAutoSaveHistory(getCurrentPageId(), []);
       queueToast(window.i18n.t('toast.autosave_cleared'), 2000);
     };
@@ -6044,10 +6054,12 @@
 
         item.querySelector('.rb-del-btn').addEventListener('click', function(e) {
           e.stopPropagation();
-          var deletedTime = new Date(entry.ts).toLocaleTimeString(locale, {hour:'2-digit', minute:'2-digit'});
+          var entryTs = entry.ts;
+          var deletedTime = new Date(entryTs).toLocaleTimeString(locale, {hour:'2-digit', minute:'2-digit'});
           animateItemDelete(item, function() {
             var h = getAutoSaveHistory(pageId);
-            h.splice(idx, 1);
+            var removeIdx = h.findIndex(function(x) { return x.ts === entryTs; });
+            if (removeIdx !== -1) h.splice(removeIdx, 1);
             setAutoSaveHistory(pageId, h);
             queueToast(lang === 'en' ? (deletedTime + ' "' + pageTitle + '" history has been deleted') : (deletedTime + 'の「' + pageTitle + '」の履歴を削除しました'), 2000);
             h.length === 0 ? animateModalHeight(rbModal.offsetHeight, renderRollbackList) : renderRollbackList();
@@ -6067,6 +6079,7 @@
       applyStyles();
       edit.value = entry.text || '';
       ActionHandlers.updateText(edit.value);
+      saveCurrentPage();
       render();
       queueToast(window.i18n.t('rb.restored'), 2500);
     }
@@ -6077,16 +6090,21 @@
     $('rbCloseBtn2').onclick = closeRollbackModal;
     $('rbClearBtn').onclick  = function() {
       var beforeH = rbModal.offsetHeight;
-      ['autosave_text','autosave_file','autosave_font','autosave_size'].forEach(function(k) { localStorage.removeItem(k); });
+      ['autosave_text','autosave_file','autosave_font','autosave_size','autosave_pageid'].forEach(function(k) { localStorage.removeItem(k); });
       setAutoSaveHistory(getCurrentPageId(), []);
       animateModalHeight(beforeH, renderRollbackList);
       queueToast(window.i18n.t('toast.autosave_cleared'), 2000);
     };
 
-    /* ── 起動時マイグレーション（旧形式 → ページ別キー） ── */
+    /* ── 起動時マイグレーション（旧形式 → ページ別キー）── 一度だけ実行 */
     (function() {
       var oldText   = localStorage.getItem('autosave_text');
       var oldPageId = localStorage.getItem('autosave_pageid');
+      /* 既にマイグレーション済みならスキップ */
+      if (localStorage.getItem('autosave_migrated') === '1') {
+        setTimeout(addHistoryEntry, 500);
+        return;
+      }
       if (oldText) {
         var targetId = oldPageId || getCurrentPageId();
         if (!oldPageId) localStorage.setItem('autosave_pageid', targetId);
@@ -6100,6 +6118,7 @@
           setAutoSaveHistory(targetId, hist);
         }
       }
+      localStorage.setItem('autosave_migrated', '1');
       setTimeout(addHistoryEntry, 500);
     })();
 
