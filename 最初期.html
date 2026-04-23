@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>HTMLブラウザメモ帳</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Meiryo", monospace;
+      background: #1e1e1e;
+      color: #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      background: #2d2d2d;
+      padding: 4px 10px;
+      display: flex;
+      gap: 15px;
+      font-size: 14px;
+      user-select: none;
+      color: #ccc;
+    }
+    header span {
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    header span:hover {
+      background: #444;
+      color: white;
+    }
+    #options {
+      display: none;
+      background: #2d2d2d;
+      padding: 5px 10px;
+      font-size: 14px;
+      color: #ccc;
+    }
+    textarea {
+      flex: 1;
+      width: 100%;
+      border: none;
+      outline: none;
+      padding: 10px;
+      font-size: 14px;
+      resize: none;
+      box-sizing: border-box;
+      background: #1e1e1e;
+      color: #e0e0e0;
+      line-height: 1.5;
+      font-family: "Segoe UI", "Meiryo", monospace;
+    }
+    footer {
+      background: #2d2d2d;
+      padding: 5px 10px;
+      font-size: 12px;
+      color: #aaa;
+      display: flex;
+      justify-content: flex-start;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <span onclick="newFile()">新規</span>
+    <span onclick="openFile()">開く</span>
+    <span onclick="saveFile()">保存</span>
+    <span onclick="saveFileAs()">名前を付けて保存</span>
+    <span onclick="toggleOptions()">オプション</span>
+  </header>
+
+  <div id="options">
+    フォント：
+    <select id="fontSelect" onchange="changeFont()">
+      <option value='"Verdana", sans-serif'>Verdana</option>
+      <option value='"Georgia", serif'>Georgia</option>
+      <option value='"Arial", sans-serif'>Arial</option>
+    </select>
+  </div>
+
+  <textarea id="editor" placeholder="ここに入力..."></textarea>
+
+  <footer>
+    <span>HTMLメモ帳</span>
+  </footer>
+
+  <input type="file" id="fileInput" accept=".txt" style="display:none" onchange="loadFile(event)">
+
+  <script>
+    let fileHandle = null;
+    const editor = document.getElementById("editor");
+    const options = document.getElementById("options");
+
+    function toggleOptions() {
+      options.style.display = options.style.display === "none" ? "block" : "none";
+    }
+
+    function changeFont() {
+      const font = document.getElementById("fontSelect").value;
+      editor.style.fontFamily = font;
+    }
+
+    async function newFile() {
+      editor.value = "";
+      fileHandle = null;
+    }
+
+    async function openFile() {
+      [fileHandle] = await window.showOpenFilePicker({
+        types: [{ description: "Text Files", accept: { "text/plain": [".txt"] } }]
+      });
+      const file = await fileHandle.getFile();
+      const contents = await file.text();
+      editor.value = contents;
+    }
+
+    async function saveFile() {
+      if (!fileHandle) return saveFileAs();
+      const writable = await fileHandle.createWritable();
+      await writable.write(editor.value);
+      await writable.close();
+    }
+
+    async function saveFileAs() {
+      fileHandle = await window.showSaveFilePicker({
+        suggestedName: "memo.txt",
+        types: [{ description: "Text Files", accept: { "text/plain": [".txt"] } }]
+      });
+      saveFile();
+    }
+
+    function loadFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => editor.value = e.target.result;
+      reader.readAsText(file);
+    }
+  </script>
+</body>
+</html>
