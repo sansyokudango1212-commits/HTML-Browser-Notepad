@@ -252,21 +252,32 @@
     }
 
     #options {
-      position: fixed; top: 50%; left: 50%; z-index: 170;
+      position: fixed; top: 50%; left: 50%; z-index: 210;
       box-shadow: 0 8px 30px rgba(0,0,0,0.2);
       width: max-content; min-width: 240px; max-width: min(340px, calc(100vw - 32px));
-      padding: 12px; padding-top: 36px; border-radius: 18px;
+      max-height: calc(100dvh - 32px); overflow: hidden;
+      display: flex; flex-direction: column;
+      padding: 0; border-radius: 18px;
       transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
       opacity: 0; pointer-events: none;
       transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1),
                   transform 0.38s cubic-bezier(0.34,1.3,0.64,1);
     }
+    #options-header {
+      position: relative; flex-shrink: 0; height: 36px;
+    }
+    #options-scroll {
+      flex: 1; overflow-y: auto; overflow-x: hidden; scrollbar-width: none;
+      padding: 12px; padding-top: 4px;
+    }
+    #options-scroll::-webkit-scrollbar { display: none; }
+    body.tab-bar-mode #options { max-height: calc(100dvh - 88px); }
     #options.show    { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
     #options.closing {
       opacity: 0; transform: translate(-50%, calc(-50% + 16px)) scale(0.9); pointer-events: none;
       transition: opacity 0.14s cubic-bezier(0.4,0,1,1), transform 0.18s cubic-bezier(0.4,0,1,1);
     }
-    #options div { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: nowrap; }
+    #options-scroll > div { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: nowrap; }
     .label { width: 60px; color: var(--dim); font-size: 11px; white-space: nowrap; flex-shrink: 0; }
     .page-nav-mode-btn {
       flex: 1; padding: 5px 0; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12);
@@ -976,7 +987,7 @@
     }
 
     #searchPanel {
-      position: fixed; top: 50%; left: 50%; z-index: 170;
+      position: fixed; top: 50%; left: 50%; z-index: 210;
       box-shadow: 0 8px 30px rgba(0,0,0,0.2);
       width: 300px; padding: 12px 16px 16px; padding-top: 40px; border-radius: 18px;
       transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
@@ -992,7 +1003,7 @@
 
     /* 文字置換パネル */
     #replacePanel {
-      position: fixed; top: 50%; left: 50%; z-index: 170;
+      position: fixed; top: 50%; left: 50%; z-index: 210;
       box-shadow: 0 8px 30px rgba(0,0,0,0.2);
       width: 300px; padding: 12px 16px 16px; padding-top: 44px; border-radius: 18px;
       transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
@@ -2038,11 +2049,14 @@
   </div>
 
   <div id="options" class="glass">
-    <div id="optionsDragHandle" class="drag-handle" style="position:absolute;top:0;left:0;right:0;height:36px;border-radius:18px 18px 0 0;"></div>
-    <button class="close-dot" onclick="act('toggle')" aria-label="閉じる"></button>
-    <button class="oss-dot"  onclick="showOssModal()"  aria-label="オープンソース情報">o</button>
-    <button class="info-dot" onclick="showDevMessage()" aria-label="開発者メッセージ">i</button>
-    <button class="theme-dot" id="themeDot" onclick="toggleLightMode()" aria-label="ライト/ダークモード切り替え"></button>
+    <div id="options-header">
+      <div id="optionsDragHandle" class="drag-handle" style="position:absolute;top:0;left:0;right:0;height:36px;border-radius:18px 18px 0 0;"></div>
+      <button class="close-dot" onclick="act('toggle')" aria-label="閉じる"></button>
+      <button class="oss-dot"  onclick="showOssModal()"  aria-label="オープンソース情報">o</button>
+      <button class="info-dot" onclick="showDevMessage()" aria-label="開発者メッセージ">i</button>
+      <button class="theme-dot" id="themeDot" onclick="toggleLightMode()" aria-label="ライト/ダークモード切り替え"></button>
+    </div>
+    <div id="options-scroll">
     <div><span class="label" data-i18n="opt.font">フォント</span><select id="fSel"></select><button id="fontMgrBtn" data-i18n="fmgr.title" data-i18n-attr="title" title="フォント管理" onclick="openFontMgr()">＋</button></div>
     <div><span class="label" data-i18n="opt.size">サイズ</span><select id="sSel"></select></div>
     <div><span class="label" data-i18n="opt.search">検索</span>
@@ -2123,11 +2137,12 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 2604222111
+      <span>Build 2604250211
       </span>
-      <span>Version 26.2.25</span>
+      <span>Version 26.2.26</span>
       <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_Gemini2.5Pro<br>Trae_Chat GPT5.2beta<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Tikuwa_Nerimono1</span>
     </div>
+    </div><!-- /options-scroll -->
   </div>
 
   <div id="bioPromptModal" class="glass panel-modal">
@@ -4095,14 +4110,16 @@
     var el = $('options'); if (!el || !el.classList.contains('show')) return;
     /* ドラッグ中はtransformを書き換えない（位置がズレるバグを防ぐ） */
     if (el.dataset.dragged) return;
+    /* max-height + overflow-y:auto でスクロール対応済み。
+       極端に横幅が狭い場合のみ水平方向をスケールダウンする */
     el.style.transform = 'translate(-50%, -50%) scale(1)';
     requestAnimationFrame(function() {
       var r = el.getBoundingClientRect();
       var margin = 16;
-      var availH = window.innerHeight - margin * 2;
-      if (r.height > availH) {
-        var scale = availH / r.height;
-        scale = Math.max(0.65, Math.min(0.98, scale));
+      var availW = window.innerWidth - margin * 2;
+      if (r.width > availW) {
+        var scale = availW / r.width;
+        scale = Math.max(0.72, Math.min(0.98, scale));
         el.style.transform = 'translate(-50%, -50%) scale(' + scale + ')';
       } else {
         el.style.transform = '';
