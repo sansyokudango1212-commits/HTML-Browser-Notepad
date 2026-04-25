@@ -316,7 +316,7 @@
       position: fixed;
       top: 50%;
       left: 50%;
-      z-index: 170;
+      z-index: 10000;
       box-shadow: 0 8px 30px rgba(0,0,0,0.2);
       width: max-content; min-width: 240px; max-width: min(340px, calc(100vw - 32px));
       padding: 12px; padding-top: 36px; border-radius: 18px;
@@ -589,7 +589,7 @@
       width: min(340px,92vw);
       padding: 28px 24px 22px;
       border-radius: 20px;
-      z-index: 210;
+      z-index: 10100;
       box-shadow: 0 12px 40px rgba(0,0,0,0.22);
     }
     #ossModal .oss-title {
@@ -633,6 +633,7 @@
     /* Common Modal Panel */
     .panel-modal {
       position: fixed; top: 50%; left: 50%;
+      z-index: 10100;
       transform: translate(-50%, calc(-50% + 16px)) scale(0.9);
       opacity: 0; pointer-events: none;
       box-shadow: 0 16px 50px rgba(0,0,0,0.3);
@@ -654,7 +655,7 @@
       padding: 24px 30px;
       text-align: center;
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      z-index: 180;
+      z-index: 10100;
     }
     .modal p {
       margin: 0 0 15px;
@@ -793,7 +794,7 @@
       width: min(320px,88vw);
       padding: 28px 24px 22px;
       border-radius: 20px;
-      z-index: 210;
+      z-index: 10100;
       box-shadow: 0 12px 40px rgba(0,0,0,0.18);
     }
     .dev-title-main {
@@ -824,7 +825,7 @@
 
     #bioPromptModal {
       width: min(300px, 88vw); padding: 28px 24px 22px;
-      border-radius: 22px; z-index: 225; box-shadow: 0 16px 50px rgba(0,0,0,0.3);
+      border-radius: 22px; z-index: 10100; box-shadow: 0 16px 50px rgba(0,0,0,0.3);
     }
 
     textarea {
@@ -1111,7 +1112,7 @@
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0);
-      z-index: 9;
+      z-index: 9999; /* header(9998)より上にしてオーバーレイが機能するようにする */
       display: none;
       pointer-events: none;
       transition: background 0.22s cubic-bezier(0.4,0,0.2,1);
@@ -1144,7 +1145,7 @@
       display: flex;
       flex-direction: column;
       padding: 24px 20px 20px;
-      border-radius: 22px; z-index: 200; box-shadow: 0 16px 50px rgba(0,0,0,0.35);
+      border-radius: 22px; z-index: 10100; box-shadow: 0 16px 50px rgba(0,0,0,0.35);
     }
     #fontMgrModal .fmgr-title {
       font-size: 14px; font-weight: 200; text-align: center;
@@ -3147,7 +3148,7 @@
   </div>
 
   <!-- ロールバックモーダル -->
-  <div id="rollbackModal" class="glass panel-modal" style="z-index:220;">
+  <div id="rollbackModal" class="glass panel-modal" style="z-index:10100;">
     <button class="close-dot" id="rbCloseBtn2"></button>
     <div class="rb-title" data-i18n="rb.title">自動保存の履歴</div>
     <div class="rb-subtitle" data-i18n="rb.subtitle">最大10件まで保持されます</div>
@@ -3286,9 +3287,9 @@
       </div>
     </div>
     <div class="options-version">
-      <span>Build 2604251315
+      <span>Build 2604251500 
       </span>
-      <span>Version 26.3</span>
+      <span>Version 26.3.1</span>
       <span><strong>↓Creator↓</strong><br>Claude Sonnet4.6<br>Claude Sonnet4.5<br>Trae_Gemini2.5Pro<br>Trae_Chat GPT5.2beta<br>Trae_kimi-K2-0905<br>Vscode_Copilot<br>Tikuwa_Nerimono1</span>
     </div>
   </div>
@@ -3406,7 +3407,7 @@
   <div id="devMessageModal" class="glass panel-modal">
     <div class="dev-title-main">Information</div>
     <br>
-    <div class="dev-body">今回のアップデートは主にバグ修正をメインとしています。<br>This update primarily focuses on bug fixes.
+    <div class="dev-body">今回のアップデートは主にバグ修正をメインとしています。<br>This update primarily focuses on bug fixes.<br>初めて学パソバグ修正からコミットまでしました(笑)
     </div>
     <button class="dev-close" onclick="hideDevMessage()" data-i18n="common.close">閉じる</button>
   </div>
